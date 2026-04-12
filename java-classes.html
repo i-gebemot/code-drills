@@ -1,0 +1,189 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="/bin/md-components.js"></script>
+
+<code-drills log-level="W" show_="['$']">
+</code-drills>
+
+<hint id="access-modifier" dir="rtl">
+    האם אפשר לגשת לזה מבחוץ?
+</hint>
+
+<hint id="missing-ret-type" dir="rtl">
+    מה זה מחזיר?
+</hint>
+
+<hint id="better-with-this" dir="rtl">
+    האם this חובה כאן?
+</hint>
+
+<hint id="must-be-with-this" dir="rtl">
+    מה משווים למה? תכונה למשתנה או הפוך?
+</hint>
+
+<hint id="member-access" dir="rtl">
+    איך נגשים לתכונות?
+</hint>
+
+<hint id="missing-declaration" dir="rtl">
+    איפו זה מוגדר?
+</hint>
+
+<hint id="syntax-error">
+    Syntax error...
+</hint>
+
+<hint id="cant-access-private" dir="rtl">
+    האם אפשר לגשת לזה מבחוץ?
+</hint>
+
+<hint id="end-of-op" dir="rtl">
+    פקודה מסתיימת ב...
+</hint>
+
+<hint id="function-call" dir="rtl">
+    זה לא משתנה, זה פונקציה...
+</hint>
+
+<drill lang="java" id="class-a">
+public class A {
+    $private $$int num$;
+    ^$
+    ~r hr access-modifier
+
+    public $int $$getNum$() {
+            ^$
+            ~r hr missing-ret-type
+        return $this.$$num$;
+                ^$
+                ~o hr better-with-this
+    }
+
+    public $void $$setNum$(int num) {
+            ^$
+            ~r hr missing-ret-type
+        $this.$$num = num$;
+        ^$
+        ~r hr must-be-with-this
+    }
+
+    $public $boolean $sameNum$(int num) {
+        ^$
+        ~r hr access-modifier
+        return this$.$num == num;
+        ^ $ ~r hr member-access
+    }
+}    
+</drill>
+
+<drill lang="java" id="using-class-a">
+class A {
+    private int num;
+
+    public int getNum() { return this.num; }
+    public void setNum(int num) { this.num = num; }
+
+-   public A(int num) {
+-       this.num = num;
+-   }
+}
+
+A a = $new A(123)$;
+    ~r hb constructor is missing
+A a2 $= a$;
+    ~g hr One object, two references
+System.out.println(a.$getNum()$);
+    ^num ~r ht cant-access-private
+System.out.println(a.$getNum$$()$);
+    ~r ht getter is a funciton...
+    ^$
+a.$setNum(321)$;
+    ^num = 321 ~r hr cant-access-private
+a.$setNum(321)$;
+    ^setNum = 321; ~r hr setter is a function call
+a.setNum$(321)$;
+    ^() = 321 ~r ht setter can't be assinged
++ ...                      // value is set
+System.out.println($a2$.getNum());    // $321$ is printed
+    ~g
+    ^? ~g ht What is printed?
+</drill>
+
+<drill lang="java" id="class-b" line-by-line>
+class B {
+    private A[] arr;
+
+    $public $$A$$[]$ $getArr$() { $return $$this.arr$; }
+    ^$
+    ~r hr מחזירים אבייקט או מערך?
+    ^$
+    ~r ht access-modifier
+    ^$
+    ~r ht זה פקודה או ביטוי? 
+
+    $public $$int$ $getSum$$()$ {
+    ^$
+    ~r ht access-modifier
+    ~r ht משתנה או פונקציה?
+    ^$
+        $int $$sum$ = 0;
+        ~^
+        ~r ht missing-declaration
+        for ($int $$i$ = 0; i < $this.$$arr$.length; i++) {
+             ^$
+             ~r ht syntax-error
+            ^$
+            ~o ht better-with-this
+            sum += $this.$$arr$[i].$getNum()$;
+                   ^$
+                   ~o ht better-with-this
+                   ^num ~r ht cant-access-private
+        }
+        return sum$;$
+                  ^ $ ~r ht end-of-op
+    }
+}
+</drill>
+
+<drill lang="java" id="using-class-b" line-by-line>
+class B {
+    private A[] arr;
+
+    public A[] getArr() { return this.arr; }
+
+    public int getSum() {
+        int sum = 0;
+        for (int i = 0; i < this.arr.length; i++) {
+            sum += this.arr[i].getNum();
+        }
+        return sum;
+    }
+
+-    public B(A[] arr) {
+-        this.arr = arr;
+-    }
+}
+
+A a = new A(12);
+A a2 = new A(21);
+B b = $new B$($new A[] {a, a2, a}$);
+    ~r ht constructor is missing 
+    ^[a, a2, a] ~r ht syntax error
+System.out.println(b.$getArr()$[2].$getNum()$);     // $12$
+    ^arr ~r ht cant-access-private
+    ^num ~r ht cant-access-private
+    ^? ~g hl What should be printed?
+System.out.println(b.$getSum$$()$);                 // $45$
+    ~r ht function-call
+    ^$
+    ^? ~g hl What should be printed?
+
+// How many classes are used here?  - $2$ classes ($A and B$)
+    ^? ~g
+    ^? ~g
+// How many objects are here?       - $4$ objects ($a, a2, b, b.arr$)
+    ^? ~g
+    ^? ~g
+// How many references are here?    - $7$ references
+    ^? ~g
+</drill>

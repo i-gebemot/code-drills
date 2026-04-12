@@ -1,0 +1,115 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="/bin/md-components.js"></script>
+
+<code-drills log-level="W" show_="['$']">
+</code-drills>
+
+<hint id="should-have-types" dir="rtl">
+    משתנים חייבים type
+</hint>
+
+<hint id="if-syntax" dir="rtl">
+    if חיב סוגריים
+</hint>
+
+<hint id="end-of-op" dir="rtl">
+    פקודה מסתיימת ב...
+</hint>
+
+<hint id="return-type" dir="rtl">
+    מה סוג הערך שפונקציה מחזירה?
+</hint>
+
+<drill lang="java" id="min">
+$int $$min$($int $$a$, $int $$b$) {
+^$
+~r hr return-type
+            ^$
+            ~r hb should-have-types
+            ^$
+            ~r hb should-have-types
+    if $($$a < b$$)$ {
+        ^$
+        ~r hb if-syntax
+        ^$
+        return a;
+    }
+    return b$;$
+            ^ $ ~r ht end-of-op
+}
+</drill>
+
+<hint id="missing-return" dir="rtl">
+    האם כל חלקי פונקציה מחזירות ערך?
+</hint>
+
+<hint id="syntax-error" dir="rtl">
+    Syntax error
+</hint>
+
+<drill lang="java" id="itsTriangle">
+$boolean $$itsTriangle$(int a$,$ int b$,$ int c) {
+^$
+~r hr return-type
+                            ^; ~r hb syntax-error
+                            ^; ~r hb syntax-error
+    if (a + b < c) {
+        return false$;$
+                    ^ $ ~r ht end-of-op
+    }
+    if (a + c < b) {
+        return false$;$
+                    ^ $ ~r ht end-of-op
+    }
+    if (b + c < a) {
+        return false$;$
+                    ~r ht end-of-op
+    }
+    return true;
+}
+</drill>
+
+<hint id="is-it-array" dir="rtl">
+    האם זה מערך?
+</hint>
+
+<hint id="missing-declaration" dir="rtl">
+    איפו זה מוגדר ומה הערך ההתחלתי?
+</hint>
+
+<drill lang="java" id="findMin">
+int findMin($int$$[]$ a) {
+               ~r hb is-it-array 
+               ^$
+-   int min = a[0];
+    for (int i = 0; i < a.length; i++) {
+        if (a[i] < $min$) {
+                   ~r hb missing-declaration
+            $min$ = a[i];
+            ~r ht missing-declaration
+        }
+    }
+    return $min$;
+           ~r ht missing-declaration
+}
+</drill>
+
+
+<hint id="return-bool-expression" dir="rtl">
+    אפשר להחזיר ביטוי בוליאני ישירות
+</hint>
+
+<drill lang="java" id="isEven">
+boolean isEven(int num) {
+    $return $num % 2 == 0$;$
+    ^if ( ~t
+    ^) { ~t
++       $return true;$
+        ~o ht return-bool-expression
++    } else {
++        $return false;$
+        ~o ht return-bool-expression
++    }
+}
+</drill>
