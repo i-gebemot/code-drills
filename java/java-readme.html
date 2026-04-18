@@ -1,0 +1,49 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="/bin/md-components.js"></script>
+
+<import-hints from="../java-hints.html"></import-hints>
+
+<!---------------------------------------------------------->
+
+<code-drills log-level="W"">
+</code-drills>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="navigation">
+Next phase - $Left click$
+    ^Left click ~g hr שלב הבא
+Previous phase - $Right click$
+    ^? ~g hr שלב קודם
+Show hint - $Mouse hover over underlined text$
+    ^? ~g hr כדי להציג רמז, רחף עם העכבר מעל הטקסט המסומן בקו תחתון
+Next drill - $Double click$ or $Next button$
+    ^? ~g hr דריל הבא
+    ^? ~g hr דריל הבא
+Previous drill - $Prev button$
+    ^? ~g hr דריל קודם
+Shuffle all drills - $Shuffle button$
+    ^? ~g hr לערבב את כל הדרילים
+Reveal all answers - $Reveal button$
+    ^? ~g hr להראות את כל התשובות
+Restart current drill - $Again button$
+    ^? ~g hr להתחיל את הדריל הנוכחי עוד פעם
+Go to a specific drill - $Number button$
+    ^? ~g hr ללכת לדריל מסוים ישירות
+</drill>
+
+<drill lang="java" id="print()">
+public static String str(Object arg) {
+    // turn argument to string
+    ...
+}
+
+// פונקצית עזר בתרגילים הבאים
+// $מדפיסה כל פרמטר בתור מחרוזת$
+        ^מה הפונקציה עושה? ~g
+public static void print(Object arg) {
+    System.out.println(str(arg));
+}
+</drill>
+

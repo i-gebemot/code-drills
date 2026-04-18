@@ -1,0 +1,43 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="/bin/md-components.js"></script>
+
+<import-hints from="../java-hints.html"></import-hints>
+
+<!---------------------------------------------------------->
+
+<code-drills>
+</code-drills>
+
+<!---------------------------------------------------------->
+
+<hint id="queue-is-destroyed" dir="rtl">
+    תור לא משוחזר...
+</hint>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="same()">
+// הפונקציה בודקת האם תור זהה לרשימה מקושרת
+public static boolean same(Queue&lt;Integer> que, Node&lt;Integer> lst) {
+    Queue&lt;Integer> tmp = new Queue&lt;Integer>();
+-   boolean isSame = true;                      {1}
+    while (!que.isEmpty() && lst != null) {
+        int x = que.remove();
+        tmp.insert(x);
+        if ($x != lst.getValue()$) {
+            ^!x.equals(lst.getValue()) ~r ht x is just a value...
+            $isSame = false;$                   {1}!
+            ^return false; ~r ht queue-is-destroyed
+        }
+        lst = lst.getNext();
+    }
+    if (lst != null) {
+        $isSame = false;$                       {1}
+        ^return false; ~r ht queue-is-destroyed
+    }
+    ...
+-   return isSame;                              {1}
+}
+</drill>
+

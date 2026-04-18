@@ -1,0 +1,33 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="/bin/md-components.js"></script>
+
+<import-hints from="../java-hints.html"></import-hints>
+
+<!---------------------------------------------------------->
+
+<code-drills log-level="W"">
+</code-drills>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="findByAge()">
+$public static $$boolean findByAge$(Person[] people, int age) {
+^$
+~r hb external-func
+    for (int i = 0$;$ i < people.length$;$ i++) {
+                  ^, ~r hu syntax-error
+                  ^, ~r hu syntax-error
+-       if (people[i] != null) {                    {1}
+-4          if ($people[i]$.getAge$$() = age) {     {1}
+                ~r hint-right can-be-null
+                                   ~r hu func-call
+-4              return true;                        {1}
+-4          }                                       {1}
+-       }                                           {1}
+    }
+-    return false;      {2}
+$} $                    {2}
+~r hr return-is-missing
+</drill>
+

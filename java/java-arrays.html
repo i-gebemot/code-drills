@@ -1,0 +1,319 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="/bin/md-components.js"></script>
+
+<import-hints from="../java-hints.html"></import-hints>
+
+<!---------------------------------------------------------->
+
+<code-drills log-level="W"">
+</code-drills>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="arrayMax()">
+int arrayMax(int$[]$ $arr$) {
+               ^$
+               ~r hr is-it-array 
+-   int max = arr[0];                             {1}
+    for (int i = 0; i < arr.length; i++) {
+        if (arr[i] > $max$) {                     {1}
+                   ~r hb missing-declaration
+            $max$ = arr[i];                       {1}
+            ~r ht missing-declaration
+        }
+    }
+    return $max$;                               {1}
+           ~r ht missing-declaration
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="arrayMin()">
+$public$ $static $int $arrayMin$(int[] a) {
+        ~r hr external-func
+        ^$
+        ^what ~g hr func-name   {1}
+    int $min$ = a[0]$;$
+            ^www ~g hr var-name             {2}
+            ^ $ ~r hr end-of-op             {+}
+    for (int i = 0; i < a.length; i++) {
+        if (a[i] < $min$) {
+                    ^www ~g hr var-name     {2}
+            $min$ = a[i];
+                    ^www ~g hr var-name     {2}
+        }
+    }
+    return min;
+}
+
+$arrayMin$(new int[] {10,3,-2,40});    // $-2$
+    ^what ~g hr func-name   {1}
+    ^? ~g hl result         {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="contains()">
+$public $$static$ boolean $contains$(int[] a, $int $$num$) {
+        ^$
+        ~r hr external-func
+        ^what ~g hr func-name   {1}
+        ^$ ~t                   {+}
+        ~r hb type-is-missing
+    for (int i = 0$;$ i < a.length$;$ i++) {
+                ^ $ ~r hb for-syntax
+                ^ $ ~r hb for-syntax
+        if (a[i] $==$ num) {
+                ^= ~r ht assign-vs-comp
+            return true;
+        }
+    }
+    return false;
+}
+
+$contains$(new int[] {16,-3,10,40}, 10);      // $true$
+    ^what ~g hr func-name   {1}
+    ^? ~g hl result         {+}
+$contains$(new int[] {16,-3,10,40}, 100);     // $false$
+    ^what ~g hr func-name   {1}
+    ^? ~g hl result         {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="calculateSum()">
+$public static $$double$ $calculateSum$(double[] arr) {
+        ^$
+        ~r hr external-func
+        ^what ~g hr func-name   {1}
+    $double$ $sum$ = 0;
+            ^int ~r hr type-mismatch
+            ^www ~g hr var-name             {2}
+    for (int i = 0; i < arr.length; i++) {
+        $sum$ += arr[i];
+            ^www ~g hr var-name             {2}
+    }
+-    return sum;                            {3}
+$} $                                        {3}
+    ~r hr חישבנו סכום ומה?
+
+
+$calculateSum$(new double[] {1,2,3,4,5,6,7,8,9});   // $45.0$
+    ^what ~g hr func-name   {1}
+    ^? ~g hl result         {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="prefix()">
+$public static$ $boolean $$prefix$(int[] a, int[] b) {
+        ~r hr external-func
+        ^$ ~t                   
+        ^what ~g hr func-name       {+}{1}
+-    if (b.length > a.length) {     {2}
+-        return false;              {2}
+-    }                              {2}
+    for ($int $$i$ = 0; i $<$ b.length; i++) {
+            ^$
+            ~r hr type-is-missing
+            ^<= ~r ht index-vs-length
+        if (a[i] != b[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+print($prefix$(new int[] {1,4,7,10,8}, new int[] {1,4,7})); // $true$
+        ^what ~g hr func-name   {1}
+        ^? ~g hl result         {+}
+print($prefix$(new int[] {1,4,7,10,8}, new int[] {1,5,7})); // $false$
+        ^what ~g hr func-name   {1}
+        ^? ~g hl result         {+}
+print($prefix$(new int[] {1,4,7}, new int[] ${1,4,7,10,8}$));
+        ^what ~g hr func-name       {1}
+        ~r ht index-out-of-bounds   {2}!
+</drill>
+
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="allEqualsTo()">
+public static boolean allEqualsTo(int$[]$ $a$, int num) {
+        ^$
+        ~r hr is-it-array
+    for (int i = 0; i < a.length$$; i++) {
+                ^() ~r hr length-is-prop
+        if (a[i] != num) {
+            return $false$;
+                    ^true ~r ht wrong-logic     {1}
+        }
+    }
+    return $true$;
+                    ^false ~r ht wrong-logic    {1}
+}
+
+print(allEqualsTo($new $$int[] {20,10,20}$, 20));    // false {2}
+    ^$
+    ~r ht new-is-missing
+print(allEqualsTo($new $$int[] {20,20,20}$, 20));    // true  {2}
+    ^$
+    ~r ht new-is-missing
+
+$public static $$boolean$ $constArray$(int[] a) {
+        ^$
+        ~r hr external-func
+        ^what ~g hr func-name                           {3}
+    return allEqualsTo(a, a[0]);
+}    
+
+print($constArray$(new int[] {1,2,1}));   // $false$
+        ^what ~g hr func-name                           {3}
+        ^? ~g hl result         {+}
+print($constArray$(new int[] {2,2,2}));   // $true$
+        ^what ~g hr func-name                           {3}
+        ^? ~g hl result         {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<hint id="not-ascending" dir="rtl">
+    פיתום זה לא עולה...
+</hint>
+
+<drill lang="java" id="ascending()">
+public static boolean $ascending$(double$[]$ $a$) {
+        ^what ~g hr func-name               {1}
+        ^$ ~t                               {+}
+        ~r hr is-it-array
+    for (int i = 1; i $<=$ a.length$-1$; i++) {
+            ^< ~r ht index-vs-length
+            ~g ht index-vs-length
+        if (a[i-1] > a[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+print($ascending$(new double[] {2,10,13,15.0}));  // true
+        ^what ~g hr func-name                 {1}
+print($ascending$(new double[] {2,$13.0,10$,15}));  // $false$
+        ^what ~g hr func-name                 {1}
+        ~o ht not-ascending                   {+}
+        ^? ~g ht result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="ascending_2()">
+$public static$ $boolean $$ascending$(double[] a) {
+        ~r hr return-type
+        ^$
+        ^what ~g hr func-name                 {1}
+    for (int i $=$ a.length-1; i > 0; i--) {
+            ^== ~r ht assign-vs-comp
+        if (a[i] < a[i-1]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+print($ascending$($new double[] {$2,10,13,15.0$}$));    // true
+        ^what ~g hr func-name                 {1}
+        ^[ ~r ht java-not-python              {2}
+        ^] ~r ht java-not-python
+print($ascending$($new double[] {$2,$13.0,10$,15$}$));    // $false$
+        ^what ~g hr func-name                 {1}
+        ^[ ~r ht java-not-python              {2}
+        ~o ht not-ascending                   {3}
+        ^] ~r ht java-not-python              {2}
+        ^? ~g ht result                       {3}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="palindrome()">
+$public $$static boolean$ $palindrome$($int[] $$a$) {
+        ^$
+        ~r hr external-func
+        ^what ~g hr func-name                   {1}
+        ^$ ~t                                   {+}
+        ~r hr type-is-missing
+    for (int i = 0; i $<=$ a.$length$$-1$; i++) {
+            ~g ht index-vs-length
+            ~r ht index-vs-length
+            ^$
+        if (a[i] != a[$a.length-i$$-1$]) {
+                    ~r ht index-vs-length
+                    ^$
+            return false;
+        }
+    }
+-    return true;                   {2}
+$} $                                {2}
+    ~r hr return-is-missing
+
+print($palindrome$(new int[] {3,7,2,4,2,7,3}));       // $true$
+        ^what ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+print($palindrome$(new int[] {3,7,2,4,4,2,7,3}));     // $true$
+        ^what ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+print($palindrome$(new int[] {1,2,3,1,2,3}));         // $false$
+        ^what ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="arithmeticProgression()">
+public static boolean $arithmeticProgression$(int[] a, int a0, int d) {
+        ^what ~g hr func-name                   {1}
+    for (int i = 0; i < a.length; i++) {
+        if (a[i] != a0 + d * i) {
+            return false;
+        }
+    }
+    return true;
+}
+
+print($arithmeticProgression$(new int[] {1,3,5,7,9,11}, 1, 2));       // $true$
+        ^what ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+print($arithmeticProgression$(new int[] {10,13,16,19,22}, 10, 3));    // $true$
+        ^what ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+print($arithmeticProgression$(new int[] {5,5,5,5,5}, 5, 0));          // $true$
+        ^what ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+print($arithmeticProgression$(new int[] {9,7,5,3,1,-1}, 9, -2));      // $true$
+        ^what ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+print($arithmeticProgression$(new int[] {9,7,5,3,1,0}, 9, -1));       // $false$
+        ^what ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="suffix()">
+boolean suffix(int[] a, int[] b) {
+    if (b.length > a.length) {
+        return false;
+    }
+    for (int i = 0; i < b.length; i++) {
+        if (a[a.length-i-1] != b[b.length-i-1]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+print(suffix(new int[] {23,10,5,7,1}, new int[] {5,7,1}));
+print(suffix(new int[] {23,10,5,7,1}, new int[] {5,8,1}));
+print(suffix(new int[] {23,10,5,7,1}, new int[] {1,23,10,5,7,1}));
+</drill>

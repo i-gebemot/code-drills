@@ -469,7 +469,7 @@
     return boundary;
   }
   // @__NO_SIDE_EFFECTS__
-  function derived$1(fn) {
+  function derived(fn) {
     var flags = DERIVED | DIRTY;
     var parent_derived = active_reaction !== null && (active_reaction.f & DERIVED) !== 0 ? (
       /** @type {Derived} */
@@ -584,13 +584,13 @@
   }
   // @__NO_SIDE_EFFECTS__
   function user_derived(fn) {
-    const d = /* @__PURE__ */ derived$1(fn);
+    const d = /* @__PURE__ */ derived(fn);
     push_reaction_value(d);
     return d;
   }
   // @__NO_SIDE_EFFECTS__
   function derived_safe_equal(fn) {
-    const signal = /* @__PURE__ */ derived$1(fn);
+    const signal = /* @__PURE__ */ derived(fn);
     signal.equals = safe_equals;
     return signal;
   }
@@ -648,7 +648,7 @@
     }
   }
   function flatten(sync, async, fn) {
-    const d = is_runes() ? derived$1 : derived_safe_equal;
+    const d = is_runes() ? derived : derived_safe_equal;
     if (async.length === 0) {
       fn(sync.map(d));
       return;
@@ -896,9 +896,9 @@
     }
     deactivate() {
       current_batch = null;
-      for (const update of effect_pending_updates) {
-        effect_pending_updates.delete(update);
-        update();
+      for (const update2 of effect_pending_updates) {
+        effect_pending_updates.delete(update2);
+        update2();
         if (current_batch !== null) {
           break;
         }
@@ -1144,6 +1144,12 @@
       }
     }
     return value;
+  }
+  function update(source2, d = 1) {
+    var value = get$1(source2);
+    var result = d === 1 ? value++ : value--;
+    set(source2, value);
+    return result;
   }
   function increment(source2) {
     set(source2, source2.v + 1);
@@ -2659,7 +2665,7 @@
     );
     var error_source = runes ? source$1(void 0) : /* @__PURE__ */ mutable_source(void 0, false, false);
     var resolved = false;
-    function update(state2, restore) {
+    function update2(state2, restore) {
       resolved = true;
       if (restore) {
         set_active_effect(effect2);
@@ -2713,12 +2719,12 @@
           (value) => {
             if (promise !== input) return;
             internal_set(input_source, value);
-            update(THEN, true);
+            update2(THEN, true);
           },
           (error) => {
             if (promise !== input) return;
             internal_set(error_source, error);
-            update(CATCH, true);
+            update2(CATCH, true);
             if (!catch_fn) {
               throw error_source.v;
             }
@@ -2730,12 +2736,12 @@
           }
         } else {
           queue_micro_task(() => {
-            if (!resolved) update(PENDING, true);
+            if (!resolved) update2(PENDING, true);
           });
         }
       } else {
         internal_set(input_source, input);
-        update(THEN, false);
+        update2(THEN, false);
       }
       if (mismatch) {
         set_hydrating(true);
@@ -3649,7 +3655,7 @@
   function is_bound_this(bound_value, element_or_component) {
     return bound_value === element_or_component || bound_value?.[STATE_SYMBOL] === element_or_component;
   }
-  function bind_this(element_or_component = {}, update, get_value, get_parts) {
+  function bind_this(element_or_component = {}, update2, get_value, get_parts) {
     effect(() => {
       var old_parts;
       var parts;
@@ -3658,9 +3664,9 @@
         parts = [];
         untrack(() => {
           if (element_or_component !== get_value(...parts)) {
-            update(element_or_component, ...parts);
+            update2(element_or_component, ...parts);
             if (old_parts && is_bound_this(get_value(...old_parts), element_or_component)) {
-              update(null, ...old_parts);
+              update2(null, ...old_parts);
             }
           }
         });
@@ -3668,7 +3674,7 @@
       return () => {
         queue_micro_task(() => {
           if (parts && is_bound_this(get_value(...parts), element_or_component)) {
-            update(null, ...parts);
+            update2(null, ...parts);
           }
         });
       };
@@ -3689,7 +3695,7 @@
         /** @type {Record<string, any>} */
         {}
       );
-      const d = /* @__PURE__ */ derived$1(() => {
+      const d = /* @__PURE__ */ derived(() => {
         let changed = false;
         const props2 = context.s;
         for (const key2 in props2) {
@@ -3735,7 +3741,6 @@
   function subscribe_to_store(store, run2, invalidate) {
     if (store == null) {
       run2(void 0);
-      if (invalidate) invalidate(void 0);
       return noop;
     }
     const unsub = untrack(
@@ -3748,11 +3753,6 @@
     return unsub.unsubscribe ? () => unsub.unsubscribe() : unsub;
   }
   const subscriber_queue = [];
-  function readable(value, start) {
-    return {
-      subscribe: writable(value, start).subscribe
-    };
-  }
   function writable(value, start = noop) {
     let stop = null;
     const subscribers = /* @__PURE__ */ new Set();
@@ -3774,7 +3774,7 @@
         }
       }
     }
-    function update(fn) {
+    function update2(fn) {
       set2(fn(
         /** @type {T} */
         value
@@ -3784,7 +3784,7 @@
       const subscriber = [run2, invalidate];
       subscribers.add(subscriber);
       if (subscribers.size === 1) {
-        stop = start(set2, update) || noop;
+        stop = start(set2, update2) || noop;
       }
       run2(
         /** @type {T} */
@@ -3798,55 +3798,7 @@
         }
       };
     }
-    return { set: set2, update, subscribe };
-  }
-  function derived(stores, fn, initial_value) {
-    const single = !Array.isArray(stores);
-    const stores_array = single ? [stores] : stores;
-    if (!stores_array.every(Boolean)) {
-      throw new Error("derived() expects stores as input, got a falsy value");
-    }
-    const auto = fn.length < 2;
-    return readable(initial_value, (set2, update) => {
-      let started = false;
-      const values = [];
-      let pending = 0;
-      let cleanup = noop;
-      const sync = () => {
-        if (pending) {
-          return;
-        }
-        cleanup();
-        const result = fn(single ? values[0] : values, set2, update);
-        if (auto) {
-          set2(result);
-        } else {
-          cleanup = typeof result === "function" ? result : noop;
-        }
-      };
-      const unsubscribers = stores_array.map(
-        (store, i) => subscribe_to_store(
-          store,
-          (value) => {
-            values[i] = value;
-            pending &= ~(1 << i);
-            if (started) {
-              sync();
-            }
-          },
-          () => {
-            pending |= 1 << i;
-          }
-        )
-      );
-      started = true;
-      sync();
-      return function stop() {
-        run_all(unsubscribers);
-        cleanup();
-        started = false;
-      };
-    });
+    return { set: set2, update: update2, subscribe };
   }
   function get(store) {
     let value;
@@ -4046,7 +3998,7 @@
       return getter;
     }
     var overridden = false;
-    var d = /* @__PURE__ */ derived$1(() => {
+    var d = /* @__PURE__ */ derived(() => {
       overridden = false;
       return getter();
     });
@@ -4424,17 +4376,17 @@
     Class;
     return Class;
   }
-  const VERSION = "0.14.1";
+  const VERSION = "0.17.5";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
   }
-  var root$C = /* @__PURE__ */ from_html(`<div></div>`);
+  var root$B = /* @__PURE__ */ from_html(`<div></div>`);
   function WithTailwind($$anchor, $$props) {
     push$1($$props, true);
     let self2;
     user_effect(() => addToMyRoot(self2, ["tailwind", "daisy-ui"]));
-    var div = root$C();
+    var div = root$B();
     bind_this(div, ($$value) => self2 = $$value, () => self2);
     append($$anchor, div);
     pop$1();
@@ -4626,8 +4578,8 @@
       takeAt: { get: () => takeAt, set: (value) => takeAt = value }
     };
   })();
-  var root_1$c = /* @__PURE__ */ from_html(`<div class="badge badge-error badge-xl svelte-o0vjex">Wrong branch</div>`);
-  var root$B = /* @__PURE__ */ from_html(`<!> <div class="svelte-o0vjex"><span class="groovy svelte-o0vjex"> </span></div> <div class="svelte-o0vjex"><span class="text-gray-400 svelte-o0vjex">Streak:</span> <span class="streak svelte-o0vjex"> </span> <span class="text-gray-400 svelte-o0vjex">Right answers today:</span> <span class="rightsToday svelte-o0vjex"> </span></div> <div class="svelte-o0vjex"><div class="badge badge-outline badge-primary badge-xl svelte-o0vjex"> </div> <div class="badge badge-warning badge-xl svelte-o0vjex"> </div> <!></div> <div class="badge badge-xl svelte-o0vjex"> </div> <div class="badge badge-xs svelte-o0vjex"> </div> <div class="badge badge-xs svelte-o0vjex"> </div> <div class="badge badge-xs svelte-o0vjex"> </div>`, 1);
+  var root_1$d = /* @__PURE__ */ from_html(`<div class="badge badge-error badge-xl svelte-o0vjex">Wrong branch</div>`);
+  var root$A = /* @__PURE__ */ from_html(`<!> <div class="svelte-o0vjex"><span class="groovy svelte-o0vjex"> </span></div> <div class="svelte-o0vjex"><span class="text-gray-400 svelte-o0vjex">Streak:</span> <span class="streak svelte-o0vjex"> </span> <span class="text-gray-400 svelte-o0vjex">Right answers today:</span> <span class="rightsToday svelte-o0vjex"> </span></div> <div class="svelte-o0vjex"><div class="badge badge-outline badge-primary badge-xl svelte-o0vjex"> </div> <div class="badge badge-warning badge-xl svelte-o0vjex"> </div> <!></div> <div class="badge badge-xl svelte-o0vjex"> </div> <div class="badge badge-xs svelte-o0vjex"> </div> <div class="badge badge-xs svelte-o0vjex"> </div> <div class="badge badge-xs svelte-o0vjex"> </div>`, 1);
   const $$css$s = {
     hash: "svelte-o0vjex",
     code: ".groovy.svelte-o0vjex {font-size:32px;font-weight:bold;display:inline-block;vertical-align:middle;background:linear-gradient(90deg, gold, magenta, cyan);background-size:200%;-webkit-background-clip:text;background-clip:text;color:transparent; \r\n        animation: svelte-o0vjex-shine 5s linear infinite;}.streak.svelte-o0vjex {font-size:36px;font-weight:bold;color:red;}.rightsToday.svelte-o0vjex {font-size:24px;font-weight:bold;color:green;}.groovy.svelte-o0vjex:hover {\r\n        animation: svelte-o0vjex-jelly 0.6s ease-in-out infinite;}\r\n    @keyframes svelte-o0vjex-shine {to{background-position:200%}}\r\n    @keyframes svelte-o0vjex-jelly {25%{transform:scale(1.1,0.9)}50%{transform:scale(0.9,1.1)}75%{transform:scale(1.05,0.95)}}"
@@ -4660,7 +4612,7 @@
       sVersion
     } = myPage2;
     myPage2.connectToBackend(path);
-    var fragment = root$B();
+    var fragment = root$A();
     var node = first_child(fragment);
     WithTailwind(node, {});
     var div = sibling(node, 2);
@@ -4686,7 +4638,7 @@
     var node_1 = sibling(div_4, 2);
     {
       var consequent = ($$anchor2) => {
-        var div_5 = root_1$c();
+        var div_5 = root_1$d();
         append($$anchor2, div_5);
       };
       if_block(node_1, ($$render) => {
@@ -4722,7 +4674,7 @@
     $$cleanup();
   }
   customElements.define("my-page", create_custom_element(MyPage, {}, [], [], false));
-  var root$A = /* @__PURE__ */ from_html(`<div></div>`);
+  var root$z = /* @__PURE__ */ from_html(`<div></div>`);
   function RunTheHeaderMsg($$anchor, $$props) {
     push$1($$props, true);
     let div;
@@ -4730,7 +4682,7 @@
       let self2 = div.parentNode;
       self2.innerHTML = "";
     });
-    var div_1 = root$A();
+    var div_1 = root$z();
     bind_this(div_1, ($$value) => div = $$value, () => div);
     append($$anchor, div_1);
     pop$1();
@@ -4756,13 +4708,13 @@
     });
   }
   customElements.define("lifecycle-hooks", create_custom_element(LifecycleHooks, { prefix: {} }, [], [], false));
-  var root$z = /* @__PURE__ */ from_html(`<div> </div>`);
+  var root$y = /* @__PURE__ */ from_html(`<div> </div>`);
   function Alert($$anchor, $$props) {
     push$1($$props, true);
     let type = prop($$props, "type", 7), message = prop($$props, "message", 7), inline = prop($$props, "inline", 7, false), outline = prop($$props, "outline", 7, false);
     let display = inline() ? "inline-block" : "block";
     let more = outline() ? "badge-outline" : "";
-    var div = root$z();
+    var div = root$y();
     var text2 = child(div, true);
     reset(div);
     template_effect(() => {
@@ -4803,11 +4755,11 @@
     });
   }
   create_custom_element(Alert, { type: {}, message: {}, inline: {}, outline: {} }, [], [], true);
-  var root$y = /* @__PURE__ */ from_html(`<!> <!>`, 1);
+  var root$x = /* @__PURE__ */ from_html(`<!> <!>`, 1);
   function ShowMsg($$anchor, $$props) {
     push$1($$props, true);
     let type = prop($$props, "type", 7, "info"), msg = prop($$props, "msg", 7);
-    var fragment = root$y();
+    var fragment = root$x();
     var node = first_child(fragment);
     WithTailwind(node, {});
     var node_1 = sibling(node, 2);
@@ -4839,7 +4791,7 @@
   }
   customElements.define("show-msg", create_custom_element(ShowMsg, { type: {}, msg: {} }, [], [], false));
   const btn = ($$anchor, txt = noop, onclick2 = noop) => {
-    var button = root_1$b();
+    var button = root_1$c();
     button.__click = function(...$$args) {
       onclick2()?.apply(this, $$args);
     };
@@ -4848,12 +4800,12 @@
     template_effect(() => set_text(text2, txt()));
     append($$anchor, button);
   };
-  var root_1$b = /* @__PURE__ */ from_html(`<button class="text-2xl px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"> </button>`);
-  var root$x = /* @__PURE__ */ from_html(`<!> <!>`, 1);
+  var root_1$c = /* @__PURE__ */ from_html(`<button class="text-2xl px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"> </button>`);
+  var root$w = /* @__PURE__ */ from_html(`<!> <!>`, 1);
   function IncDec($$anchor, $$props) {
     push$1($$props, true);
     let inc = prop($$props, "inc", 7), dec = prop($$props, "dec", 7);
-    var fragment = root$x();
+    var fragment = root$w();
     var node = first_child(fragment);
     btn(node, () => "+", () => () => inc()());
     var node_1 = sibling(node, 2);
@@ -4878,11 +4830,11 @@
   }
   delegate(["click"]);
   create_custom_element(IncDec, { inc: {}, dec: {} }, [], [], true);
-  var root$w = /* @__PURE__ */ from_html(`<!> <div class="bg-yellow-100 text-xl rounded" style="width:fit-content"> </div> <!>`, 1);
+  var root$v = /* @__PURE__ */ from_html(`<!> <div class="bg-yellow-100 text-xl rounded" style="width:fit-content"> </div> <!>`, 1);
   function ElementOne($$anchor, $$props) {
     push$1($$props, true);
     let name = prop($$props, "name", 7, "world");
-    var fragment = root$w();
+    var fragment = root$v();
     var node = first_child(fragment);
     WithTailwind(node, {});
     var div = sibling(node, 2);
@@ -4903,11 +4855,11 @@
     });
   }
   customElements.define("my-element-one", create_custom_element(ElementOne, { name: {} }, [], [], false));
-  var root$v = /* @__PURE__ */ from_html(`<!> <div class="w-fit p-4 bg-green-200 text-white rounded-xl shadow-md" style="width:fit-content">🌱 <strong> </strong> <!> <span class="text-2xl font-bold"> </span></div>`, 1);
+  var root$u = /* @__PURE__ */ from_html(`<!> <div class="w-fit p-4 bg-green-200 text-white rounded-xl shadow-md" style="width:fit-content">🌱 <strong> </strong> <!> <span class="text-2xl font-bold"> </span></div>`, 1);
   function ElementTwo($$anchor, $$props) {
     push$1($$props, true);
     let message = prop($$props, "message", 7, "OK");
-    var fragment = root$v();
+    var fragment = root$u();
     var node = first_child(fragment);
     WithTailwind(node, {});
     var div = sibling(node, 2);
@@ -4940,10 +4892,10 @@
   function onclick$1(_, count) {
     set(count, get$1(count) + 1);
   }
-  var root$u = /* @__PURE__ */ from_html(`<!> <button class="text-2xl px-4 py-2 bg-yellow-200 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"> </button>`, 1);
+  var root$t = /* @__PURE__ */ from_html(`<!> <button class="text-2xl px-4 py-2 bg-yellow-200 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"> </button>`, 1);
   function MyButton($$anchor) {
     let count = /* @__PURE__ */ mutable_source(0);
-    var fragment = root$u();
+    var fragment = root$t();
     var node = first_child(fragment);
     WithTailwind(node, {});
     var button = sibling(node, 2);
@@ -4955,18 +4907,18 @@
   }
   delegate(["click"]);
   customElements.define("my-button", create_custom_element(MyButton, {}, [], [], false));
-  var root$t = /* @__PURE__ */ from_html(`<iframe title="ai-frame"></iframe>`);
+  var root$s = /* @__PURE__ */ from_html(`<iframe title="ai-frame"></iframe>`);
   function AiFrame($$anchor, $$props) {
     push$1($$props, false);
     let src = fwd("http://localhost:5000/ai-frame");
     init();
-    var iframe = root$t();
+    var iframe = root$s();
     template_effect(() => set_attribute(iframe, "src", src));
     append($$anchor, iframe);
     pop$1();
   }
   customElements.define("ai-frame", create_custom_element(AiFrame, {}, [], [], false));
-  var root$s = /* @__PURE__ */ from_html(`<div class="outer svelte-1qizcrp"><div class="inner svelte-1qizcrp"><!></div></div>`);
+  var root$r = /* @__PURE__ */ from_html(`<div class="outer svelte-1qizcrp"><div class="inner svelte-1qizcrp"><!></div></div>`);
   const $$css$r = {
     hash: "svelte-1qizcrp",
     code: ".outer.svelte-1qizcrp {width:var(--size);height:var(--size);padding-left:calc(var(--size) * var(--padding-left));padding-top:calc(var(--size) * var(--padding-top));border:1px solid #333;}.inner.svelte-1qizcrp {width:calc(var(--size) * (1 - var(--padding-left)));height:calc(var(--size) * (1 - var(--padding-top)));font-size:calc(calc(var(--size) * (1 - var(--padding-top))) / var(--scale));}"
@@ -4975,7 +4927,7 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$r);
     let Character = prop($$props, "Character", 7), size = prop($$props, "size", 7), paddingLeft = prop($$props, "paddingLeft", 7), paddingTop = prop($$props, "paddingTop", 7), scale = prop($$props, "scale", 7), bgColor = prop($$props, "bgColor", 7);
-    var div = root$s();
+    var div = root$r();
     var div_1 = child(div);
     var node = child(div_1);
     component(node, Character, ($$anchor2, Character_1) => {
@@ -5044,7 +4996,7 @@
     [],
     true
   );
-  var root$r = /* @__PURE__ */ from_html(`<article role="img" aria-label="Cartoon of a hippopotamus sleeping on the hypotenuse of a right triangle" class="svelte-jf96nf"><h1 class="svelte-jf96nf">Hippopotenuse</h1> <div class="hippo svelte-jf96nf"><div class="tail svelte-jf96nf"></div> <div class="body svelte-jf96nf"></div> <div class="leg svelte-jf96nf"></div> <div class="leg svelte-jf96nf"></div> <div class="ear svelte-jf96nf"></div> <div class="ear svelte-jf96nf"></div> <div class="head svelte-jf96nf"></div> <div class="snout svelte-jf96nf"></div> <div class="mouth svelte-jf96nf"></div></div> <div class="triangle svelte-jf96nf"><div class="adjacent svelte-jf96nf"></div> <div class="opposite svelte-jf96nf"></div> <div class="hypotenuse svelte-jf96nf"></div></div> <div class="letter a svelte-jf96nf">A</div> <div class="letter b svelte-jf96nf">B</div> <div class="letter c svelte-jf96nf">C</div> <div class="letter t svelte-jf96nf">&theta;</div> <div class="arc svelte-jf96nf"></div> <div class="square svelte-jf96nf"></div></article>`);
+  var root$q = /* @__PURE__ */ from_html(`<article role="img" aria-label="Cartoon of a hippopotamus sleeping on the hypotenuse of a right triangle" class="svelte-jf96nf"><h1 class="svelte-jf96nf">Hippopotenuse</h1> <div class="hippo svelte-jf96nf"><div class="tail svelte-jf96nf"></div> <div class="body svelte-jf96nf"></div> <div class="leg svelte-jf96nf"></div> <div class="leg svelte-jf96nf"></div> <div class="ear svelte-jf96nf"></div> <div class="ear svelte-jf96nf"></div> <div class="head svelte-jf96nf"></div> <div class="snout svelte-jf96nf"></div> <div class="mouth svelte-jf96nf"></div></div> <div class="triangle svelte-jf96nf"><div class="adjacent svelte-jf96nf"></div> <div class="opposite svelte-jf96nf"></div> <div class="hypotenuse svelte-jf96nf"></div></div> <div class="letter a svelte-jf96nf">A</div> <div class="letter b svelte-jf96nf">B</div> <div class="letter c svelte-jf96nf">C</div> <div class="letter t svelte-jf96nf">&theta;</div> <div class="arc svelte-jf96nf"></div> <div class="square svelte-jf96nf"></div></article>`);
   const $$css$q = {
     hash: "svelte-jf96nf",
     code: `article.svelte-jf96nf {position:relative;width:50em;aspect-ratio:1;:where(.svelte-jf96nf), :where(.svelte-jf96nf)::before, :where(.svelte-jf96nf)::after {position:absolute;box-sizing:border-box;}h1:where(.svelte-jf96nf) {font-size:10em;font-family:'Amatic SC', sans-serif;line-height:1;margin:0;translate:30% -50%;&::before {content:"";width:2em;height:2.2em;border-radius:50%;border:0.05em solid;clip-path:polygon(0 0, 50% 0, 10% 100%, 0 100%);top:0.5em;translatE:-53% 0;rotate:-6deg;}&::after {content:"";width:0.5em;aspect-ratio:1;border:0.05em solid;top:200%;left:-28.25%;border-top:0;border-left:0;}}.triangle:where(.svelte-jf96nf) {--w: 50em;--h: 37.5em;--b: 0.75em;--b2: calc(var(--b) / 2);width:var(--w);height:var(--h);bottom:0;left:0;filter:drop-shadow(-1em -1em 5em #fff4);&::before {content:"";inset:0;background:#fff;clip-path:polygon(0 100%, 100% 100%, 100% 0);}> div:where(.svelte-jf96nf) {height:var(--b);background:#000;bottom:0;border-radius:1em;&.opposite {width:var(--h);right:calc(var(--b2) / -2);transform-origin:calc(100% - var(--b2)) var(--b2);rotate:90deg;}&.adjacent {width:var(--w);}&.hypotenuse {width:hypot(var(--w), var(--h));transform-origin:var(--b2) var(--b2);rotate:atan(-37.5 / 50)}}}.letter:where(.svelte-jf96nf) {font-size:7em;font-family:'Amatic SC';font-weight:700;&.a {top:100%;left:0;translate:-150% -50%;}&.b {top:20%;left:100%;translate:50% -30%;}&.c {top:100%;left:100%;translate:50% -50%;}&.t {top:87%;left:32%;translate:50% -50%;font-weight:400;font-size:6em;}}.square:where(.svelte-jf96nf) {width:15%;aspect-ratio:1;border:0.5em solid;border-right:0;border-bottom:0;bottom:0;right:0;}.arc:where(.svelte-jf96nf) {width:40%;height:20%;left:0;bottom:0;background:radial-gradient(100% 200% at 0 100%, #0000 80%, #000 0 82%, #0000 0)}.hippo:where(.svelte-jf96nf) {--b: 0.75em solid;--c: #cbd;--cl: #edf;--cd: #a9b;--s: pink;width:100%;height:45%;left:0;bottom:0;transform-origin:0.375em calc(100% - 0.375em);rotate:atan(-37.5 / 50);translate:9% -15%;.tail:where(.svelte-jf96nf) {width:6em;aspect-ratio:1;border-radius:0 0 0 100%;border:var(--b) #0000;border-bottom:var(--b);border-left:var(--b);top:35%;left:8%;scale:1 1.2;&::after {content:"";width:80%;aspect-ratio:1;border:var(--b);border-radius:0 50% 50% 50%;rotate:40deg;translate:-50% -50%;background:var(--cd);}}.body:where(.svelte-jf96nf) {left:42%;bottom:0;translate:-50%;width:59%;height:85%;border:var(--b);border-radius:50% / 100% 100% 0 0;background:var(--c);box-shadow:inset 1em 1em var(--cd);}.leg:where(.svelte-jf96nf) {width:18%;height:40%;border:var(--b);border-right:0;border-radius:50% 0 0 50% / 100%;bottom:0;box-shadow:inset 0 3.5em 0 -2em var(--cd);background:radial-gradient(circle at 8% 90%, var(--cl) 10%, #0000 0),\r
@@ -5054,18 +5006,18 @@
   };
   function Hippopotenuse($$anchor) {
     append_styles$1($$anchor, $$css$q);
-    var article = root$r();
+    var article = root$q();
     append($$anchor, article);
   }
   create_custom_element(Hippopotenuse, {}, [], [], true);
-  var root$q = /* @__PURE__ */ from_html(`<article role="img" aria-labelledby="alt" class="svelte-3eq7xg"><h1 id="alt" class="svelte-3eq7xg">Cartoon of bunny in kawaii style</h1> <div class="body svelte-3eq7xg"><div class="arm svelte-3eq7xg"></div> <div class="arm svelte-3eq7xg"></div> <div class="leg svelte-3eq7xg"></div> <div class="leg svelte-3eq7xg"></div></div> <div class="ear svelte-3eq7xg"></div> <div class="ear svelte-3eq7xg"></div> <div class="hair-back svelte-3eq7xg"></div> <div class="head svelte-3eq7xg"><div class="hair svelte-3eq7xg"></div> <div class="cheek svelte-3eq7xg"></div> <div class="cheek svelte-3eq7xg"></div> <div class="eye svelte-3eq7xg"></div> <div class="eye svelte-3eq7xg"></div> <div class="mouth svelte-3eq7xg"></div> <div class="nose svelte-3eq7xg"></div></div></article>`);
+  var root$p = /* @__PURE__ */ from_html(`<article role="img" aria-labelledby="alt" class="svelte-3eq7xg"><h1 id="alt" class="svelte-3eq7xg">Cartoon of bunny in kawaii style</h1> <div class="body svelte-3eq7xg"><div class="arm svelte-3eq7xg"></div> <div class="arm svelte-3eq7xg"></div> <div class="leg svelte-3eq7xg"></div> <div class="leg svelte-3eq7xg"></div></div> <div class="ear svelte-3eq7xg"></div> <div class="ear svelte-3eq7xg"></div> <div class="hair-back svelte-3eq7xg"></div> <div class="head svelte-3eq7xg"><div class="hair svelte-3eq7xg"></div> <div class="cheek svelte-3eq7xg"></div> <div class="cheek svelte-3eq7xg"></div> <div class="eye svelte-3eq7xg"></div> <div class="eye svelte-3eq7xg"></div> <div class="mouth svelte-3eq7xg"></div> <div class="nose svelte-3eq7xg"></div></div></article>`);
   const $$css$p = {
     hash: "svelte-3eq7xg",
     code: 'article.svelte-3eq7xg {--c1: #f0fafa;--c2: #d0e0f6;width:80em;margin-top:15em;aspect-ratio:1;position:relative;:where(.svelte-3eq7xg), :where(.svelte-3eq7xg)::before, :where(.svelte-3eq7xg)::after {position:absolute;box-sizing:border-box;}#alt:where(.svelte-3eq7xg) {width:1px;height:1px;overflow:hidden;}.head:where(.svelte-3eq7xg) {width:52em;height:45em;border:1.5em solid;border-radius:100% / 130% 130% 75% 75%;left:50%;translate:-50%;top:10%;clip-path:polygon(0 -100%, 100% -100%, 100% 100%, 65% 100%, 78.5% 90%, 21.5% 90%, 35% 100%, 0 100%);background:var(--c1);box-shadow:inset 0 -2em 0 1em var(--c2);.hair:where(.svelte-3eq7xg) {width:15%;aspect-ratio:1.1;left:45%;translatE:-50% -80%;&::before {content:"";inset:0;border:1.5em solid;border-radius:50%;background:var(--c1);border-right-color:var(--c1);rotate:50deg;box-shadow:inset 1em 1em var(--c2),\r\n          2em 0em var(--c1);}}.eye:where(.svelte-3eq7xg) {--p: 28%;width:23%;aspect-ratio:1;border-radius:50%;left:var(--p);top:45%;translate:-50%;background:radial-gradient(circle at 38% 30%, #fff 24%, #0000 calc(24% + 1px)),\r\n        radial-gradient(circle at 19% 62%, #fff 12%, #0000 calc(12% + 1px)),\r\n        #000;& + & {left:calc(100% - var(--p))}}.cheek:where(.svelte-3eq7xg) {--p: 18%;--d: 60deg;width:16%;top:66.6%;left:var(--p);translate:-50%;aspect-ratio:1.35;border-radius:50%;box-shadow:inset 0 0 1em 1.25em pink;background:repeating-linear-gradient(var(--d), #0000 0 13%, #f003 0 18%),\r\n        pink;opacity:0.8;rotate:5deg;& ~ & {--d: -60deg;left:calc(100% - var(--p));rotate:-5deg;}}.mouth:where(.svelte-3eq7xg) {top:65%;left:50%;translate:-50%;width:12%;height:22%;border:1.5em solid;border-radius:50% / 0 0 100% 100%;background:radial-gradient(circle at 50% 100%, #d55 30%, #822 0)}.nose:where(.svelte-3eq7xg) {width:10%;aspect-ratio:1.8;background:radial-gradient(circle at 25% 40%, #fff 12%, #0000 0),\r\n        pink;top:58%;left:50%;translate:-50%;border-radius:50%;&::before, &::after {--p: 35%;top:100%;content:"";left:0;right:0;height:100%;border:1.25em solid;border-top:0;border-radius:50% / 0 0 100% 100%;translate:var(--p);background:var(--c1);}&::after {translate:calc(var(--p) * -1);}}}.hair-back:where(.svelte-3eq7xg) {border:1.5em solid;background:var(--c1);width:9%;aspect-ratio:1;border-radius:50%;left:48%;top:4%;box-shadow:inset -1em 1em var(--c2);}.ear:where(.svelte-3eq7xg) {width:20%;height:44%;border:1.5em solid;border-radius:50%;border-radius:100% / 125% 125% 80% 80%;overflow:hidden;background:radial-gradient(130% 100% at 50% 0, #0000 80%, var(--c2) 0),\r\n      var(--c1);rotate:-30deg;left:17%;top:-20%;& ~ & {rotate:70deg;top:-12%;left:68%;background:radial-gradient(130% 100% at 25% 0, #0000 80%, var(--c2) 0),\r\n      var(--c1);&::before {background:radial-gradient(160% 100% at 25% 0, #0000 75%, #f002 0),\r\n        pink;}}&::before {content:"";width:80%;height:80%;left:50%;top:60%;translate:-50% -50%;border:1.5em solid;background:radial-gradient(150% 100% at 50% 0, #0000 80%, #f002 0),\r\n        pink;border-radius:50%;}}.body:where(.svelte-3eq7xg) {bottom:6%;left:50%;translate:-50%;width:41em;height:36em;border:1.5em solid;border-bottom:2em solid;border-radius:100% / 130% 130% 75% 75%;background:radial-gradient(135% 110% at 50% 0%,var(--c2) 40%, #0000 calc(40% + 1px)),\r\n      var(--c1);box-shadow:inset 0 -2em 0 1em var(--c2);.arm:where(.svelte-3eq7xg) {\r\n      animation: flip 3s alternate infinite;--p: -4%;--d: 19deg;width:28%;height:36%;top:24%;left:var(--p);translate:-50%;border:1.5em solid;background:var(--c1);border-radius:100% 0 0 100% / 50%;border-right:0;box-shadow:inset 0 -1em var(--c2);transform-origin:100% 0;rotate:var(--d);box-shadow:4em 0 0 -1em var(--c1), inset 0 -1em var(--c2);& ~ & {left:auto;right:var(--p);scale:-1 1;rotate:-15deg;}}.leg:where(.svelte-3eq7xg) {--p: 18%;--d: 22deg;width:35%;aspect-ratio:1.5;border-radius:0 0 15em 15em;border:1.5em solid;top:91%;left:var(--p);background:var(--c2);border-top:0;border-bottom:1.6em solid;rotate:var(--d);translate:-50%;box-shadow:inset 0 -3.5em 0 -2em #0061;& ~ & {left:calc(100% - var(--p));--d: -22deg;}}}}'
   };
   function Bunny($$anchor) {
     append_styles$1($$anchor, $$css$p);
-    var article = root$q();
+    var article = root$p();
     append($$anchor, article);
   }
   create_custom_element(Bunny, {}, [], [], true);
@@ -5150,7 +5102,7 @@
   let column;
   let token;
   let key;
-  let root$p;
+  let root$o;
   var parse = function parse2(text2, reviver) {
     source = String(text2);
     parseState = "start";
@@ -5160,15 +5112,15 @@
     column = 0;
     token = void 0;
     key = void 0;
-    root$p = void 0;
+    root$o = void 0;
     do {
       token = lex();
       parseStates[parseState]();
     } while (token.type !== "eof");
     if (typeof reviver === "function") {
-      return internalize({ "": root$p }, "", reviver);
+      return internalize({ "": root$o }, "", reviver);
     }
-    return root$p;
+    return root$o;
   };
   function internalize(holder, name, reviver) {
     const value = holder[name];
@@ -5892,8 +5844,8 @@
         value = token.value;
         break;
     }
-    if (root$p === void 0) {
-      root$p = value;
+    if (root$o === void 0) {
+      root$o = value;
     } else {
       const parent = stack[stack.length - 1];
       if (Array.isArray(parent)) {
@@ -6199,8 +6151,8 @@
     stringify
   };
   var lib = JSON5;
-  var root_1$a = /* @__PURE__ */ from_html(`<progress class="progress progress-primary svelte-18i2ml5"></progress>`);
-  var root$o = /* @__PURE__ */ from_html(`<!> <!>`, 1);
+  var root_1$b = /* @__PURE__ */ from_html(`<progress class="progress progress-primary svelte-18i2ml5"></progress>`);
+  var root$n = /* @__PURE__ */ from_html(`<!> <!>`, 1);
   const $$css$o = {
     hash: "svelte-18i2ml5",
     code: "progress.svelte-18i2ml5 {position:fixed;bottom:1px;width:90%;left:10px;}"
@@ -6209,13 +6161,13 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$o);
     let rounds = prop($$props, "rounds", 7), children = prop($$props, "children", 7);
-    var fragment = root$o();
+    var fragment = root$n();
     var node = first_child(fragment);
     snippet(node, children);
     var node_1 = sibling(node, 2);
     {
       var consequent = ($$anchor2) => {
-        var progress = root_1$a();
+        var progress = root_1$b();
         set_value(progress, 1);
         template_effect(() => set_attribute(progress, "max", rounds()));
         append($$anchor2, progress);
@@ -10714,7 +10666,7 @@
           function unset(object, path) {
             return object == null ? true : baseUnset(object, path);
           }
-          function update(object, path, updater) {
+          function update2(object, path, updater) {
             return object == null ? object : baseUpdate(object, path, castFunction(updater));
           }
           function updateWith(object, path, updater, customizer) {
@@ -11380,7 +11332,7 @@
           lodash2.unset = unset;
           lodash2.unzip = unzip;
           lodash2.unzipWith = unzipWith;
-          lodash2.update = update;
+          lodash2.update = update2;
           lodash2.updateWith = updateWith;
           lodash2.values = values;
           lodash2.valuesIn = valuesIn;
@@ -11767,14 +11719,14 @@
     };
   })();
   var on_click$2 = (_, clicked2, indx) => clicked2(indx());
-  var root_2$4 = /* @__PURE__ */ from_html(`<span class="ans-letter"> </span>`);
-  var root_1$9 = /* @__PURE__ */ from_html(`<button></button>`);
+  var root_2$5 = /* @__PURE__ */ from_html(`<span class="ans-letter"> </span>`);
+  var root_1$a = /* @__PURE__ */ from_html(`<button></button>`);
   var root_5$1 = /* @__PURE__ */ from_html(`<span> </span>`);
   var root_4$1 = /* @__PURE__ */ from_html(`<div class="row svelte-qx0naz"><span class="label svelte-qx0naz"> </span> <div class="cells svelte-qx0naz"></div></div>`);
   var root_3$2 = /* @__PURE__ */ from_html(`<div></div>`);
   var root_6 = /* @__PURE__ */ from_html(`<div class="case ml-4 mt-4 badge badge-accent svelte-qx0naz">A = a</div>`);
   var root_7$3 = /* @__PURE__ */ from_html(`<div class="case ml-4 mt-4 badge badge-accent svelte-qx0naz">A ≠ a</div>`);
-  var root$n = /* @__PURE__ */ from_html(`<!> <!> <!> <div class="answers grid2x2 svelte-qx0naz"><!> <!> <!> <!></div> <!>`, 1);
+  var root$m = /* @__PURE__ */ from_html(`<!> <!> <!> <div class="answers grid2x2 svelte-qx0naz"><!> <!> <!> <!></div> <!>`, 1);
   const $$css$n = {
     hash: "svelte-qx0naz",
     code: ".case.svelte-qx0naz {font-weight:bold;font-size:18px;}.main-desk.svelte-qx0naz {margin-top:12px;zoom:1;}.answer-btn.svelte-qx0naz {display:flex;gap:8px;align-items:center;}.answer-desk.svelte-qx0naz {margin-top:16px;margin-left:35%;width:60%;zoom:0.6;}.grid2x2.svelte-qx0naz {display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;width:100%;height:100%;}.grid2x2.svelte-qx0naz > button:where(.svelte-qx0naz) {justify-self:center;align-self:center;padding:1px 4px;}.answers.svelte-qx0naz {width:80%;margin-top:12px;margin-left:10%;}.row.svelte-qx0naz {display:flex;align-items:center;margin:8px 2px;}.label.svelte-qx0naz {width:40px;text-align:right;margin-right:10px;margin-left:1px;font-family:monospace;font-size:22px;}.cells.svelte-qx0naz {display:flex;border:1px solid #000;}.cell.svelte-qx0naz {width:48px;height:42px;border-left:1px solid #000;display:flex;align-items:center;justify-content:center;font-size:28px;}.cell.svelte-qx0naz:first-child {border-left:none;}.red.svelte-qx0naz {color:red;}"
@@ -11783,12 +11735,12 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$n);
     const ansbtn = ($$anchor2, indx = noop) => {
-      var button = root_1$9();
+      var button = root_1$a();
       const color = /* @__PURE__ */ user_derived(() => btnColor(indx()));
       const word = /* @__PURE__ */ user_derived(() => answers[indx()]);
       button.__click = [on_click$2, clicked2, indx];
       each(button, 21, () => get$1(word), index, ($$anchor3, n) => {
-        var span = root_2$4();
+        var span = root_2$5();
         var text2 = child(span, true);
         reset(span);
         template_effect(($0) => set_text(text2, $0), [() => viewAt(get$1(n))]);
@@ -11896,7 +11848,7 @@
     function completed() {
       return true;
     }
-    var fragment = root$n();
+    var fragment = root$m();
     var node = first_child(fragment);
     {
       var consequent = ($$anchor2) => {
@@ -11999,7 +11951,7 @@
     });
   }
   customElements.define("drill-wordle", create_custom_element(Drill_wordle, { config: {}, rounds: {} }, [], [], false));
-  var root$m = /* @__PURE__ */ from_html(`<div class="panel svelte-1nkqiir"><div><span><!></span></div></div>`);
+  var root$l = /* @__PURE__ */ from_html(`<div class="panel svelte-1nkqiir"><div><span><!></span></div></div>`);
   const $$css$m = {
     hash: "svelte-1nkqiir",
     code: ".panel.svelte-1nkqiir {display:flex;justify-content:center;}.heb.svelte-1nkqiir {direction:rtl;text-align:right;display:inline-block;width:90%;}"
@@ -12008,7 +11960,7 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$m);
     let clazz = prop($$props, "clazz", 7, ""), children = prop($$props, "children", 7);
-    var div = root$m();
+    var div = root$l();
     var div_1 = child(div);
     var span = child(div_1);
     var node = child(span);
@@ -12122,8 +12074,8 @@
     append($$anchor, text_9);
   };
   var on_click$1 = (_, answerIsHere, text2) => answerIsHere(text2());
-  var root_1$8 = /* @__PURE__ */ from_html(`<button> </button>`);
-  var root$l = /* @__PURE__ */ from_html(`<div class="my-card svelte-1tx0ras"><!> <!> <!> <!> <!> <!></div>`);
+  var root_1$9 = /* @__PURE__ */ from_html(`<button> </button>`);
+  var root$k = /* @__PURE__ */ from_html(`<div class="my-card svelte-1tx0ras"><!> <!> <!> <!> <!> <!></div>`);
   const $$css$l = {
     hash: "svelte-1tx0ras",
     code: ".my-card.svelte-1tx0ras {font-size:18px;}.ans-btn.svelte-1tx0ras {font-size:18px;padding:0px 10px;}"
@@ -12132,7 +12084,7 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$l);
     const ansBtn = ($$anchor2, text2 = noop, color = noop) => {
-      var button = root_1$8();
+      var button = root_1$9();
       button.__click = [on_click$1, answerIsHere, text2];
       var text_1 = child(button, true);
       reset(button);
@@ -12152,7 +12104,7 @@
     let flow = prop($$props, "flow", 7), problemSet = prop($$props, "problemSet", 7);
     function answerIsHere(text2) {
     }
-    var div = root$l();
+    var div = root$k();
     var node = child(div);
     _let(node);
     var node_1 = sibling(node, 2);
@@ -12357,43 +12309,59 @@
     });
   }
   customElements.define("drill-grira", create_custom_element(Drill_grira, { config: {}, flow: {}, problemSet: {}, rounds: {} }, [], [], false));
-  let phase = (() => {
-    let _prev = "init";
-    let _state = writable("wrong");
-    let wrong = writable(true);
-    let hint = writable(false);
-    let right = writable(false);
-    let currentPhaseNo = writable(0);
-    let _states = ["wrong", "hint", "right"];
-    let _current = 0;
-    function onswitch(handler) {
-      _state.subscribe((next22) => handler(next22, _prev));
+  function assert(expr) {
+    if (expr()) return;
+    console.error("ASSERT has failed: ", expr);
+    throw new Error(`ASSERT has failed: ${expr}`);
+  }
+  const ticks = writable(0);
+  let phase = /* @__PURE__ */ (() => {
+    let _drillId = "";
+    let _phases = [];
+    let currentTick = 0;
+    function tick() {
+      assert(() => _drillId !== "");
+      currentTick++;
+      ticks.set(currentTick);
     }
-    let get2 = (indx) => _states[indx % _states.length];
-    function update() {
-      let next22 = get2(_current);
-      wrong.set(next22 === "wrong");
-      hint.set(next22 === "hint");
-      right.set(next22 === "right");
-      _state.set(next22);
+    function untick() {
+      if (currentTick === 0) return;
+      assert(() => _drillId !== "");
+      currentTick--;
+      ticks.set(currentTick);
     }
-    function next2() {
-      _prev = get2(_current);
-      _current++;
-      if (_current % _states.length === 0) _current++;
-      currentPhaseNo.set(Math.floor(_current / _states.length));
-      update();
+    function start(drillId, phases) {
+      _drillId = drillId;
+      _phases = [...phases];
+      currentTick = 0;
+      ticks.set(0);
     }
-    function restart() {
-      _prev = get2(_current);
-      _current = 0;
-      update();
+    function reveal2() {
+      currentTick = _phases.length + 3;
+      ticks.set(currentTick);
     }
-    return { onswitch, next: next2, restart, wrong, hint, right, currentPhaseNo };
+    function meAt(_, myPhase) {
+      if (currentTick === 0) return { wrong: true, hint: false, right: false };
+      if (currentTick === 1) return { wrong: false, hint: true, right: false };
+      let phaseNo = currentTick - 2;
+      if (phaseNo < _phases.length) {
+        let currentPhase = _phases[phaseNo];
+        return {
+          wrong: false,
+          hint: currentPhase < myPhase.get(),
+          right: currentPhase >= myPhase.get()
+        };
+      }
+      let tickNo = phaseNo - _phases.length;
+      if (_phases.length === 0) tickNo++;
+      return { wrong: false, hint: tickNo % 2 == 0, right: tickNo % 2 === 1 };
+    }
+    return { tick, untick, start, reveal: reveal2, meAt };
   })();
   let log = (() => {
     let lines = writable([]);
     let minLevel = "E";
+    let stack2 = [];
     let levels = { "*": 100, "E": 0, "W": 1, "I": 2 };
     function write(level, msg) {
       if (levels[level] > levels[minLevel]) return;
@@ -12409,16 +12377,28 @@
       }
       minLevel = level;
     }
+    function pushLevel(level) {
+      if (level === void 0 || !(level in levels)) return;
+      stack2.push(minLevel);
+      if (levels[level] < levels[minLevel]) return;
+      minLevel = level;
+    }
+    function popLevel() {
+      if (stack2.length === 0) return;
+      minLevel = stack2.pop();
+    }
     return {
       lines,
       setLevel,
       info: (msg) => write("I", msg),
       warn: (msg) => write("W", msg),
-      error: (msg) => write("E", msg)
+      error: (msg) => write("E", msg),
+      pushLevel,
+      popLevel
     };
   })();
-  var root_1$7 = /* @__PURE__ */ from_html(`<div><span> </span> <span class="msg"> </span></div>`);
-  var root$k = /* @__PURE__ */ from_html(`<div class="panel svelte-1ba5k7a"></div>`);
+  var root_1$8 = /* @__PURE__ */ from_html(`<div><span> </span> <span class="msg"> </span></div>`);
+  var root$j = /* @__PURE__ */ from_html(`<div class="panel svelte-1ba5k7a"></div>`);
   const $$css$k = {
     hash: "svelte-1ba5k7a",
     code: ".panel.svelte-1ba5k7a {font-size:12px;font-family:monospace;background-color:white;color:black;}.info.svelte-1ba5k7a {color:black;}.warn.svelte-1ba5k7a {background-color:cornsilk;}.error.svelte-1ba5k7a {color:red;font-weight:bold;background-color:yellow;}"
@@ -12430,9 +12410,9 @@
     const $lines = () => store_get(lines, "$lines", $$stores);
     let lines = log.lines;
     init();
-    var div = root$k();
+    var div = root$j();
     each(div, 5, $lines, index, ($$anchor2, ln) => {
-      var div_1 = root_1$7();
+      var div_1 = root_1$8();
       let classes;
       var span = child(div_1);
       var text2 = child(span, true);
@@ -12463,7 +12443,7 @@
     $$cleanup();
   }
   create_custom_element(Logger, {}, [], [], true);
-  var root$j = /* @__PURE__ */ from_html(`<span class="svelte-h87r00"> </span>`);
+  var root$i = /* @__PURE__ */ from_html(`<span class="svelte-h87r00"> </span>`);
   const $$css$j = {
     hash: "svelte-h87r00",
     code: "span.svelte-h87r00 {font-size:var(--line-no-font-size);color:gray;}"
@@ -12472,7 +12452,7 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$j);
     let lineNo = prop($$props, "lineNo", 7);
-    var span = root$j();
+    var span = root$i();
     var text2 = child(span, true);
     reset(span);
     template_effect(() => set_text(text2, lineNo()));
@@ -12488,7 +12468,8 @@
     });
   }
   create_custom_element(LineNo, { lineNo: {} }, [], [], true);
-  var root$i = /* @__PURE__ */ from_html(`<span><div class="svelte-gy0mow"><!></div></span>`);
+  var root_1$7 = /* @__PURE__ */ from_html(`<div><!></div>`);
+  var root_2$4 = /* @__PURE__ */ from_html(`<div class="svelte-gy0mow"><!></div>`);
   const $$css$i = {
     hash: "svelte-gy0mow",
     code: "div.svelte-gy0mow {transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.right.svelte-gy0mow {font-size:0px;}"
@@ -12497,27 +12478,48 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$i);
     const [$$stores, $$cleanup] = setup_stores();
-    const $wrong = () => store_get(wrong, "$wrong", $$stores);
-    const $hint = () => store_get(hint, "$hint", $$stores);
-    const $right = () => store_get(right, "$right", $$stores);
-    let wrongLine = prop($$props, "wrongLine", 7), children = prop($$props, "children", 7);
-    let { wrong, hint, right } = phase;
-    var span = root$i();
-    let classes;
-    var div = child(span);
-    var node = child(div);
-    snippet(node, children);
-    reset(div);
-    reset(span);
-    template_effect(($0) => classes = set_class(span, 1, "svelte-gy0mow", null, classes, $0), [
-      () => ({
-        wrong: $wrong(),
-        hint: $hint(),
-        right: wrongLine() && $right()
-      })
-    ]);
-    append($$anchor, span);
+    const $ticks = () => store_get(ticks, "$ticks", $$stores);
+    let phaseNo = prop($$props, "phaseNo", 7), wrongLine = prop($$props, "wrongLine", 7), children = prop($$props, "children", 7);
+    let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
+    var fragment = comment();
+    var node = first_child(fragment);
+    {
+      var consequent = ($$anchor2) => {
+        var div = root_1$7();
+        let classes;
+        var node_1 = child(div);
+        snippet(node_1, children);
+        reset(div);
+        template_effect(($0) => classes = set_class(div, 1, "svelte-gy0mow", null, classes, $0), [
+          () => ({
+            wrong: get$1(meAt).wrong,
+            hint: get$1(meAt).hint,
+            right: get$1(meAt).right
+          })
+        ]);
+        append($$anchor2, div);
+      };
+      var alternate = ($$anchor2) => {
+        var div_1 = root_2$4();
+        var node_2 = child(div_1);
+        snippet(node_2, children);
+        reset(div_1);
+        append($$anchor2, div_1);
+      };
+      if_block(node, ($$render) => {
+        if (wrongLine()) $$render(consequent);
+        else $$render(alternate, false);
+      });
+    }
+    append($$anchor, fragment);
     var $$pop = pop$1({
+      get phaseNo() {
+        return phaseNo();
+      },
+      set phaseNo($$value) {
+        phaseNo($$value);
+        flushSync();
+      },
       get wrongLine() {
         return wrongLine();
       },
@@ -12536,8 +12538,8 @@
     $$cleanup();
     return $$pop;
   }
-  create_custom_element(Line, { wrongLine: {}, children: {} }, [], [], true);
-  var root$h = /* @__PURE__ */ from_html(`<span> </span>`);
+  create_custom_element(Line, { phaseNo: {}, wrongLine: {}, children: {} }, [], [], true);
+  var root$h = /* @__PURE__ */ from_html(`<span class="svelte-1afycyp"> </span>`);
   const $$css$h = {
     hash: "svelte-1afycyp",
     code: "span.svelte-1afycyp {transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}"
@@ -12545,25 +12547,13 @@
   function AsIs($$anchor, $$props) {
     push$1($$props, true);
     append_styles$1($$anchor, $$css$h);
-    const [$$stores, $$cleanup] = setup_stores();
-    const $wrong = () => store_get(wrong, "$wrong", $$stores);
-    const $hint = () => store_get(hint, "$hint", $$stores);
-    const $right = () => store_get(right, "$right", $$stores);
     let code = prop($$props, "code", 7);
-    let { wrong, hint, right } = phase;
     var span = root$h();
-    let classes;
     var text2 = child(span, true);
     reset(span);
-    template_effect(
-      ($0) => {
-        classes = set_class(span, 1, "svelte-1afycyp", null, classes, $0);
-        set_text(text2, code());
-      },
-      [() => ({ wrong: $wrong(), hint: $hint(), right: $right() })]
-    );
+    template_effect(() => set_text(text2, code()));
     append($$anchor, span);
-    var $$pop = pop$1({
+    return pop$1({
       get code() {
         return code();
       },
@@ -12572,8 +12562,6 @@
         flushSync();
       }
     });
-    $$cleanup();
-    return $$pop;
   }
   create_custom_element(AsIs, { code: {} }, [], [], true);
   var root$g = /* @__PURE__ */ from_html(`<span> </span>`);
@@ -12585,12 +12573,9 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$g);
     const [$$stores, $$cleanup] = setup_stores();
-    const $hintPh = () => store_get(hintPh, "$hintPh", $$stores);
-    const $wrong = () => store_get(wrong, "$wrong", $$stores);
-    const $right = () => store_get(right, "$right", $$stores);
+    const $ticks = () => store_get(ticks, "$ticks", $$stores);
     let phaseNo = prop($$props, "phaseNo", 7), code = prop($$props, "code", 7), color = prop($$props, "color", 7, "red"), hint = prop($$props, "hint", 7);
-    let { wrong, hint: hintPh, right, currentPhaseNo } = phase;
-    derived(currentPhaseNo, ($currentPhaseNo) => $currentPhaseNo >= phaseNo());
+    let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
     let isEmpty = code().trim().length === 0;
     if (isEmpty) {
       code(
@@ -12598,7 +12583,6 @@
         // spaces has no glyphes, so are not decorated
       );
     }
-    let showHint = /* @__PURE__ */ user_derived(() => $hintPh() && hint());
     var span = root$g();
     let classes;
     let styles;
@@ -12614,11 +12598,11 @@
       [
         () => ({
           "rtl-tooltip": hint()?.rtl,
-          tooltip: get$1(showHint),
+          tooltip: get$1(meAt).hint,
           "is-empty": isEmpty,
-          wrong: $wrong(),
-          hint: $hintPh(),
-          right: $right()
+          wrong: get$1(meAt).wrong,
+          hint: get$1(meAt).hint,
+          right: get$1(meAt).right
         }),
         () => ({ "--color": color() })
       ]
@@ -12660,29 +12644,32 @@
   create_custom_element(WrongSpan, { phaseNo: {}, code: {}, color: {}, hint: {} }, [], [], true);
   var root$f = /* @__PURE__ */ from_html(`<span> </span>`);
   const $$css$f = {
-    hash: "svelte-k3ui11",
-    code: "span.svelte-k3ui11 {transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.wrong.svelte-k3ui11 {opacity:0;font-size:0px;}.hint.svelte-k3ui11 {opacity:0;font-size:0px;}.right.svelte-k3ui11 {background-color:lightgreen;}"
+    hash: "svelte-grh0vk",
+    code: "span.svelte-grh0vk {transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.wrong.svelte-grh0vk {opacity:0;font-size:0px;}.hint.svelte-grh0vk {opacity:0;font-size:0px;}.right.svelte-grh0vk {background-color:var(--right-color);}"
   };
   function RightSpan($$anchor, $$props) {
     push$1($$props, true);
     append_styles$1($$anchor, $$css$f);
     const [$$stores, $$cleanup] = setup_stores();
-    const $wrong = () => store_get(wrong, "$wrong", $$stores);
-    const $hint = () => store_get(hint, "$hint", $$stores);
-    const $right = () => store_get(right, "$right", $$stores);
+    const $ticks = () => store_get(ticks, "$ticks", $$stores);
     let phaseNo = prop($$props, "phaseNo", 7), code = prop($$props, "code", 7);
-    let { wrong, hint, right, currentPhaseNo } = phase;
-    derived(currentPhaseNo, ($currentPhaseNo) => $currentPhaseNo >= phaseNo());
+    let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
     var span = root$f();
     let classes;
     var text2 = child(span, true);
     reset(span);
     template_effect(
       ($0) => {
-        classes = set_class(span, 1, "svelte-k3ui11", null, classes, $0);
+        classes = set_class(span, 1, "svelte-grh0vk", null, classes, $0);
         set_text(text2, code());
       },
-      [() => ({ wrong: $wrong(), hint: $hint(), right: $right() })]
+      [
+        () => ({
+          wrong: get$1(meAt).wrong,
+          hint: get$1(meAt).hint,
+          right: get$1(meAt).right
+        })
+      ]
     );
     append($$anchor, span);
     var $$pop = pop$1({
@@ -12714,12 +12701,9 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$e);
     const [$$stores, $$cleanup] = setup_stores();
-    const $hintPh = () => store_get(hintPh, "$hintPh", $$stores);
-    const $wrong = () => store_get(wrong, "$wrong", $$stores);
-    const $right = () => store_get(right, "$right", $$stores);
+    const $ticks = () => store_get(ticks, "$ticks", $$stores);
     let phaseNo = prop($$props, "phaseNo", 7), code = prop($$props, "code", 7), color = prop($$props, "color", 7, "red"), hint = prop($$props, "hint", 7);
-    let { wrong, hint: hintPh, right } = phase;
-    let showHint = /* @__PURE__ */ user_derived(() => $hintPh() && hint());
+    let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
     var span = root$e();
     let classes;
     let styles;
@@ -12735,10 +12719,10 @@
       [
         () => ({
           "rtl-tooltip": hint()?.rtl,
-          tooltip: get$1(showHint),
-          wrong: $wrong(),
-          hint: $hintPh(),
-          right: $right()
+          tooltip: get$1(meAt).hint,
+          wrong: get$1(meAt).wrong,
+          hint: get$1(meAt).hint,
+          right: get$1(meAt).right
         }),
         () => ({ "--color": color() })
       ]
@@ -12790,20 +12774,18 @@
     append($$anchor, new_line);
   }
   create_custom_element(NewLine, {}, [], [], true);
-  var root$c = /* @__PURE__ */ from_html(`<div><span class="line-no svelte-ypyx4h"></span><span> </span></div>`);
+  var root$c = /* @__PURE__ */ from_html(`<div><span class="line-no svelte-15o8w5g"></span><span> </span></div>`);
   const $$css$c = {
-    hash: "svelte-ypyx4h",
-    code: "div.svelte-ypyx4h {transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.line-no.svelte-ypyx4h {font-size:var(--line-no-font-size);color:gray;}.wrong.svelte-ypyx4h {opacity:0;font-size:0px;}.hint.svelte-ypyx4h {opacity:0;font-size:0px;}.right.svelte-ypyx4h {background-color:lightgreen;}"
+    hash: "svelte-15o8w5g",
+    code: "div.svelte-15o8w5g {transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.line-no.svelte-15o8w5g {font-size:var(--line-no-font-size);color:gray;}.wrong.svelte-15o8w5g {opacity:0;font-size:0px;}.hint.svelte-15o8w5g {opacity:0;font-size:0px;}.right.svelte-15o8w5g {background-color:var(--right-color);}"
   };
   function RightLine($$anchor, $$props) {
     push$1($$props, true);
     append_styles$1($$anchor, $$css$c);
     const [$$stores, $$cleanup] = setup_stores();
-    const $wrong = () => store_get(wrong, "$wrong", $$stores);
-    const $hint = () => store_get(hint, "$hint", $$stores);
-    const $right = () => store_get(right, "$right", $$stores);
+    const $ticks = () => store_get(ticks, "$ticks", $$stores);
     let phaseNo = prop($$props, "phaseNo", 7), code = prop($$props, "code", 7);
-    let { wrong, hint, right } = phase;
+    let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
     var div = root$c();
     let classes;
     var span = child(div);
@@ -12814,10 +12796,16 @@
     reset(div);
     template_effect(
       ($0) => {
-        classes = set_class(div, 1, "svelte-ypyx4h", null, classes, $0);
+        classes = set_class(div, 1, "svelte-15o8w5g", null, classes, $0);
         set_text(text2, code());
       },
-      [() => ({ wrong: $wrong(), hint: $hint(), right: $right() })]
+      [
+        () => ({
+          wrong: get$1(meAt).wrong,
+          hint: get$1(meAt).hint,
+          right: get$1(meAt).right
+        })
+      ]
     );
     append($$anchor, div);
     var $$pop = pop$1({
@@ -12849,11 +12837,9 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$b);
     const [$$stores, $$cleanup] = setup_stores();
-    const $wrong = () => store_get(wrong, "$wrong", $$stores);
-    const $hint = () => store_get(hint, "$hint", $$stores);
-    const $right = () => store_get(right, "$right", $$stores);
+    const $ticks = () => store_get(ticks, "$ticks", $$stores);
     let phaseNo = prop($$props, "phaseNo", 7), spaceCount = prop($$props, "spaceCount", 7);
-    let { wrong, hint, right } = phase;
+    let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
     let code = "".padStart(spaceCount());
     var span = root$b();
     let classes;
@@ -12864,7 +12850,13 @@
         classes = set_class(span, 1, "svelte-tj7gjt", null, classes, $0);
         set_text(text2, code);
       },
-      [() => ({ wrong: $wrong(), hint: $hint(), right: $right() })]
+      [
+        () => ({
+          wrong: get$1(meAt).wrong,
+          hint: get$1(meAt).hint,
+          right: get$1(meAt).right
+        })
+      ]
     );
     append($$anchor, span);
     var $$pop = pop$1({
@@ -12896,11 +12888,9 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$a);
     const [$$stores, $$cleanup] = setup_stores();
-    const $wrong = () => store_get(wrong, "$wrong", $$stores);
-    const $hint = () => store_get(hint, "$hint", $$stores);
-    const $right = () => store_get(right, "$right", $$stores);
+    const $ticks = () => store_get(ticks, "$ticks", $$stores);
     let phaseNo = prop($$props, "phaseNo", 7), spaceCount = prop($$props, "spaceCount", 7);
-    let { wrong, hint, right } = phase;
+    let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
     let code = "".padStart(spaceCount());
     var span = root$a();
     let classes;
@@ -12911,7 +12901,13 @@
         classes = set_class(span, 1, "svelte-eg6z97", null, classes, $0);
         set_text(text2, code);
       },
-      [() => ({ wrong: $wrong(), hint: $hint(), right: $right() })]
+      [
+        () => ({
+          wrong: get$1(meAt).wrong,
+          hint: get$1(meAt).hint,
+          right: get$1(meAt).right
+        })
+      ]
     );
     append($$anchor, span);
     var $$pop = pop$1({
@@ -12934,13 +12930,8 @@
     return $$pop;
   }
   create_custom_element(RightIndent, { phaseNo: {}, spaceCount: {} }, [], [], true);
-  function Hint($$anchor) {
-  }
-  create_custom_element(Hint, {}, [], [], true);
-  let shellChars = { java: "$", cs: "@", csharp: "@", "c#": "@", "python": "&" };
-  function buildDrills() {
-    let drills = [];
-    let hints = {};
+  const hints = /* @__PURE__ */ (() => {
+    let db = {};
     function makeHint(html) {
       let id = html.getAttribute("id");
       let dir = html.getAttribute("dir") || "ltr";
@@ -12951,23 +12942,75 @@
       }
       return { id, text: text2, dir };
     }
-    function parseHints() {
-      document.querySelectorAll("hint").forEach((html) => {
+    function parseHtmlDocument(doc, external) {
+      let count = 0;
+      doc.querySelectorAll("hint").forEach((html) => {
         let hint = makeHint(html);
         if (!hint) return;
-        if (hints[hint.id] !== void 0) throw new Error(`Hint with same id='${hint.id}'`);
-        hints[hint.id] = hint;
+        if (db[hint.id] !== void 0) {
+          if (external) return;
+          log.warn(`Hint with same id='${hint.id}'`);
+        }
+        db[hint.id] = hint;
+        count++;
       });
-      let ids = Object.keys(hints);
-      log.info(`Parsed ${ids.length} hints; [${ids.join(",")}]`);
+      return count;
     }
+    function parseMyDocument() {
+      let count = parseHtmlDocument(document, false);
+      log.info(`Parsed ${count} hints`);
+    }
+    function importHints(from) {
+      try {
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", from, false);
+        xhr.send();
+        if (xhr.status !== 200) {
+          throw new Error("HTTP " + xhr.status);
+        }
+        if (!xhr.responseText) {
+          throw new Error("Empty response");
+        }
+        let doc = new DOMParser().parseFromString(xhr.responseText, "text/html");
+        let count = parseHtmlDocument(doc, true);
+        log.info(`${from}: parsed ${count} hints`);
+      } catch (err) {
+        log.error(`Failed to load hints from '${from}' (${err.message})`);
+      }
+    }
+    function get2(hintId) {
+      let hint = db[hintId];
+      return hint;
+    }
+    function names() {
+      let ids = Object.keys(db);
+      return ids.join(",");
+    }
+    return { parseMyDocument, importHints, get: get2, names };
+  })();
+  function Hint($$anchor) {
+  }
+  create_custom_element(Hint, {}, [], [], true);
+  let shellChars = {
+    java: "$",
+    cs: "@",
+    csharp: "@",
+    "c#": "@",
+    "python": "&",
+    "js": "@",
+    "javascript": "@"
+  };
+  function buildDrills() {
+    let drills = [];
     function parseDrills() {
+      let phaseNoRegex = /\{(\d+)\}(\!?)/;
+      let phaseSwitchRegex = /\{\+\}/;
       function makeSrc(id, content, _$) {
         let lines = content.split(/\r?\n/);
         let lineNo = 0;
         let next2 = () => lineNo += lineNo < lines.length ? 1 : 0;
         let end = () => lineNo >= lines.length;
-        function assert(expr) {
+        function assert2(expr) {
           if (expr()) return;
           let msg = `Line ${lineNo}: ASSERT has failed: ${expr}`;
           log.error(msg);
@@ -13002,13 +13045,16 @@
           let positions = {
             "u": "top",
             "t": "top",
+            "a": "top",
             "d": "bottom",
             "b": "bottom",
             "l": "left",
             "r": "right",
             "top": "top",
             "up": "top",
+            "above": "top",
             "bottom": "bottom",
+            "below": "bottom",
             "down": "bottom",
             "left": "left",
             "right": "right"
@@ -13020,7 +13066,7 @@
           return where || "bottom";
         }
         function parseHint(hintId, whereCh, whereName) {
-          let hint = hints[hintId];
+          let hint = hints.get(hintId);
           return {
             id: hint ? hint.id : `${id}.${lineNo}`,
             text: hint ? hint.text : hintId,
@@ -13039,9 +13085,14 @@
         }
         function parse$Line() {
           let spans = lineWithNoMarkup().split(_$);
-          assert(() => spans.length > 1);
+          assert2(() => spans.length > 1);
           let noOf$ = spans.length - 1;
-          if (noOf$ % 2 != 0) throw new Error(`Line ${lineNo}: Odd number of '${_$}' (${noOf$}); '${_$}' should come in pairs`);
+          if (noOf$ % 2 != 0) {
+            let argsLine = argumentLine();
+            let msg = `Line ${lineNo}: Odd number of '${_$}' (${noOf$}); '${_$}'`;
+            let why = argsLine ? `too many argument lines?` : `'${_$}' should come in pairs`;
+            throw new Error(`${msg} (${why})`);
+          }
           return spans;
         }
         function parseWaveColor() {
@@ -13050,7 +13101,8 @@
           return parseColor(ch[1]);
         }
         function parseHintProps() {
-          let wavedWithHint = /~(\w?\s*)(?:h(\w)|hint-(\w+))\s+(.+)/.exec(line2());
+          let ln = lineWithNoMarkup();
+          let wavedWithHint = /~(\w?\s*)(?:h(\w)|hint-(\w+))\s+(.+)/.exec(ln);
           if (!wavedWithHint) return void 0;
           let whereCh = wavedWithHint[2];
           let whereName = wavedWithHint[3];
@@ -13062,7 +13114,7 @@
         }
         function parseReplacement() {
           let replacement = /\^(.*)/.exec(line2());
-          assert(() => replacement !== null);
+          assert2(() => replacement !== null);
           let span = replacement[1].split("~")[0].trimEnd();
           return trimEnd$(span);
         }
@@ -13073,28 +13125,32 @@
           return parseInt(indent[1]);
         }
         function lineWithNoMarkup() {
-          let noMarkup = line2().replace(indentRegex, (match) => " ".repeat(match.length));
+          let noMarkup = line2().replace(indentRegex, (match) => " ".repeat(match.length)).replace(phaseNoRegex, "").replace(phaseSwitchRegex, "");
           if (noMarkup[0] === "+" || noMarkup[0] === "-") noMarkup = " " + noMarkup.substring(1);
           return noMarkup;
         }
         function argumentLine() {
-          let argPrefixes = ["+", "-", "~", "^"];
+          let argPrefixes = ["^", "~"];
           let ln = line2().trim();
           for (let prefix of argPrefixes) {
             if (ln.startsWith(prefix)) return true;
           }
           return false;
         }
+        function hasPhaseSwitch() {
+          return phaseNoRegex.test(line2()) || phaseSwitchRegex.test(line2());
+        }
         return {
           id,
           text: content,
           lines,
           line: () => lineWithNoMarkup(),
+          lineWithMarkup: () => line2(),
           lineNo: () => lineNo,
           emptyLine: () => lines[lineNo].trim().length === 0,
           next: next2,
           end,
-          assert,
+          assert: assert2,
           skipEmptyLines,
           trimEnd$,
           parseColor,
@@ -13109,7 +13165,8 @@
           replaceSpan,
           parseReplacement,
           parseIndent,
-          argumentLine
+          argumentLine,
+          hasPhaseSwitch
         };
       }
       function makeDrill(id, src) {
@@ -13135,18 +13192,17 @@
           let token2 = { type, props };
           tokens.push(token2);
         }
-        function startNewLine(wrongLine) {
+        function addLineNo() {
           lineNo++;
           let lnPrefix = lineNo.toString().padStart(2, " ").padEnd(4, " ");
-          add("new-line", { wrongLine });
           add("line-no", { lineNo: lnPrefix });
         }
         function addAsIsSpan(code) {
           add("as-is", { code });
         }
         function addReplaceSpan(phaseNo, rightSpan, wrongSpan, color, hint) {
-          if (wrongSpan.length > 0) add("wrong-span", { phaseNo, code: wrongSpan, color, hint });
           if (rightSpan.length > 0) add("right-span", { phaseNo, code: rightSpan });
+          if (wrongSpan.length > 0) add("wrong-span", { phaseNo, code: wrongSpan, color, hint });
         }
         function addWavedSpan(phaseNo, span, color, hint) {
           if (span.length > 0) add("waved", { phaseNo, code: span, color, hint });
@@ -13163,10 +13219,16 @@
             add("left-indent", { phaseNo, spaceCount: indent });
           }
         }
+        function addLine(wrongLine, phaseNo) {
+          if (wrongLine) add("wrong-line", { phaseNo });
+          else add("new-line", {});
+          addLineNo();
+        }
         return {
           id,
           tokens,
-          startNewLine,
+          addLine,
+          addLineNo,
           addAsIsSpan,
           addReplaceSpan,
           addWavedSpan,
@@ -13175,9 +13237,37 @@
         };
       }
       function parseDrill(id, content, _$) {
+        let phaseNo = (() => {
+          function makePhaseNo(value) {
+            return {
+              get: () => value,
+              set: (_) => value = _,
+              toString: () => value
+            };
+          }
+          let currentNo = 0;
+          let currentPhase = makePhaseNo(currentNo);
+          let explicits = /* @__PURE__ */ new Map();
+          function next2(src2) {
+            let line2 = src2.lineWithMarkup();
+            currentNo++;
+            let match = phaseNoRegex.exec(line2);
+            if (match) {
+              let explicitId = match[1];
+              let setNow = match[2].length > 0;
+              if (!explicits.has(explicitId)) {
+                explicits.set(explicitId, makePhaseNo(currentNo));
+              }
+              currentPhase = explicits.get(explicitId);
+              if (setNow) currentPhase.set(currentNo);
+            } else {
+              currentPhase = makePhaseNo(currentNo);
+            }
+          }
+          return { next: next2, get: () => currentPhase };
+        })();
         let src = makeSrc(id, content, _$);
         let drill = makeDrill(id);
-        let phaseNo = 0;
         function applyIndent(indent, span) {
           if (!indent) return span;
           if (indent < 0) indent = -indent;
@@ -13188,26 +13278,32 @@
         while (!src.end()) {
           if (src.emptyLine()) {
             src.skipEmptyLines();
-            if (!src.end()) drill.startNewLine(false);
+            if (!src.end()) {
+              drill.addLine(false, phaseNo.get());
+            }
             continue;
           }
           if (src.rightLineRemoved()) {
-            phaseNo++;
-            drill.addRightLine(phaseNo, src.line());
+            phaseNo.next(src);
+            drill.addRightLine(phaseNo.get(), src.line());
             src.next();
             continue;
           }
-          drill.startNewLine(src.wrongLineAdded());
           let indent = src.parseIndent();
-          drill.addIndent(phaseNo, indent);
+          let wrongLine = src.wrongLineAdded();
           if (src.asIsLine()) {
+            if (wrongLine) phaseNo.next(src);
+            drill.addLine(wrongLine, phaseNo.get());
+            drill.addIndent(phaseNo.get(), indent);
             drill.addAsIsSpan(applyIndent(indent, src.line()));
             src.next();
             continue;
           }
           let spans = src.parse$Line();
-          phaseNo++;
           spans[0] = applyIndent(indent, spans[0]);
+          phaseNo.next(src);
+          drill.addLine(wrongLine, phaseNo.get());
+          drill.addIndent(phaseNo.get(), indent);
           for (let i = 0; i < spans.length; i += 2) {
             let asIsSpan = spans[i];
             let rightSpan = spans[i + 1];
@@ -13217,13 +13313,16 @@
             if (rightSpan !== void 0) {
               src.next();
               if (!src.argumentLine()) throw new Error(`Line: ${src.lineNo()}: Not enough arguments for previous line`);
+              if (src.hasPhaseSwitch()) {
+                phaseNo.next(src);
+              }
               let color = src.parseWaveColor();
               let hint = src.parseHintProps();
               if (src.replaceSpan()) {
                 let wrongSpan = src.parseReplacement();
-                drill.addReplaceSpan(phaseNo, rightSpan, wrongSpan, color, hint);
+                drill.addReplaceSpan(phaseNo.get(), rightSpan, wrongSpan, color, hint);
               } else {
-                drill.addWavedSpan(phaseNo, rightSpan, color, hint);
+                drill.addWavedSpan(phaseNo.get(), rightSpan, color, hint);
               }
             }
           }
@@ -13231,24 +13330,34 @@
         }
         return drill.tokens;
       }
-      function buildDrill(id, tokens) {
+      function buildDrill(id, tokens, atOnce) {
+        let seenPhases = /* @__PURE__ */ new Set();
         function splitTokensToLines() {
           let line2 = null;
-          let lines = [];
+          let lines2 = [];
           for (let i = 0; i < tokens.length; i++) {
             let token2 = tokens[i];
+            if ("phaseNo" in token2.props) seenPhases.add(token2.props.phaseNo.get());
             if (token2.type === "new-line") {
-              line2 = { wrongLine: token2.props.wrongLine, tokens: [] };
-              lines.push(line2);
-            } else if (token2.type === "right-line") {
               line2 = { wrongLine: false, tokens: [] };
-              lines.push(line2);
+              lines2.push(line2);
+            } else if (token2.type === "right-line") {
+              line2 = { phaseNo: token2.props.phaseNo, wrongLine: false, tokens: [] };
+              lines2.push(line2);
+            } else if (token2.type === "wrong-line") {
+              line2 = { phaseNo: token2.props.phaseNo, wrongLine: true, tokens: [] };
+              lines2.push(line2);
+              continue;
             }
             line2?.tokens.push(token2);
           }
-          return lines;
+          return lines2;
         }
-        return { id, tokens, lines: splitTokensToLines() };
+        let lines = splitTokensToLines();
+        let phases = [...seenPhases].sort((a, b) => a - b);
+        if (atOnce) phases = [];
+        console.log(`${id} is built:`, phases);
+        return { id, atOnce, phases, tokens, lines };
       }
       let htmls = document.querySelectorAll("drill");
       log.info(`Found ${htmls.length} drills`);
@@ -13260,23 +13369,28 @@
         ids.add(id);
         let lang = el.getAttribute("lang") || "java";
         let _$ = el.getAttribute("$") || shellChars[lang] || "$";
+        let atOnce = el.hasAttribute("at-once");
+        let logLevel = el.getAttribute("log-level") || "E";
+        log.pushLevel(logLevel);
         try {
           let content = el.textContent;
           let tokens = parseDrill(id, content, _$);
           if (tokens.length === 0) throw new Error(`Drill is empty`);
-          let drill = buildDrill(id, tokens);
+          let drill = buildDrill(id, tokens, atOnce);
           drills.push(drill);
           log.info(`Drill '${id}' is parsed: ${tokens.length} tokens`);
         } catch (err) {
           console.log(err);
           log.error(`Failed to parse drill '${id}': ${err.message}`);
+        } finally {
+          log.popLevel();
         }
       });
-      log.info(`Drills parsed (${drills.length}): [${drills.map((h) => h.id)}]`);
+      log.info(`Parsed ${drills.length} drills`);
       return drills;
     }
     try {
-      parseHints();
+      hints.parseMyDocument();
       parseDrills();
     } catch (err) {
       console.log(err);
@@ -13284,8 +13398,16 @@
     }
     return drills;
   }
-  function orderDrills(drills, order) {
-    if (order.length === 0) return drills;
+  function importantFirst(drills) {
+    let reordered = [];
+    drills.map((drill) => {
+      if (drill.id.endsWith("!")) reordered.unshift(drill);
+      else reordered.push(drill);
+    });
+    return reordered;
+  }
+  function orderDrills(drills, order, shuffle) {
+    if (order.length === 0) return shuffle ? lodashExports.shuffle(drills) : importantFirst(drills);
     let ordered = [];
     let id2drill = /* @__PURE__ */ new Map();
     let shown = /* @__PURE__ */ new Set();
@@ -13305,17 +13427,27 @@
       ordered.push(drill);
       shown.add(id);
     });
+    if (shuffle) ordered = lodashExports.shuffle(ordered);
     return ordered;
   }
   const prev = (_, setNo, indx) => setNo(get$1(indx) - 1);
-  function again() {
-    phase.restart();
+  function again(__1, drill) {
+    phase.start(get$1(drill).id, get$1(drill).phases);
   }
-  var root_7$2 = /* @__PURE__ */ from_html(`<div class="tooltip"><button></button></div>`);
-  var root$9 = /* @__PURE__ */ from_html(`<!> <div class="code svelte-cwws93"><!></div> <div class="control svelte-cwws93"><button>Prev</button> <button class="again btn btn-xs btn-warning">Again</button> <button>Next</button> <!></div>`, 1);
+  function shuffleDrills(__2, shuffleCount, drills, setNo) {
+    update(shuffleCount);
+    set(drills, lodashExports.shuffle(get$1(drills)), true);
+    setNo(0);
+  }
+  function reveal() {
+    phase.reveal();
+  }
+  var root_7$2 = /* @__PURE__ */ from_html(`<br/>`);
+  var root_8 = /* @__PURE__ */ from_html(`<div class="tooltip"><button></button></div>`);
+  var root$9 = /* @__PURE__ */ from_html(`<!> <div class="code svelte-ur0zc1"><!></div> <div class="control svelte-ur0zc1"><button class="shuffle btn btn-xs btn-warning">Shuffle</button> <button>Prev</button> <button>Next</button> <button class="show btn btn-xs btn-outline btn-success">Reveal</button> <button class="again btn btn-xs btn-outline btn-error">Again</button> <!> <!></div>`, 1);
   const $$css$9 = {
-    hash: "svelte-cwws93",
-    code: ".code.svelte-cwws93 {position:relative;user-select:none;font-family:monospace;white-space:pre;font-size:18px;font-family:monospace;cursor:pointer;}.control.svelte-cwws93 {position:fixed;width:100%;bottom:0;font-size:14px;user-select:none;}.next.svelte-cwws93 {position:absolute;bottom:0;right:0;}.exact.svelte-cwws93 {margin:2px;}"
+    hash: "svelte-ur0zc1",
+    code: ".code.svelte-ur0zc1 {position:relative;user-select:none;font-family:monospace;white-space:pre;font-size:18px;font-family:monospace;cursor:pointer;padding-bottom:50px;}.control.svelte-ur0zc1 {position:fixed;width:100%;bottom:0;font-size:14px;user-select:none;}.exact.svelte-ur0zc1 {margin:2px;}"
   };
   function Code_drills($$anchor, $$props) {
     push$1($$props, true);
@@ -13331,47 +13463,64 @@
       ["left-indent", LeftIndent],
       ["right-indent", RightIndent]
     ]);
-    let logLevel = prop($$props, "log-level", 7), show = prop($$props, "show", 7);
-    let order = show() ? lib.parse(show()) : [];
+    let logLevel = prop($$props, "log-level", 7), show = prop($$props, "show", 7), shuffle = prop($$props, "shuffle", 7);
     if (logLevel()) log.setLevel(logLevel());
+    let order = show() ? lib.parse(show()) : [];
+    shuffle(shuffle() !== void 0);
     let drills = /* @__PURE__ */ state$1(proxy([]));
     let drill = /* @__PURE__ */ state$1(void 0);
     let indx = /* @__PURE__ */ state$1(0);
+    let shuffleCount = /* @__PURE__ */ state$1(0);
+    let refreshKey = /* @__PURE__ */ user_derived(() => `${get$1(shuffleCount)}-${get$1(indx)}`);
     function onclick2(e) {
       let target = e.target;
       if (!(target instanceof Element)) return;
       if (target.closest("button")) return;
-      phase.next();
+      phase.tick();
+    }
+    function onRightClick(e) {
+      let target = e.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest("button")) return;
+      phase.untick();
     }
     function setNo(no) {
-      if (no < 0 || no === get$1(drills).length) return;
+      if (no < 0 || no >= get$1(drills).length) return;
       set(indx, no, true);
       set(drill, get$1(drills)[get$1(indx) % get$1(drills).length], true);
-      phase.restart();
+      phase.start(get$1(drill).id, get$1(drill).phases);
     }
     let next2 = () => setNo(get$1(indx) + 1);
     document.addEventListener("DOMContentLoaded", () => {
       let all = buildDrills();
-      set(drills, orderDrills(all, order), true);
+      set(drills, orderDrills(all, order, shuffle()), true);
       setNo(0);
     });
     var fragment = root$9();
     event("click", $window, onclick2);
+    event("contextmenu", $window, onRightClick);
     event("dblclick", $window, next2);
     var node = first_child(fragment);
     Logger(node, {});
     var div = sibling(node, 2);
-    set_style(div, "", {}, { "--animation-time": "1s", "--line-no-font-size": "0.6em" });
+    set_style(div, "", {}, {
+      "--animation-time": "1s",
+      "--line-no-font-size": "0.6em",
+      "--right-color": "rgb(200, 255, 200);"
+    });
     var node_1 = child(div);
     {
       var consequent = ($$anchor2) => {
         var fragment_1 = comment();
         var node_2 = first_child(fragment_1);
-        key$1(node_2, () => get$1(indx), ($$anchor3) => {
+        key$1(node_2, () => get$1(refreshKey), ($$anchor3) => {
           var fragment_2 = comment();
           var node_3 = first_child(fragment_2);
           each(node_3, 17, () => get$1(drill).lines, index, ($$anchor4, line2) => {
             Line($$anchor4, {
+              get phaseNo() {
+                return get$1(line2).phaseNo;
+              },
               get wrongLine() {
                 return get$1(line2).wrongLine;
               },
@@ -13408,25 +13557,39 @@
     reset(div);
     var div_1 = sibling(div, 2);
     var button = child(div_1);
-    let classes;
-    button.__click = [prev, setNo, indx];
+    button.__click = [shuffleDrills, shuffleCount, drills, setNo];
     var button_1 = sibling(button, 2);
-    button_1.__click = [again];
+    let classes;
+    button_1.__click = [prev, setNo, indx];
     var button_2 = sibling(button_1, 2);
     let classes_1;
     button_2.__click = next2;
-    var node_6 = sibling(button_2, 2);
-    each(node_6, 17, () => get$1(drills), index, ($$anchor2, drill2, no, $$array) => {
-      var div_2 = root_7$2();
-      var button_3 = child(div_2);
+    var button_3 = sibling(button_2, 2);
+    button_3.__click = [reveal];
+    var button_4 = sibling(button_3, 2);
+    button_4.__click = [again, drill];
+    var node_6 = sibling(button_4, 2);
+    {
+      var consequent_1 = ($$anchor2) => {
+        var br = root_7$2();
+        append($$anchor2, br);
+      };
+      if_block(node_6, ($$render) => {
+        if (get$1(drills).length > 15) $$render(consequent_1);
+      });
+    }
+    var node_7 = sibling(node_6, 2);
+    each(node_7, 17, () => get$1(drills), index, ($$anchor2, drill2, no, $$array) => {
+      var div_2 = root_8();
+      var button_5 = child(div_2);
       let classes_2;
-      button_3.__click = () => setNo(no);
-      button_3.textContent = no + 1;
+      button_5.__click = () => setNo(no);
+      button_5.textContent = no + 1;
       reset(div_2);
       template_effect(
         ($0) => {
           set_attribute(div_2, "data-tip", get$1(drill2).id);
-          classes_2 = set_class(button_3, 1, "exact btn btn-xs btn-primary  svelte-cwws93", null, classes_2, $0);
+          classes_2 = set_class(button_5, 1, "exact btn btn-xs btn-primary  svelte-ur0zc1", null, classes_2, $0);
         },
         [() => ({ "btn-outline": no !== get$1(indx) })]
       );
@@ -13435,8 +13598,8 @@
     reset(div_1);
     template_effect(
       ($0, $1) => {
-        classes = set_class(button, 1, "prev btn btn-xs btn-accent", null, classes, $0);
-        classes_1 = set_class(button_2, 1, "next btn btn-xs btn-accent svelte-cwws93", null, classes_1, $1);
+        classes = set_class(button_1, 1, "prev btn btn-xs btn-accent", null, classes, $0);
+        classes_1 = set_class(button_2, 1, "next btn btn-xs btn-accent", null, classes_1, $1);
       },
       [
         () => ({ "btn-disabled": get$1(indx) === 0 }),
@@ -13458,11 +13621,38 @@
       set show($$value) {
         show($$value);
         flushSync();
+      },
+      get shuffle() {
+        return shuffle();
+      },
+      set shuffle($$value) {
+        shuffle($$value);
+        flushSync();
       }
     });
   }
   delegate(["click"]);
-  customElements.define("code-drills", create_custom_element(Code_drills, { "log-level": {}, show: {} }, [], [], false));
+  customElements.define("code-drills", create_custom_element(Code_drills, { "log-level": {}, show: {}, shuffle: {} }, [], [], false));
+  function Import_hints($$anchor, $$props) {
+    push$1($$props, true);
+    let from = prop($$props, "from", 7);
+    if (from()) {
+      console.log(`Loading hints from '${from()}'`);
+      hints.importHints(from());
+    } else {
+      console.warn(`Can't loading hints from '${from()}' (attribute 'from' is missing?)`);
+    }
+    return pop$1({
+      get from() {
+        return from();
+      },
+      set from($$value) {
+        from($$value);
+        flushSync();
+      }
+    });
+  }
+  customElements.define("import-hints", create_custom_element(Import_hints, { from: {} }, [], [], false));
   const preventDblClick = (me) => {
     me.addEventListener("dblclick", (e) => {
       e.stopPropagation();
