@@ -4376,7 +4376,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.17.5";
+  const VERSION = "0.17.6";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -13482,6 +13482,7 @@
       let target = e.target;
       if (!(target instanceof Element)) return;
       if (target.closest("button")) return;
+      e.preventDefault();
       phase.untick();
     }
     function setNo(no) {
