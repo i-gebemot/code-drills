@@ -4376,7 +4376,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.18.6";
+  const VERSION = "0.18.7";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
