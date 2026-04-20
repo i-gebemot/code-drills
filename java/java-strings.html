@@ -1,15 +1,67 @@
 <meta charset="utf-8" />
 <style> hint, drill {display: none;} </style>
-<script src="/bin/md-components.js"></script>
+<script src="./md-components.js"></script>
 
 <import-hints from="../java-hints.html"></import-hints>
 
 <!---------------------------------------------------------->
 
-<code-drills log-level="W"">
+<code-drills log-level="W"
+    heading="Strings"
+>
 </code-drills>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="mostFrequentNo()">
+<drill lang="java" id="hasCharInString()">
+public static boolean hasCharInString(String str, char ch) {
+    for (int i = 0; i < str.$length$$()$; i++) {
+            ~r ht length-is-func
+            ^$ 
+        if (str$.charAt($i$)$ == ch) {
+                ^[ ~r ht index-in-string
+                ^] ~r ht index-in-string
+            return true;
+        }
+    }
+    return false;
+}
+
+print(hasCharInString("Abcd efgh", 'A'));  // $true$
+    ^? ~g ht result
+print(hasCharInString("Abcd efgh", 'e'));  // $true$
+    ^? ~g ht result
+print(hasCharInString("Abcd efgh", ' '));  // $true$
+    ^? ~g ht result
+print(hasCharInString("Abcd efgh", 'a'));  // $false$
+    ^? ~g ht result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="isPalindrome()">
+public static boolean isPalindrome($S$$tring$ str) {
+        ^s ~r hb case-in-type
+        ~r hb case-in-type
+    for (int i = 0; i $<$ str$.length()$$ / 2$; i++) {
+            ^<= ~r ht index-out-of-bounds
+            ~o ht נראה שיש עבודה קפולה כאן...        {+}
+            ^$
+        if (str.charAt(i) != str$.charAt($str.length()-i-1$)$) {
+                ^[ ~r ht index-in-string
+                ^] ~r ht index-in-string
+            return false;
+        }
+    }
+    return true;
+}
+
+print(isPalindrome("aba"));         // $true$
+    ^? ~g ht result
+print(isPalindrome("abba"));        // $true$
+    ^? ~g ht result
+print(isPalindrome(abcabc"));       // $false$
+    ^? ~g ht result
+print(isPalindrome(""));            // $true$
+    ^? ~g ht result
 </drill>

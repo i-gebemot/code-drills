@@ -1,55 +1,15 @@
 <meta charset="utf-8" />
 <style> hint, drill {display: none;} </style>
-<script src="/bin/md-components.js"></script>
+<script src="./md-components.js"></script>
 
 <import-hints from="../java-hints.html"></import-hints>
 
 <!---------------------------------------------------------->
 
-<code-drills>
+<code-drills log-level="W"
+    heading="Classes"
+>
 </code-drills>
-
-<!---------------------------------------------------------->
-
-<hint id="access-modifier" dir="rtl">
-    האם אפשר לגשת לזה מבחוץ?
-</hint>
-
-<hint id="missing-ret-type" dir="rtl">
-    מה זה מחזיר?
-</hint>
-
-<hint id="better-with-this" dir="rtl">
-    האם this חובה כאן?
-</hint>
-
-<hint id="must-be-with-this" dir="rtl">
-    מה משווים למה? תכונה למשתנה או הפוך?
-</hint>
-
-<hint id="member-access" dir="rtl">
-    איך נגשים לתכונות?
-</hint>
-
-<hint id="missing-declaration" dir="rtl">
-    איפו זה מוגדר?
-</hint>
-
-<hint id="syntax-error">
-    Syntax error...
-</hint>
-
-<hint id="cant-access-private" dir="rtl">
-    האם אפשר לגשת לזה מבחוץ?
-</hint>
-
-<hint id="end-of-op" dir="rtl">
-    פקודה מסתיימת ב...
-</hint>
-
-<hint id="function-call" dir="rtl">
-    זה לא משתנה, זה פונקציה...
-</hint>
 
 <!---------------------------------------------------------->
 
@@ -115,7 +75,7 @@ a.setNum$(321)$;
     ^() = 321 ~r ht setter can't be assinged
 System.out.println($a2$.getNum());    // $321$ is printed
     ~g
-    ^? ~g ht What is printed?
+    ^? ~g ht whats-printed
 </drill>
 
 <!---------------------------------------------------------->
@@ -139,7 +99,7 @@ class B {
     ^$
         $int $$sum$ = 0;
         ~^
-        ~r ht missing-declaration
+        ~r ht type-is-missing
         for ($int $$i$ = 0; i < $this.$$arr$.length; i++) {
              ^$
              ~r ht syntax-error
@@ -185,11 +145,11 @@ B b = $new B$($new A[] {a, a2, a}$);
 System.out.println(b.$getArr()$[2].$getNum()$);     // $12$
     ^arr ~r ht cant-access-private      
     ^num ~r ht cant-access-private
-    ^? ~g hl What should be printed?    {+}
+    ^? ~g hl whats-printed    {+}
 System.out.println(b.$getSum$$()$);                 // $45$
     ~r ht function-call
     ^$
-    ^? ~g hl What should be printed?    {+}
+    ^? ~g hl whats-printed    {+}
 
 // How many classes are used here?  - $2$ classes ($A and B$)
     ^? ~g
@@ -243,4 +203,5 @@ $public $$static $$boolean same$(Person p1, Person p2) {
            ^p1.this.name.equals(p2.this.name) ~r ht syntax-error
 }
 </drill>
+
 

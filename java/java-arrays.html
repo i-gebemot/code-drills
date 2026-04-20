@@ -1,12 +1,14 @@
 <meta charset="utf-8" />
 <style> hint, drill {display: none;} </style>
-<script src="../md-components.js"></script>
+<script src="./md-components.js"></script>
 
 <import-hints from="../java-hints.html"></import-hints>
 
 <!---------------------------------------------------------->
 
-<code-drills log-level="W"">
+<code-drills log-level="W"
+    heading="Arrays"
+>
 </code-drills>
 
 <!---------------------------------------------------------->
@@ -301,19 +303,31 @@ print($arithmeticProgression$(new int[] {9,7,5,3,1,0}, 9, -1));       // $false$
 <!---------------------------------------------------------->
 
 <drill lang="java" id="suffix()">
-boolean suffix(int[] a, int[] b) {
-    if (b.length > a.length) {
-        return false;
-    }
-    for (int i = 0; i < b.length; i++) {
-        if (a[a.length-i-1] != b[b.length-i-1]) {
+public static boolean $suffix$(int$[]$ $a$, int$[]$ $b$) {
+        ^what ~g hr func-name                   {1}
+        ^$ ~t                                   {+}
+        ~r hb is-it-array
+        ^$
+        ~r hb is-it-array
+-    if (b.length > a.length) {                 {2}
+-        return false;                          {2}
+-    }                                          {2}
+    for (int i = 0; i < b.length; $i += 1$) {
+            ~g ht זה דווקה בסדר, זהה ל- ++i
+        if (a[a.length-i-1] $!=$ b[$b$.length-i-1]) {
+                ^== ~r ht wrong-logic
+                ^a ~r ht זה אחרון של מערך a או b?   {+}
             return false;
         }
     }
     return true;
 }
 
-print(suffix(new int[] {23,10,5,7,1}, new int[] {5,7,1}));
-print(suffix(new int[] {23,10,5,7,1}, new int[] {5,8,1}));
-print(suffix(new int[] {23,10,5,7,1}, new int[] {1,23,10,5,7,1}));
+$suffix$(new int[] {23,10,5,7,1}, new int[] {5,7,1});   // true
+        ^what ~g hr func-name                   {1}
+$suffix$(new int[] {23,10,5,7,1}, new int[] {5,8,1});   // true
+        ^what ~g hr func-name                   {1}
+$suffix$(new int[] {23,10,5,7,1}, new int[] ${1,23,10,5,7,1}$);
+        ^what ~g hr func-name                   {1}
+        ~r ht מה יקרא אחרי בדיקה של מספר 23?    {2}!
 </drill>

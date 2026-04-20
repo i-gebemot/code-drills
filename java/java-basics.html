@@ -1,12 +1,14 @@
 <meta charset="utf-8" />
 <style> hint, drill {display: none;} </style>
-<script src="../md-components.js"></script>
+<script src="./md-components.js"></script>
 
 <import-hints from="../java-hints.html"></import-hints>
 
 <!---------------------------------------------------------->
 
-<code-drills log-level="E" shuffle_ show_="['basic-logic']">
+<code-drills log-level="W"
+    heading="Basic syntax"
+>
 </code-drills>
 
 <!---------------------------------------------------------->
@@ -15,10 +17,10 @@
 int a = 10;         // 10
 int b = a + 10;     // $20$
                         ^? ~g hr result
-int b = "a";        // $error$
+int b = "a";        // $❌ Can't assing string to int$
                         ^? ~g hr result
 double pi = 3.14;   // 3.14
-int x = pi;         // $error$
+int x = pi;         // $❌ Can't assing double to int$
                         ^? ~g hr result
 char ch = 'A';      // 'A'
 a = ch;             // $65$
@@ -36,22 +38,22 @@ String name = $"$$Java$$"$;
 <!---------------------------------------------------------->
 
 <drill lang="java" id="types-and-conversions">
-int n = 123;            // 5
-double pi = 3.14;       // 3.14
-double x = "pi";        // $error: can't assing string to double$
+int n = 123;        // 5
+double pi = 3.14;   // 3.14
+double x = "pi";    // $❌ Can't assing string to double$
                             ^? ~g hr result
-double d = 123.0;       // 123.0
-d = n;                  // $123.0$
+double d = 123.0;   // 123.0
+d = n;              // $123.0$
                             ^? ~g hr result
-n = d;                  // $error: can't assign double to int$
+n = d;              // $❌ Can't assign double to int$
                             ^? ~g hr result
-n = (int) d;            // $123$
+n = (int) d;        // $123$
                             ^? ~g hr result
-y = pi;                 // $error: y is not defined$
+y = pi;             // $❌ y is not defined$
                             ^? ~g hr result
-double d2 = n + d;      // $246.0$
+double d2 = n + d;  // $246.0$
                             ^? ~g hr result
-int n2 = 123.0;         // $error: can't assign double to int$
+int n2 = 123.0;     // $error: can't assign double to int$
                             ^? ~g hr result
 </drill>
 
@@ -131,13 +133,13 @@ boolean b = n1 == 9;    // $true$
 
 System.out.println(n % 11 == 3) // $true is printed$    {1}
                                         ~o
-n = ?                           // $14$                 {1}
+n = ?                       // $14$                     {1}
                                    ^?n מה יכול להיות הערך של ~g
 
 
 System.out.println(n % 11 != 0) // $false is printed$   {2}
                                         ~o
-n = ?                           // $22$                 {2}
+n = ?                       // $22$                     {2}
                                    ^?n מה יכול להיות הערך של ~g
 
 </drill>
@@ -149,34 +151,34 @@ int n1 = 10;
 int n2 = 20;
 
 System.out.println(n1 == n2);                   // $false$
-                                        ^? ~g ht what-is-printed
+                                        ^? ~g ht result
 System.out.println(n1 != n2);                   // $true$
-                                        ^? ~g ht what-is-printed
+                                        ^? ~g ht result
                                         
 System.out.println(n1 > n2  ||  n1 < n2);       // $true$
-                                        ^? ~g ht what-is-printed
+                                        ^? ~g ht result
 System.out.println(n1 < n2  &&  n2 < 10);       // $false$
-                                        ^? ~g ht what-is-printed
+                                        ^? ~g ht result
 System.out.println(n1 < 10  ||  n2 > 20);       // $false$
-                                        ^? ~g ht what-is-printed
+                                        ^? ~g ht result
 System.out.println(n1 <= 10  &&  n2 >= 20);     // $true$
-                                        ^? ~g ht what-is-printed
+                                        ^? ~g ht result
 
 System.out.println(n1 + n2 == 30);              // $true$
-                                        ^? ~g ht what-is-printed
+                                        ^? ~g ht result
 System.out.println(n1 * n2 > 100);              // $true$
-                                        ^? ~g ht what-is-printed
+                                        ^? ~g ht result
 System.out.println(n2 / n1 == 2);               // $true$
-                                        ^? ~g ht what-is-printed
+                                        ^? ~g ht result
 System.out.println(n2 % n1 == 0);               // $true$
-                                        ^? ~g ht what-is-printed
+                                        ^? ~g ht result
 
 System.out.println(!(n1 == n2));                // $true$
-                                        ^? ~g ht what-is-printed
+                                        ^? ~g ht result
 System.out.println(!(n1 < n2));                 // $false$
-                                        ^? ~g ht what-is-printed
+                                        ^? ~g ht result
 System.out.println((n1 + 5) == (n2 - 5));       // $true$
-                                        ^? ~g ht what-is-printed
+                                        ^? ~g ht result
 </drill>
 
 <!---------------------------------------------------------->
@@ -348,7 +350,7 @@ $digitSum$(123456789);        // $45$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="reverse()!"> 
+<drill lang="java" id="reverse()"> 
 public static int $reverse$($int $$num$) {
         ^what ~g hr func-name   {1}
         ^$ ~t                   {+}
@@ -407,15 +409,15 @@ public static void say(int num) {
 }
 
 say(13);        // $Boom$
-                    ^? ~g ht what-is-printed
+                    ^? ~g ht result
 say(3);         // $Boom boom$
-                    ^? ~g ht what-is-printed
+                    ^? ~g ht result
 say(12);        // $Boom$
-                    ^? ~g ht what-is-printed
+                    ^? ~g ht result
 say(0);         // $Boom$
-                    ^? ~g ht what-is-printed
+                    ^? ~g ht result
 say(10);        // $10$
-                    ^? ~g ht what-is-printed
+                    ^? ~g ht result
 </drill>
 
 <!---------------------------------------------------------->
