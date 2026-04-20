@@ -5,14 +5,14 @@
 <!---------------------------------------------------------->
 <import-hints from="../java-hints.html"></import-hints>
 
-<code-drills log-level="W"
-    heading="Readme and navigation"
+<code-drills log-level="W" no-wrong-phase
+    heading="Readme"
 >
 </code-drills>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="navigation">
+<drill lang="java" id="navigation" at-once>
 Next phase - $Left click$
     ^Left click ~g hr שלב הבא
 Previous phase - $Right click$
@@ -40,6 +40,8 @@ public static String str(Object arg) {
     ...
 }
 
+<!---------------------------------------------------------->
+
 // פונקצית עזר בתרגילים הבאים
 // $מדפיסה כל פרמטר בתור מחרוזת$
         ^מה הפונקציה עושה? ~g
@@ -48,4 +50,20 @@ public static void print(Object arg) {
 }
 </drill>
 
+<!---------------------------------------------------------->
+
+<drill lang="java" id="How to learn">
+How to learn
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="About" at-once>
+Author $Gosha Smeh$
+    ^? ~g hr Gosha Smeh
+Contact me: $gosha.smeh@gmail.com$
+    ^? ~g hr gosha.smeh@gmail.com
+Powered by $gebemot.com$
+    ^? ~g hr gebemot.com
+</drill>
 
