@@ -40,22 +40,162 @@ print(hasCharInString("Abcd efgh", 'a'));  // $false$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="what-01()" todo>
-public static boolean suffix(String a, String b) {
-    return a.substring(a.length() - b.length()).equals(b);
+<drill lang="java" id="count()">
+public static int $count$(String str, char ch) {
+        ^what ~g hr func-name                   {1}
+    int $cnt$$ = 0$;
+        ~r hr init-value
+        ^$
+    for (int i = 0; i < str.length(); i++) {
+        if (str$.charAt($i$)$ $==$ ch) {
+                ^[ ~r ht index-in-string
+                ^] ~r ht index-in-string
+                ^= ~r ht assign-vs-comp         {+}
+            cnt++;
+        }
+    }
+-    return cnt;                {2}
+$} $                            {2}
+    ~r ht return-is-missing
+
+print($count$("aaabbc", 'a'));
+        ^what ~g hr func-name                   {1}
+print($count$("aaabbc", 'b'));
+        ^what ~g hr func-name                   {1}
+print($count$("aaabbc", 'c'));
+        ^what ~g hr func-name                   {1}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="anagrams()">
+// אותם אותיות (אותה כמות של כל אות) רק בסדר שונה
+$public static $boolean $anagrams$($S$$tring$ s1, $S$$tring$ s2) {
+        ^$
+        ~r hb external-func
+        ^s ~r hb case-in-type   {+}
+        ~r hb case-in-type
+        ^s ~r hb case-in-type
+        ~r hb case-in-type
+    if (s1.$length$$()$ != s2.$length$$()$) {   {1}
+            ~r ht length-is-func
+            ^$
+            ~r ht length-is-func
+            ^$
+        return false;
+    }
+    for (int i = 0; i < s1.$length$$()$; i++) { {1}
+            ~r ht length-is-func
+            ^$
+        char ch = s1.charAt(i);
+        if (count(s1, ch) $!=$ count(s2, ch)) {
+                ^== ~r ht wrong-logic
+            return false;
+        }
+    }
+    return true;
 }
+
+print(anagrams("ABCD", "DCBA"));        // $true$
+        ^? ~g hl result
+print(anagrams("aaabbc", "ababac"));    // $true$
+        ^? ~g hl result
+print(anagrams("aaabbc", "ababab"));    // $false$
+        ^? ~g hl result
 </drill>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="substring(a,b)" todo>
-...
+<drill lang="java" id="endsWith()">
+public static boolean $endsWith$(String a, String b) {
+        ^what ~g hr func-name                   {1}
+-    if (a.length() < b.length()) {             {2}
+-        return false;                          {2}
+-    }                                          {2}
+    return a.substring(a.length() - b.length())$.equals($b$)$;
+        ^ == $ ~r ht strings-are-refs
+        ^$
+}
+
+print($endsWith$("abcd", "cd"));        // $true$
+        ^what ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+print($endsWith$("abcd", "dd"));        // $false$
+        ^what ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+print($endsWith$($"abcd", "aabcd"$));     // $false$
+        ^what ~g hr func-name                   {1}
+        ~r ht index-out-of-bounds               {2}!
+        ^? ~g hl result                         {+}
 </drill>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="isPalindrome()">
-public static boolean isPalindrome($S$$tring$ str) {
+<drill lang="java" id="isUpDown()">
+public static $boolean $$isUpDown$($String $$str$) {
+        ^$
+        ~r hb return-type
+        ^$ ~t                                   {1}
+        ~r hb type-is-missing
+    $char $$firstCh$ = str.charAt(0);               {1}
+        ^$
+        ~r ht type-is-missing
+    $boolean $$up$ = firstCh >= 'A' $&&$ firstCh $<=$ 'Z';
+        ^$ ~t                                       {1}
+        ~r ht type-is-missing
+        ^and ~r ht java-not-python                  {3}
+                    ^< ~r ht wrong-logic           {2}
+    for (int i = 0; i < str.length(); i++) {
+        $char $$ch$ = str.charAt(i);                {1}
+            ^$
+            ~r ht type-is-missing
+        if (up $&&$ ch >= 'a' $&&$ ch $<=$ 'z') {
+                ^and ~r ht java-not-python                  {3}
+                ^and ~r ht java-not-python                  {3}
+                    ^< ~r ht wrong-logic           {2}
+            return false;
+        }
+        if (!up $&&$ ch >= 'A' $&&$ ch $<=$ 'Z') {
+                ^and ~r ht java-not-python                  {3}
+                ^and ~r ht java-not-python                  {3}
+                    ^< ~r ht wrong-logic           {2}
+            return false;
+        }
+-        up = !up;                                      {4}
+    $} $                                                {4}
+        ~r ht מה קורה עם משתנה up?
+    return true;
+}
+
+print(isUpDown("abcd"));        // false
+print(isUpDown("AbCd"));        // true
+print(isUpDown("aBcD"));        // true
+print(isUpDown("AbcD"));        // false
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="reverse()">
+// מחזיר מחרוזת הפוכה
+public static String reverse(String str) {
+    String rev = "";
+    for (int i = 0; i <= str.$length()$$-1$; i++) {
+            ~r ht index-vs-length
+            ^$
+        rev = $str.charAt(i)$ + $rev$;
+            ^rev ~r ht wrong-logic
+            ^str.charAt(i) ~r ht wrong-logic
+    }
+    return rev;
+}
+
+print(reverse("abcd"));     // dcba
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="palindrome()">
+public static boolean palindrome($S$$tring$ str) {
         ^s ~r hb case-in-type
         ~r hb case-in-type
     for (int i = 0; i $<$ str$.length()$$ / 2$; i++) {
@@ -71,12 +211,39 @@ public static boolean isPalindrome($S$$tring$ str) {
     return true;
 }
 
-print(isPalindrome("aba"));         // $true$
+print(palindrome("aba"));         // $true$
     ^? ~g ht result
-print(isPalindrome("abba"));        // $true$
+print(palindrome("abba"));        // $true$
     ^? ~g ht result
-print(isPalindrome(abcabc"));       // $false$
+print(palindrome(abcabc"));       // $false$
     ^? ~g ht result
-print(isPalindrome(""));            // $true$
+print(palindrome(""));            // $true$
     ^? ~g ht result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="isRotation()">
+// האם מחרוזת b היא רוטציה של מחרוזת a
+// כאילו מחרוזת מעגלית - אחרי אות אחרונה באה את ראשונה
+boolean isRotation(String a, String b) {
+    for (int i = 0; i < a.length(); i++) {
+        String rotation = a.substring($i$) + a.substring($0, i$);
+            ^... ~r ht implement
+            ^... ~r ht implement        {+}
+        if (rotation$.equals($b$)$) {
+                ^ == $ ~r ht strings-are-refs
+                ^$
+            return $true$;
+                ^... ~r ht implement
+        }
+    }
+    return $false$;
+            ^... ~r ht implement
+}
+
+print(isRotation("abcdef", "fabcde"));      // true
+print(isRotation("abcdef", "cdefab"));      // true
+print(isRotation("abcdef", "efabcd"));      // true
+print(isRotation("abcdef", "feabcd"));      // false
 </drill>
