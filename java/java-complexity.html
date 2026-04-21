@@ -6,12 +6,47 @@
 
 <!---------------------------------------------------------->
 
-<code-drills log-level="W"
+<code-drills
     heading="Complexity"
+    log-level="W"
 >
 </code-drills>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="()">
+<drill lang="java" id="hasLoop()" todo>
+boolean hasLoop(Node head) {
+    Node node = head;
+    int indx = 0;
+    while (node != null) {
+        Node node2 = head;
+        for (int i = 0; i < indx; i++) {
+            if (node2 == node) {
+                return true;
+            }
+            node2 = node2.getNext();
+        }
+        node = node.getNext();
+        indx++;
+    }
+    return false;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="hasLoop2()" todo>
+boolean hasLoop(Node head) {
+    Node l1 = head;
+    Node l2 = head;
+    while (l1 != null && l2 != null && l2.getNext() != null) {
+        l1 = l1.getNext();
+        l2 = l2.getNext().getNext();
+
+        if (l2 == l1) {
+            return true;
+        }
+    }
+    return false;
+}
 </drill>

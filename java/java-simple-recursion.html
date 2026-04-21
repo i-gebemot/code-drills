@@ -6,12 +6,249 @@
 
 <!---------------------------------------------------------->
 
-<code-drills log-level="W"
+<code-drills
     heading="Simple recursion"
+    log-level="W"
 >
 </code-drills>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="">
+<drill lang="java" id="pow()" todo>
+public static double pow(double x, int n) {
+    if (n == 0) {
+        return 1;
+    }
+    return x * pow(x, n-1);
+}
+
+print(pow(2, 10));
+print(pow(10, 6));
+print(pow(0.1, 3));
+print(pow(0.5, 5));
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="digitSum()" todo>
+int digitSum(int num) {
+    if (num == 0) {
+        return 0;
+    }
+    return num % 10 + digitSum(num / 10);
+}
+
+print(digitSum(123456789));
+print(digitSum(1024));
+print(digitSum(100000000));
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="what()" todo>
+boolean what(int num) {
+    if (num < 10) {
+        return num == 3 || num == 6 || num == 9;
+    }
+    return what(digitSum(num));
+}
+
+print(what(123456789));
+print(what(10101));
+print(what(6339));
+print(what(6301));
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="prefix()" todo>
+boolean prefix(String a, String b) {
+    if (b.length() == 0) {
+        return true;
+    }
+    if (a.length() == 0) {
+        return false;
+    }
+    if (a.charAt(0) != b.charAt(0)) {
+        return false;
+    }
+    return prefix(a.substring(1), b.substring(1));
+}
+
+print(prefix("abcdef", "abc"));
+print(prefix("abcdef", "abd"));
+print(prefix("abc", "abcdef"));
+print(prefix("abcdef", "abcdef"));
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="contains()" todo>
+boolean contains(String a, String b) {
+    if (a.length() < b.length()) {
+        return false;
+    }
+    if (prefix(a, b)) {
+        return true;
+    }
+    return contains(a.substring(1), b);
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="upcase()" todo>
+boolean upcase(String s) {
+    if (s.length() == 0) {
+        return true;
+    }
+    char ch = s.charAt(0);
+    if (ch >= 'a' && ch <= 'z') {
+        return false;
+    }
+    return upcase(s.substring(1));
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="palindrome()" todo>
+boolean palindrome(String s) {
+    if (s.length() == 0) {
+        return true;
+    }
+    if (s.length() == 1) {
+        return true;
+    }
+    if (s.charAt(0) != s.charAt(s.length()-1)) {
+        return false;
+    }
+    return palindrome(s.substring(1, s.length()-1));
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="reverse()" todo>
+String reverse(String s) {
+    if (s.length() == 0) {
+        return "";
+    }
+    return reverse(s.substring(1)) + s.charAt(0);
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="sumArray()" todo>
+int sum(int[] a, int i) {
+    if (i == a.length) {
+        return 0;
+    }
+    return a[i] + sum(a, i+1);
+}
+
+int sum(int[] a) {
+    return sum(a, 0);
+}
+
+print(sum(new int[] {1,2,3,4,5}));
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="minArray()" todo>
+int min(int[] a, int i) {
+    if (i == a.length) {
+        return Integer.MAX_VALUE;
+    }
+    return Math.min(a[i], min(a, i+1));
+}
+
+// אפשר גם טיפה שונה
+int min(int[] a, int i) {
+    if (i == a.length-1) {
+        return a[$a.length-1$];
+            ^? ~r
+    }
+    return Math.min(a[i], min(a, i+1));
+}
+
+int min(int[] a) {
+    return min(a, 0);
+}
+</drill>
+
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="palindrome-array()" todo>
+boolean palindrome(int[] a, int l, int r) {
+    if (l >= r) {
+        return true;
+    }
+    return a[l] == a[r] && palindrome(a, l+1, r-1);
+}
+
+boolean palindrome(int[] a) {
+    return palindrome(a, 0, a.length-1);
+}
+</drill>
+
+
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="same-array" todo>
+boolean same(int[] a, int[] b, int i) {
+    if (i == a.length) {
+        return true;
+    }
+    return a[i] == b[i] && same(a, b, i+1);
+}
+
+boolean same(int[] a, int[] b) {
+    if (a.length != b.length) {
+        return false;
+    }
+    return same(a, b, 0);
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="sorted-array" todo>
+boolean sorted(int[] a, int i) {
+    if (i == a.length) {
+        return true;
+    }
+    return a[i-1] < a[i] && sorted(a, i+1);
+}
+
+boolean sorted(int[] a) {
+    if (a.length < 2) {
+        return true;
+    }
+    return sorted(a, 1);
+}
+
+print(sorted(new int[] {1,3,4,7}));
+print(sorted(new int[] {1,3,3,7}));
+print(sorted(new int[] {1,3,-4,7}));
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="count-nodes" todo>
+public static int count(Node&lt;Integer> lst) {
+    ...
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="same-array-and-list!" todo>
+public static boolean same(Node&lt;Integer> lst, int[] a) {
+    ...
+}
 </drill>

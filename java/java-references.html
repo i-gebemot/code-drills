@@ -6,12 +6,110 @@
 
 <!---------------------------------------------------------->
 
-<code-drills log-level="W"
+<code-drills
     heading="References"
+    log-level="W"
 >
 </code-drills>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="">
+<drill lang="java" id="ref-01" todo>
+public class Person {
+    private String name;
+    private int age;
+    ...
+}
+
+Person2 p1 = new Person("Avi", 123);
+Person2 p2 = new Person("Avi", 123);
+
+print(p1);                  // [Avi: 123]
+print(p2);                  // [Avi: 123]
+print(p1 == p2);            // false
+
+p1 = p2;
+print(p1 == p2);            // true
+</drill>
+
+<drill lang="java" id="ref-02">
+public class Person {
+    private String name;
+    private int age;
+    ...
+}
+
+Person p1 = new Person2("Avi", 123);
+Person p2 = new Person2("Yoda", 321);
+
+print(p1);                  // [Avi: 123]
+print(p2);                  // [Yoda: 321]
+
+p1 = p2;
+
+print(p1);                  // [Yoda: 321]
+// How to print Avi again?
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="printPlusOne()" todo>
+public static void printPlusOne(int num) {
+    num += 1;
+    print(num);
+}
+
+public static void printPlusOne(Person p2) {
+    p2.setAge(p2.getAge() + 1);
+    print(p2.getAge());
+}
+
+int n1 = 33;
+Person p = new Person("Gili", 33);
+
+printPlusOne(n1);                   // 34
+printPlusOne(p);                    // 34
+
+print(n1, p.getAge());              // 33 34
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="array" todo>
+void foo(int[] a) {
+    a[1] += 100;
+}
+
+int[] a = new int[] {1, 2, 3};
+
+print(a);               // [1, 2, 3]
+foo(a);
+print(a);               // [1, 102, 3]
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="count-all" todo>
+class Point {
+    private int x;
+    private int y;
+    ...
+}
+
+Point[] points = new Point[3];      // obj: 1  ref: 4 
+for (int i = 0; i < points.length; i++) {
+    points[i] = new Point(i, i);
+}                                   // obj: 4  ref: 4 
+
+Point[] points2 = new Point[3];     // obj: 5  ref: 8 
+for (int i = 0; i < points.length; i++) {
+    points2[i] = points[i];         // obj: 5  ref: 8
+}
+
+Point[] points3 = new Point[3];     // obj: 6  ref: 12 
+for (int i = 0; i < points.length; i++) {
+    int x = points[i].getX();
+    int y = points[i].getY();
+    points3[i] = new Point(x, y);   // obj: 9  ref: 12 
+}
 </drill>

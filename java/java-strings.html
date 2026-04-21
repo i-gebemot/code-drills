@@ -6,8 +6,9 @@
 
 <!---------------------------------------------------------->
 
-<code-drills log-level="W"
+<code-drills
     heading="Strings"
+    log-level="W"
 >
 </code-drills>
 
@@ -35,6 +36,20 @@ print(hasCharInString("Abcd efgh", ' '));  // $true$
     ^? ~g ht result
 print(hasCharInString("Abcd efgh", 'a'));  // $false$
     ^? ~g ht result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="what-01()" todo>
+public static boolean suffix(String a, String b) {
+    return a.substring(a.length() - b.length()).equals(b);
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="substring(a,b)" todo>
+...
 </drill>
 
 <!---------------------------------------------------------->

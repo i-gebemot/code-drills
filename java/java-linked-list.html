@@ -6,12 +6,78 @@
 
 <!---------------------------------------------------------->
 
-<code-drills log-level="W"
+<code-drills
     heading="Linked list"
+    log-level="W"
 >
 </code-drills>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="">
+<drill lang="java" id="addToAllNodes()" todo>
+void addToAllNodes(Node node, int num) {
+    while (node != null) {
+        node.setValue(node.getValue() + num);
+        node = node.getNext();
+    }
+}
+
+Node list = listFromArray(new int[] {1, 2, 3, 4, 5});
+
+addToAllNodes(list, 100);
+print(list);        // [101, 102, 103, 104, 105] 
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="find()" todo>
+Node find(Node node, int value) {
+    while (node != null) {
+        if (value == node.getValue()) {
+            return node;
+        }
+        node = node.getNext();
+    }
+    return null;
+}
+
+Node list = listFromArray(new int[] {1, 2, 3, 4, 5});
+Node node = find(list, 3);
+
+print(list);        // [1, 2, 3, 4, 5] 
+print(node);        // [3, 4, 5]
+
+node.setNext(null);
+
+print(node);        // [3]
+print(list);        // [1, 2, 3]
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="list" todo>
+int[] numbers = new int[] {1, 2, 3, 4, 5};
+
+Node l1 = listFromArray(numbers);
+Node l2 = listFromArray(numbers);
+
+print(l1);          // [1, 2, 3, 4, 5]
+print(l2);          // [1, 2, 3, 4, 5]
+print(l1 == l2);    // false
+
+l1.getNext().getNext().getNext().setNext(l2.getNext());
+
+print(l1);          // [1, 2, 3, 4, 2, 3, 4, 5]
+print(l2);          // [1, 2, 3, 4, 5]   
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="endless-list" todo>
+int[] numbers = new int[] {1, 2, 3, 4, 5};
+
+Node l1 = listFromArray(numbers);
+
+l1.getNext().getNext().getNext().setNext(l1.getNext());
+print(l1);
 </drill>

@@ -5,14 +5,17 @@
 <!---------------------------------------------------------->
 <import-hints from="./java-hints.html"></import-hints>
 
-<code-drills log-level="W" no-wrong-phase
+<code-drills
     heading="Readme"
+    no-wrong-phase
+    at-once
+    log-level="W"
 >
 </code-drills>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="navigation" at-once>
+<drill lang="java" id="navigation">
 Next phase - $Left click$
     ^Left click ~g hr שלב הבא
 Previous phase - $Right click$
@@ -34,31 +37,56 @@ Go to a specific drill - $Number button$
     ^? ~g hr ללכת לדריל מסוים ישירות
 </drill>
 
-<drill lang="java" id="print()">
-public static String str(Object arg) {
-    // turn argument to string
-    ...
-}
-
 <!---------------------------------------------------------->
 
-<drill lang="java" id="How to learn">
+<drill lang="java" id="How to learn" todo>
 How to learn
 </drill>
 
 <!---------------------------------------------------------->
 
+<hint id="va-args" dir="rtl">
+    מקבלת הרבה פרמטרים של כל מיני סוגים
+</hint>
+
+<hint id="print-all" dir="rtl">
+    מדפיסה כל פרמטר לפי סוג שלו
+</hint>
+
+<drill lang="java" id="print(...)">
 // פונקצית עזר בתרגילים הבאים
 // $מדפיסה כל פרמטר בתור מחרוזת$
         ^מה הפונקציה עושה? ~g
-public static void print(Object arg) {
-    System.out.println(str(arg));
+public static void $print$($Object... args$) {
+        ~g ht helper
+        ^... ~g ht va-args
+-    for (var arg : args) {
+-        System.out.print(str(arg));
+-        System.out.print(' ');
+-    }
+-    System.out.println();
++    $...$
+        ~g hr print-all
 }
 </drill>
 
+<drill lang="java" id="listFromArray()">
+public static Node listFromArray(int[] a) {
+    if (a == null || a.length == 0) return null;
+    Node lst = new Node(values[0]);
+    Node node = lst;
+    for (int i = 1; i < values.length; i++) {
+        node.setNext(new Node(values[i]));
+        node = node.getNext();
+    }
+    return lst;
+}
+</drill>
+
+
 <!---------------------------------------------------------->
 
-<drill lang="java" id="About" at-once>
+<drill lang="java" id="About">
 Author: $Gosha Smeh$
     ^? ~g hr Gosha Smeh
 Contact me: $gosha.smeh@gmail.com$

@@ -4376,7 +4376,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.18.8";
+  const VERSION = "0.18.11";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -13016,7 +13016,7 @@
     "js": "@",
     "javascript": "@"
   };
-  function buildDrills() {
+  function buildDrills(args) {
     let drills = [];
     function parseDrills() {
       let phaseNoRegex = /\{(\d+)\}(\!?)/;
@@ -13387,6 +13387,11 @@
         let _$ = el.getAttribute("$") || shellChars[lang] || "$";
         let atOnce = el.hasAttribute("at-once");
         let logLevel = el.getAttribute("log-level") || "E";
+        let todo = el.getAttribute("todo") !== null;
+        if (todo) {
+          if (args.noTodoDrills) return;
+          log.warn(`Drill '${id}': Is not finished yet`);
+        }
         log.pushLevel(logLevel);
         try {
           let content = el.textContent;
@@ -13447,8 +13452,8 @@
     return ordered;
   }
   const prev = (_, setNo, indx) => setNo(get$1(indx) - 1);
-  function again(__1, drill, noWrongPhase) {
-    phase.start(get$1(drill).id, get$1(drill).phases, noWrongPhase());
+  function again(__1, start, drill) {
+    start(get$1(drill));
   }
   function shuffleDrills(__2, shuffleCount, drills, setNo) {
     update(shuffleCount);
@@ -13479,11 +13484,14 @@
       ["left-indent", LeftIndent],
       ["right-indent", RightIndent]
     ]);
-    let heading = prop($$props, "heading", 7), logLevel = prop($$props, "log-level", 7), show = prop($$props, "show", 7), shuffle = prop($$props, "shuffle", 7), noWrongPhase = prop($$props, "no-wrong-phase", 7);
+    let heading = prop($$props, "heading", 7), logLevel = prop($$props, "log-level", 7), show = prop($$props, "show", 7), shuffle = prop($$props, "shuffle", 7), noWrongPhase = prop($$props, "no-wrong-phase", 7), atOnce = prop($$props, "at-once", 7);
     if (logLevel()) log.setLevel(logLevel());
     let order = show() ? lib.parse(show()) : [];
     shuffle(shuffle() !== void 0);
     noWrongPhase(noWrongPhase() !== void 0);
+    atOnce(atOnce() !== void 0);
+    let urlArgs = new URLSearchParams(window.location.search);
+    let noTodoDrills = urlArgs.has("no-todo-drills");
     let drills = /* @__PURE__ */ state$1(proxy([]));
     let drill = /* @__PURE__ */ state$1(void 0);
     let indx = /* @__PURE__ */ state$1(0);
@@ -13502,15 +13510,19 @@
       e.preventDefault();
       phase.untick();
     }
+    function start(drill2) {
+      let phases = atOnce() ? [] : drill2.phases;
+      phase.start(drill2.id, phases, noWrongPhase());
+    }
     function setNo(no) {
       if (no < 0 || no >= get$1(drills).length) return;
       set(indx, no, true);
       set(drill, get$1(drills)[get$1(indx) % get$1(drills).length], true);
-      phase.start(get$1(drill).id, get$1(drill).phases, noWrongPhase());
+      start(get$1(drill));
     }
     let next2 = () => setNo(get$1(indx) + 1);
     document.addEventListener("DOMContentLoaded", () => {
-      let all = buildDrills();
+      let all = buildDrills({ noTodoDrills });
       set(drills, orderDrills(all, order, shuffle()), true);
       setNo(0);
     });
@@ -13589,7 +13601,7 @@
     var button_3 = sibling(button_2, 2);
     button_3.__click = [reveal];
     var button_4 = sibling(button_3, 2);
-    button_4.__click = [again, drill, noWrongPhase];
+    button_4.__click = [again, start, drill];
     var node_6 = sibling(button_4, 2);
     {
       var consequent_1 = ($$anchor2) => {
@@ -13597,7 +13609,7 @@
         append($$anchor2, br);
       };
       if_block(node_6, ($$render) => {
-        if (get$1(drills).length > 15) $$render(consequent_1);
+        if (get$1(drills).length >= 15) $$render(consequent_1);
       });
     }
     var node_7 = sibling(node_6, 2);
@@ -13668,6 +13680,13 @@
       set "no-wrong-phase"($$value) {
         noWrongPhase($$value);
         flushSync();
+      },
+      get "at-once"() {
+        return atOnce();
+      },
+      set "at-once"($$value) {
+        atOnce($$value);
+        flushSync();
       }
     });
   }
@@ -13679,7 +13698,8 @@
       "log-level": {},
       show: {},
       shuffle: {},
-      "no-wrong-phase": {}
+      "no-wrong-phase": {},
+      "at-once": {}
     },
     [],
     [],
@@ -13697,14 +13717,15 @@
     append_styles$1($$anchor, $$css$9);
     const iframe = ($$anchor2, name = noop) => {
       var iframe_1 = root_1$7();
-      const src = /* @__PURE__ */ user_derived(() => `${base()}/${name()}.html`);
+      const src = /* @__PURE__ */ user_derived(() => makeSrcUrl(name()));
       template_effect(() => {
         set_attribute(iframe_1, "src", get$1(src));
         set_attribute(iframe_1, "title", name());
       });
       append($$anchor2, iframe_1);
     };
-    let width = prop($$props, "width", 7, 700), height = prop($$props, "height", 7, 700), base = prop($$props, "base", 7, "./java"), drillsList = prop($$props, "drills", 7);
+    let width = prop($$props, "width", 7, 700), height = prop($$props, "height", 7, 700), base = prop($$props, "base", 7, "./java"), todoDrills = prop($$props, "todo-drills", 7), drillsList = prop($$props, "drills", 7);
+    todoDrills(todoDrills() !== void 0);
     let errorMsg = /* @__PURE__ */ state$1("");
     function parseDrillsList(list) {
       try {
@@ -13714,6 +13735,10 @@
         set(errorMsg, error.message, true);
         return [];
       }
+    }
+    function makeSrcUrl(name) {
+      let args = !todoDrills() ? "?no-todo-drills" : "";
+      return `${base()}/${name}.html${args}`;
     }
     let drills = parseDrillsList(drillsList());
     var div = root$9();
@@ -13765,6 +13790,13 @@
         base($$value);
         flushSync();
       },
+      get "todo-drills"() {
+        return todoDrills();
+      },
+      set "todo-drills"($$value) {
+        todoDrills($$value);
+        flushSync();
+      },
       get drills() {
         return drillsList();
       },
@@ -13774,7 +13806,19 @@
       }
     });
   }
-  customElements.define("drills-page", create_custom_element(Drills_page, { width: {}, height: {}, base: {}, drills: {} }, [], [], false));
+  customElements.define("drills-page", create_custom_element(
+    Drills_page,
+    {
+      width: {},
+      height: {},
+      base: {},
+      "todo-drills": {},
+      drills: {}
+    },
+    [],
+    [],
+    false
+  ));
   function Import_hints($$anchor, $$props) {
     push$1($$props, true);
     let from = prop($$props, "from", 7);
