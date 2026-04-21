@@ -2351,9 +2351,9 @@
       set_active_effect(previous_effect);
     }
   }
-  function create_fragment_from_html(html) {
+  function create_fragment_from_html(html2) {
     var elem = document.createElement("template");
-    elem.innerHTML = html.replaceAll("<!>", "<!---->");
+    elem.innerHTML = html2.replaceAll("<!>", "<!---->");
     return elem.content;
   }
   function assign_nodes(start, end) {
@@ -3330,6 +3330,71 @@
       next2.prev = prev2;
       next2.e.prev = prev2 && prev2.e;
     }
+  }
+  function html(node, get_value, svg = false, mathml = false, skip_warning = false) {
+    var anchor = node;
+    var value = "";
+    template_effect(() => {
+      var effect2 = (
+        /** @type {Effect} */
+        active_effect
+      );
+      if (value === (value = get_value() ?? "")) {
+        if (hydrating) hydrate_next();
+        return;
+      }
+      if (effect2.nodes_start !== null) {
+        remove_effect_dom(
+          effect2.nodes_start,
+          /** @type {TemplateNode} */
+          effect2.nodes_end
+        );
+        effect2.nodes_start = effect2.nodes_end = null;
+      }
+      if (value === "") return;
+      if (hydrating) {
+        hydrate_node.data;
+        var next2 = hydrate_next();
+        var last = next2;
+        while (next2 !== null && (next2.nodeType !== COMMENT_NODE || /** @type {Comment} */
+        next2.data !== "")) {
+          last = next2;
+          next2 = /** @type {TemplateNode} */
+          /* @__PURE__ */ get_next_sibling(next2);
+        }
+        if (next2 === null) {
+          hydration_mismatch();
+          throw HYDRATION_ERROR;
+        }
+        assign_nodes(hydrate_node, last);
+        anchor = set_hydrate_node(next2);
+        return;
+      }
+      var html2 = value + "";
+      if (svg) html2 = `<svg>${html2}</svg>`;
+      else if (mathml) html2 = `<math>${html2}</math>`;
+      var node2 = create_fragment_from_html(html2);
+      if (svg || mathml) {
+        node2 = /** @type {Element} */
+        /* @__PURE__ */ get_first_child(node2);
+      }
+      assign_nodes(
+        /** @type {TemplateNode} */
+        /* @__PURE__ */ get_first_child(node2),
+        /** @type {TemplateNode} */
+        node2.lastChild
+      );
+      if (svg || mathml) {
+        while (/* @__PURE__ */ get_first_child(node2)) {
+          anchor.before(
+            /** @type {Node} */
+            /* @__PURE__ */ get_first_child(node2)
+          );
+        }
+      } else {
+        anchor.before(node2);
+      }
+    });
   }
   function component(node, get_component, render_fn) {
     if (hydrating) {
@@ -4376,7 +4441,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.18.12";
+  const VERSION = "0.19.0";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -12946,12 +13011,30 @@
     append($$anchor, span);
   }
   create_custom_element(PoweredBy, {}, [], [], true);
+  function HtmlContent($$anchor, $$props) {
+    push$1($$props, true);
+    let content = prop($$props, "content", 7);
+    var fragment = comment();
+    var node = first_child(fragment);
+    html(node, content);
+    append($$anchor, fragment);
+    return pop$1({
+      get content() {
+        return content();
+      },
+      set content($$value) {
+        content($$value);
+        flushSync();
+      }
+    });
+  }
+  create_custom_element(HtmlContent, { content: {} }, [], [], true);
   const hints = /* @__PURE__ */ (() => {
     let db = {};
-    function makeHint(html) {
-      let id = html.getAttribute("id");
-      let dir = html.getAttribute("dir") || "ltr";
-      let text2 = html.textContent.trim();
+    function makeHint(html2) {
+      let id = html2.getAttribute("id");
+      let dir = html2.getAttribute("dir") || "ltr";
+      let text2 = html2.textContent.trim();
       if (!id) {
         log.warn(`Hint with no id; context='${text2}'`);
         return;
@@ -12960,8 +13043,8 @@
     }
     function parseHtmlDocument(doc, external) {
       let count = 0;
-      doc.querySelectorAll("hint").forEach((html) => {
-        let hint = makeHint(html);
+      doc.querySelectorAll("hint").forEach((html2) => {
+        let hint = makeHint(html2);
         if (!hint) return;
         if (db[hint.id] !== void 0) {
           if (external) return;
@@ -13156,6 +13239,26 @@
         function hasPhaseSwitch() {
           return phaseNoRegex.test(line2()) || phaseSwitchRegex.test(line2());
         }
+        function htmlContentStart() {
+          return line2().trimStart().startsWith("$!html");
+        }
+        function parseHtmlContent() {
+          let content2 = line2().replace("$!html", "");
+          console.log(content2);
+          if (!content2.includes("{")) return content2;
+          content2 = content2.replace("{", "");
+          next2();
+          while (!end() && !line2().trimEnd().endsWith("}")) {
+            content2 += "\r\n" + line2();
+            console.log(content2);
+            next2();
+          }
+          content2 += "\r\n" + line2().replace("}", "");
+          console.log(content2);
+          next2();
+          console.log("HTMLCONTENT IS HERE:", content2);
+          return content2;
+        }
         return {
           id,
           text: content,
@@ -13182,7 +13285,9 @@
           parseReplacement,
           parseIndent,
           argumentLine,
-          hasPhaseSwitch
+          hasPhaseSwitch,
+          htmlContentStart,
+          parseHtmlContent
         };
       }
       function makeDrill(id, src) {
@@ -13240,6 +13345,9 @@
           else add("new-line", {});
           addLineNo();
         }
+        function addHtmlContent(content) {
+          add("html-content", { content });
+        }
         return {
           id,
           tokens,
@@ -13249,7 +13357,8 @@
           addReplaceSpan,
           addWavedSpan,
           addRightLine,
-          addIndent
+          addIndent,
+          addHtmlContent
         };
       }
       function parseDrill(id, content, _$) {
@@ -13292,6 +13401,10 @@
         log.info(`Parsing drill '${id}' $='${_$}' (${src.lines.length} lines)`);
         src.skipEmptyLines();
         while (!src.end()) {
+          if (src.htmlContentStart()) {
+            let content2 = src.parseHtmlContent();
+            drill.addHtmlContent(content2);
+          }
           if (src.emptyLine()) {
             src.skipEmptyLines();
             if (!src.end()) {
@@ -13346,7 +13459,7 @@
         }
         return drill.tokens;
       }
-      function buildDrill(id, tokens, atOnce) {
+      function buildDrill(id, tokens, atOnce, noWrongPhase) {
         let seenPhases = /* @__PURE__ */ new Set();
         function splitTokensToLines() {
           let line2 = null;
@@ -13354,7 +13467,7 @@
           for (let i = 0; i < tokens.length; i++) {
             let token2 = tokens[i];
             if ("phaseNo" in token2.props) seenPhases.add(token2.props.phaseNo.get());
-            if (token2.type === "new-line") {
+            if (token2.type === "new-line" || token2.type === "html-content") {
               line2 = { wrongLine: false, tokens: [] };
               lines2.push(line2);
             } else if (token2.type === "right-line") {
@@ -13371,9 +13484,8 @@
         }
         let lines = splitTokensToLines();
         let phases = [...seenPhases].sort((a, b) => a - b);
-        if (atOnce) phases = [];
         console.log(`${id} is built:`, phases);
-        return { id, atOnce, phases, tokens, lines };
+        return { id, atOnce, noWrongPhase, phases, tokens, lines };
       }
       let htmls = document.querySelectorAll("drill");
       log.info(`Found ${htmls.length} drills`);
@@ -13386,6 +13498,7 @@
         let lang = el.getAttribute("lang") || "java";
         let _$ = el.getAttribute("$") || shellChars[lang] || "$";
         let atOnce = el.hasAttribute("at-once");
+        let noWrongPhase = el.hasAttribute("no-wrong-phase");
         let logLevel = el.getAttribute("log-level") || "E";
         let todo = el.getAttribute("todo") !== null;
         if (todo) {
@@ -13394,10 +13507,10 @@
         }
         log.pushLevel(logLevel);
         try {
-          let content = el.textContent;
+          let content = el.innerHTML;
           let tokens = parseDrill(id, content, _$);
           if (tokens.length === 0) throw new Error(`Drill is empty`);
-          let drill = buildDrill(id, tokens, atOnce);
+          let drill = buildDrill(id, tokens, atOnce, noWrongPhase);
           drills.push(drill);
           log.info(`Drill '${id}' is parsed: ${tokens.length} tokens`);
         } catch (err) {
@@ -13482,7 +13595,8 @@
       ["new-line", NewLine],
       ["right-line", RightLine],
       ["left-indent", LeftIndent],
-      ["right-indent", RightIndent]
+      ["right-indent", RightIndent],
+      ["html-content", HtmlContent]
     ]);
     let heading = prop($$props, "heading", 7), logLevel = prop($$props, "log-level", 7), show = prop($$props, "show", 7), shuffle = prop($$props, "shuffle", 7), noWrongPhase = prop($$props, "no-wrong-phase", 7), atOnce = prop($$props, "at-once", 7);
     if (logLevel()) log.setLevel(logLevel());
@@ -13511,8 +13625,9 @@
       phase.untick();
     }
     function start(drill2) {
-      let phases = atOnce() ? [] : drill2.phases;
-      phase.start(drill2.id, phases, noWrongPhase());
+      let phases = drill2.phases;
+      if (atOnce() || drill2.atOnce) phases = [];
+      phase.start(drill2.id, phases, noWrongPhase() || drill2.noWrongPhase);
     }
     function setNo(no) {
       if (no < 0 || no >= get$1(drills).length) return;

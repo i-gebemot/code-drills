@@ -14,54 +14,116 @@
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="ref-01" todo>
+<drill lang="java" id="class-obj-ref-null" no-wrong-phase>
+?class מה זה
+    $class-זה רק תיאור מה יש בכל אובייקט של ה$
+        ^...$ ~g
+
+?object מה זה
+    $זה משהו ממשי שנימצא בזיכרון ויש לו כתובת מסויימת$
+        ^...$ ~g
+
+?reference מה זה
+    $זאת הכתובת המסויימת של אוביקט בזיכרון$
+        ^...$ ~g
+
+?null מה זה
+   $reference זה ערך מיוחד של$              {1}
+        ^...$ ~g
+   $להגיד שהוא לא מתייחס לשום אוביקט$   {1}
+        ^...$ ~g
+
+Person $p$ $=$ $new$ $Person$("Avi", 21);   {2}
+    ~g ht reference
+    ~g ht שלב 3
+    ~g ht שלב 1
+    ~g ht שלב 2
+
+$$ שלב 1 - $יוצרים מיקום מזיכרון$
+    ^... ~g
+    ^$ ~g
+$$ שלב 2 - $קוראים לפעולה בונה$ 
+    ^... ~g
+    ^$ ~g
+$reference$ שלב 3 - $שמים את הכתובת בתוך$  {2}!
+    ^... ~g
+    ^$ ~g
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="ref-01">
 public class Person {
     private String name;
     private int age;
     ...
 }
 
-Person2 p1 = new Person("Avi", 123);
-Person2 p2 = new Person("Avi", 123);
+Person p1 = $new $$Person$("Avi", 123);    {1}
+    ^$
+    ~r ht new-is-missing
+Person p2 = $new $$Person$("Avi", 123);    {1}
+    ^$
+    ~r ht new-is-missing
 
 print(p1);                  // [Avi: 123]
 print(p2);                  // [Avi: 123]
-print(p1 == p2);            // false
+print($p1 == p2$);            // $false$
+    ~g hr האם זה אותו אבי?
+    ^? ~g ht result
 
 p1 = p2;
-print(p1 == p2);            // true
+
+print(p1 == p2);            // $true$
+    ^? ~g ht result
 </drill>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="ref-02" todo>
+<drill lang="java" id="ref-02">
 public class Person {
     private String name;
     private int age;
     ...
 }
 
-Person p1 = new Person2("Avi", 123);
-Person p2 = new Person2("Yoda", 321);
+$Person $$p1$ = $new$$ Person$("Avi", 123);
+    ^$ ~t                           {1}
+    ~r rt missing-declaration
+    ~r rt class-is-missing          {2}
+    ^$
+$Person $$p2$ = $new$$ Person$("Yoda", 321);
+    ^$ ~t                           {1}
+    ~r rt missing-declaration
+    ~r rt class-is-missing          {2}
+    ^$
 
 print(p1);                  // [Avi: 123]
-print(p2);                  // [Yoda: 321]
+print(p2);                  // $[Yoda: 321]$
+    ^? ~g ht result
 
 p1 = p2;
 
-print(p1);                  // [Yoda: 321]
-// How to print Avi again?
+print(p1);                  // $[Yoda: 321]$
+    ^? ~g ht result
+
+// $How to print Avi again?$    {3}
+    ~o ht object-is-gone
+// $No way, bye-bye Avi$        {3}
+    ^? ~g ht answer
 </drill>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="printPlusOne()" todo>
-public static void printPlusOne(int num) {
+<drill lang="java" id="printPlusOne()">
+public static void $printPlusOne$(int num) {        {1}
+        ~g hb זה לא בעיה, שיש שתי פונקציות עם אותו שם?
     num += 1;
     print(num);
 }
 
-public static void printPlusOne(Person p2) {
+public static void $printPlusOne$(Person p2) {      {1}
+        ~g ht העמסה - פרמטרים שונים ⇐ פונקציות שונות
     p2.setAge(p2.getAge() + 1);
     print(p2.getAge());
 }
@@ -69,29 +131,41 @@ public static void printPlusOne(Person p2) {
 int n1 = 33;
 Person p = new Person("Gili", 33);
 
-printPlusOne(n1);                   // 34
-printPlusOne(p);                    // 34
+printPlusOne(n1);                   // $34$
+        ^? ~g ht whats-printed
+printPlusOne(p);                    // $34$
+        ^? ~g ht whats-printed
 
-print(n1, p.getAge());              // 33 34
+print(n1);                          // $33 - Why not 34?$
+        ^? ~g ht whats-printed
+print(p.getAge());                  // $34 - Why not 33?$
+        ^? ~g ht whats-printed
+
 </drill>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="array" todo>
-void foo(int[] a) {
+<drill lang="java" id="array">
+public static $void $$foo$(int[] a) {
+        ^$
+        ~r hb missing-ret-type
     a[1] += 100;
 }
 
-int[] a = new int[] {1, 2, 3};
+int[] a2 = $new int[] {$1, 2, 3$}$;
+    ^[ ~r ht java-not-python
+    ^] ~r ht java-not-python
 
-print(a);               // [1, 2, 3]
-foo(a);
-print(a);               // [1, 102, 3]
+print(a2);               // [1, 2, 3]
+foo($a2$);
+        ~g hr לא אמור להיות a, כמו בפונקציה?
+print(a2);               // $[1, 102, 3] - Why 102?$
+        ^? ~g ht whats-printed
 </drill>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="count-all" todo>
+<drill lang="java" id="count-all!" todo>
 class Point {
     private int x;
     private int y;
@@ -113,5 +187,19 @@ for (int i = 0; i < points.length; i++) {
     int x = points[i].getX();
     int y = points[i].getY();
     points3[i] = new Point(x, y);   // obj: 9  ref: 12 
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="not-null" todo>
+public static int countObjects(Point[] points) {
+    int count = 0;
+    for (int i = 0; i < points.length; i++) {
+        if (points[i] != null) {
+            count++;
+        }
+    }
+    return count;
 }
 </drill>

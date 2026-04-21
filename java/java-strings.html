@@ -14,8 +14,8 @@
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="hasCharInString()">
-public static boolean hasCharInString(String str, char ch) {
+<drill lang="java" id="contains()">
+public static boolean contains(String str, char ch) {
     for (int i = 0; i < str.$length$$()$; i++) {
             ~r ht length-is-func
             ^$ 
@@ -28,13 +28,13 @@ public static boolean hasCharInString(String str, char ch) {
     return false;
 }
 
-print(hasCharInString("Abcd efgh", 'A'));  // $true$
+print(contains("Abcd efgh", 'A'));  // $true$
     ^? ~g ht result
-print(hasCharInString("Abcd efgh", 'e'));  // $true$
+print(contains("Abcd efgh", 'e'));  // $true$
     ^? ~g ht result
-print(hasCharInString("Abcd efgh", ' '));  // $true$
+print(contains("Abcd efgh", ' '));  // $true$
     ^? ~g ht result
-print(hasCharInString("Abcd efgh", 'a'));  // $false$
+print(contains("Abcd efgh", 'a'));  // $false$
     ^? ~g ht result
 </drill>
 
@@ -46,17 +46,18 @@ public static int $count$(String str, char ch) {
     int $cnt$$ = 0$;
         ~r hr init-value
         ^$
-    for (int i = 0; i < str.length(); i++) {
-        if (str$.charAt($i$)$ $==$ ch) {
-                ^[ ~r ht index-in-string
-                ^] ~r ht index-in-string
-                ^= ~r ht assign-vs-comp         {+}
+    for (int i = 0; i < str.$length$$()$; i++) {
+            ~r ht length-is-func
+            ^$
+        if (str.charAt(i)$ == $ch$$) {
+            ^.equals( ~r ht char-comp
+            ^)
             cnt++;
         }
     }
 -    return cnt;                {2}
 $} $                            {2}
-    ~r ht return-is-missing
+    ~r hr return-is-missing
 
 print($count$("aaabbc", 'a'));
         ^what ~g hr func-name                   {1}

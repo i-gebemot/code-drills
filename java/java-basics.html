@@ -99,7 +99,7 @@ int n2 = 123.0;     // $error: can't assign double to int$
 
 <drill lang="java" id="variables-and-operations">
 int x = 5;
-int y = 20;
+double y = 3.14;
 boolean ok = true;
 x += 1;             // $6$
                         ^? ~g hr result
@@ -150,34 +150,34 @@ n = ?                       // $22$                     {2}
 int n1 = 10;
 int n2 = 20;
 
-System.out.println(n1 == n2);                   // $false$
+print(n1 == n2);                   // $false$
                                         ^? ~g ht result
-System.out.println(n1 != n2);                   // $true$
+print(n1 != n2);                   // $true$
                                         ^? ~g ht result
                                         
-System.out.println(n1 > n2  ||  n1 < n2);       // $true$
+print(n1 > n2  ||  n1 < n2);       // $true$
                                         ^? ~g ht result
-System.out.println(n1 < n2  &&  n2 < 10);       // $false$
+print(n1 < n2  &&  n2 < 10);       // $false$
                                         ^? ~g ht result
-System.out.println(n1 < 10  ||  n2 > 20);       // $false$
+print(n1 < 10  ||  n2 > 20);       // $false$
                                         ^? ~g ht result
-System.out.println(n1 <= 10  &&  n2 >= 20);     // $true$
-                                        ^? ~g ht result
-
-System.out.println(n1 + n2 == 30);              // $true$
-                                        ^? ~g ht result
-System.out.println(n1 * n2 > 100);              // $true$
-                                        ^? ~g ht result
-System.out.println(n2 / n1 == 2);               // $true$
-                                        ^? ~g ht result
-System.out.println(n2 % n1 == 0);               // $true$
+print(n1 <= 10  &&  n2 >= 20);     // $true$
                                         ^? ~g ht result
 
-System.out.println(!(n1 == n2));                // $true$
+print(n1 + n2 == 30);              // $true$
                                         ^? ~g ht result
-System.out.println(!(n1 < n2));                 // $false$
+print(n1 * n2 > 100);              // $true$
                                         ^? ~g ht result
-System.out.println((n1 + 5) == (n2 - 5));       // $true$
+print(n2 / n1 == 2);               // $true$
+                                        ^? ~g ht result
+print(n2 % n1 == 0);               // $true$
+                                        ^? ~g ht result
+
+print(!(n1 == n2));                // $true$
+                                        ^? ~g ht result
+print(!(n1 < n2));                 // $false$
+                                        ^? ~g ht result
+print((n1 + 5) == (n2 - 5));       // $true$
                                         ^? ~g ht result
 </drill>
 
