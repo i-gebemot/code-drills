@@ -177,43 +177,70 @@ print(a2);               // $[1, 102, 3] - Why 102?$
     How many references are null?
 </hint>
 
-<drill lang="java" id="count-all!" todo>
+<drill lang="java" id="count-all">
 class Point {
     private int x;
     private int y;
     ...
 }
 
-Point[] points = new Point[3];      // obj: $1$  ref: $4$ null: $3$
-    ^? ~g ht obj-count
-    ^? ~g ht ref-count
-    ^? ~g hl null-count
+Point[] points = new Point[3];      // obj: $1$  ref: $4$  null: $3$
+                                    ^? ~g ht obj-count
+                                    ^? ~g ht ref-count
+                                    ^? ~g hl null-count
 for (int i = 0; i < points.length; i++) {
     points[i] = new Point(i, i);
-}                                   // obj: 4  ref: 4 
+}                                   // obj: $4$  ref: $4$   null: $0$
+                                    ^? ~g ht obj-count
+                                    ^? ~g ht ref-count
+                                    ^? ~g hl null-count
 
-Point[] points2 = new Point[3];     // obj: 5  ref: 8 
+Point[] points2 = new Point[3];     // obj: $5$  ref: $8$   null: $3$
+                                    ^? ~g ht obj-count
+                                    ^? ~g ht ref-count
+                                    ^? ~g hl null-count
 for (int i = 0; i < points.length; i++) {
-    points2[i] = points[i];         // obj: 5  ref: 8
-}
+    points2[i] = points[i];
+}                                   // obj: $5$  ref: $8$   null: $0$
+                                    ^? ~g ht obj-count
+                                    ^? ~g ht ref-count
+                                    ^? ~g hl null-count
 
-Point[] points3 = new Point[3];     // obj: 6  ref: 12 
+Point[] points3 = new Point[3];     // obj: $6$  ref: $12$  null: $3$
+                                    ^? ~g ht obj-count
+                                    ^? ~g ht ref-count
+                                    ^? ~g hl null-count
 for (int i = 0; i < points.length; i++) {
     int x = points[i].getX();
     int y = points[i].getY();
-    points3[i] = new Point(x, y);   // obj: 9  ref: 12 
-}
+    points3[i] = new Point(x, y);
+}                                   // obj: $9$  ref: $12$  null: $0$
+                                    ^? ~g ht obj-count
+                                    ^? ~g ht ref-count
+                                    ^? ~g hl null-count
 </drill>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="not-null" todo>
-public static int countObjects(Point[] points) {
-    int count = 0;
+<drill lang="java" id="not-null">
+public static int countPoints($Point[] $$points$, $Point $$p$) {
+        ^$
+        ~r hl type-is-missing
+        ^$
+        ~r hl type-is-missing
+    int $count$$ = 0$;
+        ~r ht init-value
+        ^$
     for (int i = 0; i < points.length; i++) {
-        if (points[i] != null) {
-            count++;
-        }
+        Point p2 = $$points[i];
+            ^new $ ~r ht syntax-error
+-        if (p2 != null) {                      {3}
+-4          if ($p2$.getX() == p.getX() && $p2$.getY() == p.getY()) {  {3}
+                    ~r ht can-be-null
+                    ~r ht can-be-null
+-4              count++;                        {3}
+-4          }                                   {3}
+-        }                                      {3}
     }
     return count;
 }
