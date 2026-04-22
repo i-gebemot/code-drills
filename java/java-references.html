@@ -165,6 +165,18 @@ print(a2);               // $[1, 102, 3] - Why 102?$
 
 <!---------------------------------------------------------->
 
+<hint id="obj-count">
+    How many objects are created?
+</hint>
+
+<hint id="ref-count">
+    How many references exist?
+</hint>
+
+<hint id="null-count">
+    How many references are null?
+</hint>
+
 <drill lang="java" id="count-all!" todo>
 class Point {
     private int x;
@@ -172,7 +184,10 @@ class Point {
     ...
 }
 
-Point[] points = new Point[3];      // obj: 1  ref: 4 
+Point[] points = new Point[3];      // obj: $1$  ref: $4$ null: $3$
+    ^? ~g ht obj-count
+    ^? ~g ht ref-count
+    ^? ~g hl null-count
 for (int i = 0; i < points.length; i++) {
     points[i] = new Point(i, i);
 }                                   // obj: 4  ref: 4 

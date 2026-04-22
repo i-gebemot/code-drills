@@ -4441,7 +4441,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.19.0";
+  const VERSION = "0.19.1";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -13104,8 +13104,10 @@
     function parseDrills() {
       let phaseNoRegex = /\{(\d+)\}(\!?)/;
       let phaseSwitchRegex = /\{\+\}/;
-      function makeSrc(id, content, _$) {
+      function makeSrc(id, content, html2, _$) {
         let lines = content.split(/\r?\n/);
+        let htmlLines = html2.split(/\r?\n/);
+        if (lines.length !== htmlLines.length) log.warn(`Drill '${id}' lines=${lines.length} htmlLines=${htmlLines.length}`);
         let lineNo = 0;
         let next2 = () => lineNo += lineNo < lines.length ? 1 : 0;
         let end = () => lineNo >= lines.length;
@@ -13121,6 +13123,10 @@
         function line2() {
           if (lineNo >= lines.length) throw new Error(`Drill '${id}': no more source lines (${lines.length} lines)`);
           return lines[lineNo].trimEnd();
+        }
+        function htmlLine() {
+          if (lineNo >= htmlLines.length) throw new Error(`Drill '${id}': no more html lines (${lines.length} lines)`);
+          return htmlLines[lineNo];
         }
         function skipEmptyLines() {
           if (lineNo >= lines.length) return;
@@ -13243,20 +13249,16 @@
           return line2().trimStart().startsWith("$!html");
         }
         function parseHtmlContent() {
-          let content2 = line2().replace("$!html", "");
-          console.log(content2);
+          let content2 = htmlLine().replace("$!html", "");
           if (!content2.includes("{")) return content2;
           content2 = content2.replace("{", "");
           next2();
-          while (!end() && !line2().trimEnd().endsWith("}")) {
-            content2 += "\r\n" + line2();
-            console.log(content2);
+          while (!end() && !htmlLine().trimEnd().endsWith("}")) {
+            content2 += "\r\n" + htmlLine();
             next2();
           }
-          content2 += "\r\n" + line2().replace("}", "");
-          console.log(content2);
+          content2 += "\r\n" + htmlLine().replace("}", "");
           next2();
-          console.log("HTMLCONTENT IS HERE:", content2);
           return content2;
         }
         return {
@@ -13265,6 +13267,7 @@
           lines,
           line: () => lineWithNoMarkup(),
           lineWithMarkup: () => line2(),
+          htmlLine,
           lineNo: () => lineNo,
           emptyLine: () => lines[lineNo].trim().length === 0,
           next: next2,
@@ -13361,7 +13364,7 @@
           addHtmlContent
         };
       }
-      function parseDrill(id, content, _$) {
+      function parseDrill(id, content, html2, _$) {
         let phaseNo = (() => {
           function makePhaseNo(value) {
             return {
@@ -13391,7 +13394,7 @@
           }
           return { next: next2, get: () => currentPhase };
         })();
-        let src = makeSrc(id, content, _$);
+        let src = makeSrc(id, content, html2, _$);
         let drill = makeDrill(id);
         function applyIndent(indent, span) {
           if (!indent) return span;
@@ -13507,8 +13510,9 @@
         }
         log.pushLevel(logLevel);
         try {
-          let content = el.innerHTML;
-          let tokens = parseDrill(id, content, _$);
+          let innerHtml = el.innerHTML;
+          let content = el.textContent;
+          let tokens = parseDrill(id, content, innerHtml, _$);
           if (tokens.length === 0) throw new Error(`Drill is empty`);
           let drill = buildDrill(id, tokens, atOnce, noWrongPhase);
           drills.push(drill);
