@@ -14,7 +14,52 @@
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="terms" todo>
-+ $$
-    ~t !html <img src="./img/classes-01.png">
+<drill lang="java" id="terms">
+$!html <img width=500 src="./img/binary-tree.terms.png" class="absolute right-0 top-0">
+Count nodes (צומת):         $13$
+    ^? ~g ht complete
+Count leaves (עלה):         $5$
+    ^? ~g ht complete
+Count parents (הורה):       $8$
+    ^? ~g ht complete
+Count children (ילד):       $12$
+    ^? ~g ht complete
+Count levels (רמה):         $5$
+    ^? ~g ht complete
+List level 3:              $[13, 12, 14]$
+    ^? ~g ht complete
+Count branches (ענף):       $5$
+    ^? ~g ht complete
+List branch to node 23:    $[19, 17,12, 23]$
+    ^? ~g ht complete
+
+PreOrder:   $me$-L-R
+    ^me ~t
+[19,17,13,11,$12$,$23$,$10$,$16$,15,14,21,22,18]
+    ^? ~g ht complete
+    ^? ~g ht complete
+    ^? ~g ht complete
+    ^? ~g ht complete
+
+InOrder:    L-$me$-R
+    ^me ~t
+[11,13,17,$23$,$12$,$16$,$10$,19,15,$21$,$22$,14,18]
+    ^? ~g ht complete
+    ^? ~g ht complete
+    ^? ~g ht complete
+    ^? ~g ht complete
+    ^? ~g ht complete       {+}
+    ^? ~g ht complete
+
+PostOrder:  L-R-$me$
+    ^me ~t
+[11,13,$23$,$16$,$10$,$12$,17,$22$,$21$,$18$,$14$,15,19]
+    ^? ~g ht complete
+    ^? ~g ht complete
+    ^? ~g ht complete
+    ^? ~g ht complete
+    ^? ~g ht complete   {+}
+    ^? ~g ht complete
+    ^? ~g ht complete
+    ^? ~g ht complete
 </drill>

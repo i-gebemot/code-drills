@@ -521,7 +521,7 @@
       /** @type {V} */
       UNINITIALIZED
     );
-    var prev2 = null;
+    var prev = null;
     var should_suspend = !active_reaction;
     async_effect(() => {
       try {
@@ -530,8 +530,8 @@
         p = Promise.reject(error);
       }
       var r = () => p;
-      promise = prev2?.then(r, r) ?? Promise.resolve(p);
-      prev2 = promise;
+      promise = prev?.then(r, r) ?? Promise.resolve(p);
+      prev = promise;
       var batch = (
         /** @type {Batch} */
         current_batch
@@ -542,7 +542,7 @@
         if (!pending) batch.increment();
       }
       const handler = (value, error = void 0) => {
-        prev2 = null;
+        prev = null;
         if (!pending) batch.activate();
         if (error) {
           if (error !== STALE_REACTION) {
@@ -1696,13 +1696,13 @@
   }
   function unlink_effect(effect2) {
     var parent = effect2.parent;
-    var prev2 = effect2.prev;
+    var prev = effect2.prev;
     var next2 = effect2.next;
-    if (prev2 !== null) prev2.next = next2;
-    if (next2 !== null) next2.prev = prev2;
+    if (prev !== null) prev.next = next2;
+    if (next2 !== null) next2.prev = prev;
     if (parent !== null) {
       if (parent.first === effect2) parent.first = next2;
-      if (parent.last === effect2) parent.last = prev2;
+      if (parent.last === effect2) parent.last = prev;
     }
   }
   function pause_effect(effect2, callback) {
@@ -2988,7 +2988,7 @@
         }
       }
       if (hydrating) {
-        var prev2 = null;
+        var prev = null;
         var item;
         for (var i = 0; i < length; i++) {
           if (hydrate_node.nodeType === COMMENT_NODE && /** @type {Comment} */
@@ -3004,7 +3004,7 @@
           item = create_item(
             hydrate_node,
             state2,
-            prev2,
+            prev,
             null,
             value,
             key2,
@@ -3014,7 +3014,7 @@
             get_collection
           );
           state2.items.set(key2, item);
-          prev2 = item;
+          prev = item;
         }
         if (length > 0) {
           set_hydrate_node(remove_nodes());
@@ -3084,7 +3084,7 @@
     var first = state2.first;
     var current2 = first;
     var seen;
-    var prev2 = null;
+    var prev = null;
     var to_animate;
     var matched = [];
     var stashed = [];
@@ -3112,21 +3112,21 @@
         if (pending !== void 0) {
           offscreen_items.delete(key2);
           items.set(key2, pending);
-          var next2 = prev2 ? prev2.next : current2;
-          link(state2, prev2, pending);
+          var next2 = prev ? prev.next : current2;
+          link(state2, prev, pending);
           link(state2, pending, next2);
           move(pending, next2, anchor);
-          prev2 = pending;
+          prev = pending;
         } else {
           var child_anchor = current2 ? (
             /** @type {TemplateNode} */
             current2.e.nodes_start
           ) : anchor;
-          prev2 = create_item(
+          prev = create_item(
             child_anchor,
             state2,
-            prev2,
-            prev2 === null ? state2.first : prev2.next,
+            prev,
+            prev === null ? state2.first : prev.next,
             value,
             key2,
             i,
@@ -3135,10 +3135,10 @@
             get_collection
           );
         }
-        items.set(key2, prev2);
+        items.set(key2, prev);
         matched = [];
         stashed = [];
-        current2 = prev2.next;
+        current2 = prev.next;
         continue;
       }
       if (should_update) {
@@ -3156,7 +3156,7 @@
           if (matched.length < stashed.length) {
             var start = stashed[0];
             var j;
-            prev2 = start.prev;
+            prev = start.prev;
             var a = matched[0];
             var b = matched[matched.length - 1];
             for (j = 0; j < matched.length; j += 1) {
@@ -3166,10 +3166,10 @@
               seen.delete(stashed[j]);
             }
             link(state2, a.prev, b.next);
-            link(state2, prev2, a);
+            link(state2, prev, a);
             link(state2, b, start);
             current2 = start;
-            prev2 = b;
+            prev = b;
             i -= 1;
             matched = [];
             stashed = [];
@@ -3177,9 +3177,9 @@
             seen.delete(item);
             move(item, current2, anchor);
             link(state2, item.prev, item.next);
-            link(state2, item, prev2 === null ? state2.first : prev2.next);
-            link(state2, prev2, item);
-            prev2 = item;
+            link(state2, item, prev === null ? state2.first : prev.next);
+            link(state2, prev, item);
+            prev = item;
           }
           continue;
         }
@@ -3198,7 +3198,7 @@
         item = current2;
       }
       matched.push(item);
-      prev2 = item;
+      prev = item;
       current2 = item.next;
     }
     if (current2 !== null || seen !== void 0) {
@@ -3232,7 +3232,7 @@
       });
     }
     each_effect.first = state2.first && state2.first.e;
-    each_effect.last = prev2 && prev2.e;
+    each_effect.last = prev && prev.e;
     for (var unused of offscreen_items.values()) {
       destroy_effect(unused.e);
     }
@@ -3252,7 +3252,7 @@
       item.i = index2;
     }
   }
-  function create_item(anchor, state2, prev2, next2, value, key2, index2, render_fn, flags, get_collection, deferred2) {
+  function create_item(anchor, state2, prev, next2, value, key2, index2, render_fn, flags, get_collection, deferred2) {
     var reactive = (flags & EACH_ITEM_REACTIVE) !== 0;
     var mutable = (flags & EACH_ITEM_IMMUTABLE) === 0;
     var v = reactive ? mutable ? /* @__PURE__ */ mutable_source(value, false, false) : source$1(value) : value;
@@ -3264,7 +3264,7 @@
       a: null,
       // @ts-expect-error
       e: null,
-      prev: prev2,
+      prev,
       next: next2
     };
     try {
@@ -3279,15 +3279,15 @@
         i,
         get_collection
       ), hydrating);
-      item.e.prev = prev2 && prev2.e;
+      item.e.prev = prev && prev.e;
       item.e.next = next2 && next2.e;
-      if (prev2 === null) {
+      if (prev === null) {
         if (!deferred2) {
           state2.first = item;
         }
       } else {
-        prev2.next = item;
-        prev2.e.next = item.e;
+        prev.next = item;
+        prev.e.next = item.e;
       }
       if (next2 !== null) {
         next2.prev = item;
@@ -3319,16 +3319,16 @@
       node = next_node;
     }
   }
-  function link(state2, prev2, next2) {
-    if (prev2 === null) {
+  function link(state2, prev, next2) {
+    if (prev === null) {
       state2.first = next2;
     } else {
-      prev2.next = next2;
-      prev2.e.next = next2 && next2.e;
+      prev.next = next2;
+      prev.e.next = next2 && next2.e;
     }
     if (next2 !== null) {
-      next2.prev = prev2;
-      next2.e.prev = prev2 && prev2.e;
+      next2.prev = prev;
+      next2.e.prev = prev && prev.e;
     }
   }
   function html(node, get_value, svg = false, mathml = false, skip_warning = false) {
@@ -3601,8 +3601,8 @@
     return value == null ? null : String(value);
   }
   function set_class(dom, is_html, value, hash, prev_classes, next_classes) {
-    var prev2 = dom.__className;
-    if (hydrating || prev2 !== value || prev2 === void 0) {
+    var prev = dom.__className;
+    if (hydrating || prev !== value || prev === void 0) {
       var next_class_name = to_class(value, hash, next_classes);
       if (!hydrating || next_class_name !== dom.getAttribute("class")) {
         if (next_class_name == null) {
@@ -3622,10 +3622,10 @@
     }
     return next_classes;
   }
-  function update_styles(dom, prev2 = {}, next2, priority) {
+  function update_styles(dom, prev = {}, next2, priority) {
     for (var key2 in next2) {
       var value = next2[key2];
-      if (prev2[key2] !== value) {
+      if (prev[key2] !== value) {
         if (next2[key2] == null) {
           dom.style.removeProperty(key2);
         } else {
@@ -3635,8 +3635,8 @@
     }
   }
   function set_style(dom, value, prev_styles, next_styles) {
-    var prev2 = dom.__style;
-    if (hydrating || prev2 !== value) {
+    var prev = dom.__style;
+    if (hydrating || prev !== value) {
       var next_style_attr = to_style(value, next_styles);
       if (!hydrating || next_style_attr !== dom.getAttribute("style")) {
         if (next_style_attr == null) {
@@ -3756,7 +3756,7 @@
     let props = () => deep_read_state(context.s);
     if (immutable) {
       let version = 0;
-      let prev2 = (
+      let prev = (
         /** @type {Record<string, any>} */
         {}
       );
@@ -3764,8 +3764,8 @@
         let changed = false;
         const props2 = context.s;
         for (const key2 in props2) {
-          if (props2[key2] !== prev2[key2]) {
-            prev2[key2] = props2[key2];
+          if (props2[key2] !== prev[key2]) {
+            prev[key2] = props2[key2];
             changed = true;
           }
         }
@@ -4441,7 +4441,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.20.0";
+  const VERSION = "0.20.1";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -12403,7 +12403,7 @@
       currentTick = firstTick;
       ticks.set(firstTick);
     }
-    function reveal2() {
+    function reveal() {
       currentTick = _phases.length + 3;
       ticks.set(currentTick);
     }
@@ -12423,7 +12423,7 @@
       if (_phases.length === 0) tickNo++;
       return { wrong: false, hint: tickNo % 2 == 0, right: tickNo % 2 === 1 };
     }
-    return { tick, untick, start, reveal: reveal2, meAt };
+    return { tick, untick, start, reveal, meAt };
   })();
   let log = (() => {
     let lines = writable([]);
@@ -12434,7 +12434,7 @@
       if (levels[level] > levels[minLevel]) return;
       let ln = { level, msg };
       console.log(ln);
-      lines.update((prev2) => [...prev2, ln]);
+      lines.update((prev) => [...prev, ln]);
     }
     function setLevel(level) {
       if (level === void 0) return;
@@ -12606,10 +12606,10 @@
     return $$pop;
   }
   create_custom_element(Line, { phaseNo: {}, wrongLine: {}, children: {} }, [], [], true);
-  var root$k = /* @__PURE__ */ from_html(`<span class="svelte-1afycyp"> </span>`);
+  var root$k = /* @__PURE__ */ from_html(`<span class="svelte-wikzf9"> </span>`);
   const $$css$k = {
-    hash: "svelte-1afycyp",
-    code: "span.svelte-1afycyp {transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}"
+    hash: "svelte-wikzf9",
+    code: "span.svelte-wikzf9 {position:relative;transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}"
   };
   function AsIs($$anchor, $$props) {
     push$1($$props, true);
@@ -12633,8 +12633,8 @@
   create_custom_element(AsIs, { code: {} }, [], [], true);
   var root$j = /* @__PURE__ */ from_html(`<span> </span>`);
   const $$css$j = {
-    hash: "svelte-1e9o2gl",
-    code: "span.svelte-1e9o2gl {text-decoration-line:underline;text-decoration-style:wavy;text-decoration-thickness:1px;text-decoration-color:var(--color);text-underline-offset:0.2em;transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.is-empty.svelte-1e9o2gl {color:transparent;}.wrong.svelte-1e9o2gl {text-decoration-color:transparent;}.right.svelte-1e9o2gl {opacity:0;font-size:0px;text-decoration-color:transparent;}.rtl-tooltip.svelte-1e9o2gl::before {direction:rtl;text-align:right;}"
+    hash: "svelte-1hzke8x",
+    code: "span.svelte-1hzke8x {position:relative;text-decoration-line:underline;text-decoration-style:wavy;text-decoration-thickness:1px;text-decoration-color:var(--color);text-underline-offset:0.2em;transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.is-empty.svelte-1hzke8x {color:transparent;}.wrong.svelte-1hzke8x {text-decoration-color:transparent;}.right.svelte-1hzke8x {opacity:0;font-size:0px;text-decoration-color:transparent;}.rtl-tooltip.svelte-1hzke8x::before {direction:rtl;text-align:right;}"
   };
   function WrongSpan($$anchor, $$props) {
     push$1($$props, true);
@@ -12657,7 +12657,7 @@
     reset(span);
     template_effect(
       ($0, $1) => {
-        classes = set_class(span, 1, `tooltip-${hint()?.where ?? ""} rtl-tooltip`, "svelte-1e9o2gl", classes, $0);
+        classes = set_class(span, 1, `tooltip-${hint()?.where ?? ""} rtl-tooltip`, "svelte-1hzke8x", classes, $0);
         set_attribute(span, "data-tip", hint()?.text);
         styles = set_style(span, "", styles, $1);
         set_text(text2, code());
@@ -12711,8 +12711,8 @@
   create_custom_element(WrongSpan, { phaseNo: {}, code: {}, color: {}, hint: {} }, [], [], true);
   var root$i = /* @__PURE__ */ from_html(`<span> </span>`);
   const $$css$i = {
-    hash: "svelte-grh0vk",
-    code: "span.svelte-grh0vk {transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.wrong.svelte-grh0vk {opacity:0;font-size:0px;}.hint.svelte-grh0vk {opacity:0;font-size:0px;}.right.svelte-grh0vk {background-color:var(--right-color);}"
+    hash: "svelte-12p80z8",
+    code: "span.svelte-12p80z8 {position:relative;transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.wrong.svelte-12p80z8 {opacity:0;font-size:0px;}.hint.svelte-12p80z8 {opacity:0;font-size:0px;}.right.svelte-12p80z8 {background-color:var(--right-color);}"
   };
   function RightSpan($$anchor, $$props) {
     push$1($$props, true);
@@ -12727,7 +12727,7 @@
     reset(span);
     template_effect(
       ($0) => {
-        classes = set_class(span, 1, "svelte-grh0vk", null, classes, $0);
+        classes = set_class(span, 1, "svelte-12p80z8", null, classes, $0);
         set_text(text2, code());
       },
       [
@@ -12761,8 +12761,8 @@
   create_custom_element(RightSpan, { phaseNo: {}, code: {} }, [], [], true);
   var root$h = /* @__PURE__ */ from_html(`<span> </span>`);
   const $$css$h = {
-    hash: "svelte-em0w11",
-    code: "span.svelte-em0w11 {text-decoration-color:var(--color);text-decoration-line:underline;text-decoration-style:wavy;text-decoration-thickness:1px;text-underline-offset:0.2em;transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.wrong.svelte-em0w11 {text-decoration-color:transparent;}.right.svelte-em0w11 {text-decoration-color:transparent;}.rtl-tooltip.svelte-em0w11::before {direction:rtl;text-align:right;}"
+    hash: "svelte-mtqyq9",
+    code: "span.svelte-mtqyq9 {position:relative;text-decoration-color:var(--color);text-decoration-line:underline;text-decoration-style:wavy;text-decoration-thickness:1px;text-underline-offset:0.2em;transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.wrong.svelte-mtqyq9 {text-decoration-color:transparent;}.right.svelte-mtqyq9 {text-decoration-color:transparent;}.rtl-tooltip.svelte-mtqyq9::before {direction:rtl;text-align:right;}"
   };
   function Waved($$anchor, $$props) {
     push$1($$props, true);
@@ -12778,7 +12778,7 @@
     reset(span);
     template_effect(
       ($0, $1) => {
-        classes = set_class(span, 1, `tooltip-${hint()?.where ?? ""}`, "svelte-em0w11", classes, $0);
+        classes = set_class(span, 1, `tooltip-${hint()?.where ?? ""}`, "svelte-mtqyq9", classes, $0);
         set_attribute(span, "data-tip", hint()?.text);
         styles = set_style(span, "", styles, $1);
         set_text(text2, code());
@@ -13013,8 +13013,8 @@
   create_custom_element(PoweredBy, {}, [], [], true);
   var root$b = /* @__PURE__ */ from_html(`<div><!></div>`);
   const $$css$b = {
-    hash: "svelte-pesjzh",
-    code: "div.svelte-pesjzh {overflow:hidden;transition:width var(--animation-time) ease;}.on.svelte-pesjzh {width:var(--width);}.off.svelte-pesjzh {width:0;}"
+    hash: "svelte-fhtu8n",
+    code: "div.svelte-fhtu8n {overflow:hidden;opacity:1;transition:opacity var(--animation-time) ease-in,\r\n            width var(--animation-time) ease;}.on.svelte-fhtu8n {width:var(--width);}.off.svelte-fhtu8n {opacity:0;width:0;}"
   };
   function HtmlContent($$anchor, $$props) {
     push$1($$props, true);
@@ -13033,7 +13033,7 @@
     var node = child(div);
     html(node, content);
     reset(div);
-    template_effect(($0) => classes = set_class(div, 1, "svelte-pesjzh", null, classes, $0), [() => ({ on: get$1(onOff), off: !get$1(onOff) })]);
+    template_effect(($0) => classes = set_class(div, 1, "svelte-fhtu8n", null, classes, $0), [() => ({ on: get$1(onOff), off: !get$1(onOff) })]);
     append($$anchor, div);
     var $$pop = pop$1({
       get phaseNo() {
@@ -13123,6 +13123,9 @@
   function Hint($$anchor) {
   }
   create_custom_element(Hint, {}, [], [], true);
+  function isAlwaysVisible(selector) {
+    return selector.wrong && selector.hint && selector.right;
+  }
   let shellChars = {
     java: "$",
     cs: "@",
@@ -13458,6 +13461,7 @@
         while (!src.end()) {
           if (src.htmlContentStart()) {
             let phaseSelector = src.parsePhaseSelector();
+            if (!isAlwaysVisible(phaseSelector) && !phaseSelector.hint) phaseNo.next(src);
             let content2 = src.parseHtmlContent();
             drill.addHtmlContent(phaseNo.get(), content2, phaseSelector);
             continue;
@@ -13540,6 +13544,7 @@
           return lines2;
         }
         let lines = splitTokensToLines();
+        seenPhases.delete(0);
         let phases = [...seenPhases].sort((a, b) => a - b);
         console.log(`${id} is built:`, phases);
         return { id, atOnce, noWrongPhase, phases, tokens, lines };
@@ -13622,17 +13627,10 @@
     if (shuffle) ordered = lodashExports.shuffle(ordered);
     return ordered;
   }
-  const prev = (_, setNo, indx) => setNo(get$1(indx) - 1);
-  function again(__1, start, drill) {
-    start(get$1(drill));
-  }
-  function shuffleDrills(__2, shuffleCount, drills, setNo) {
+  function shuffleDrills(_, shuffleCount, drills, setNo) {
     update(shuffleCount);
     set(drills, lodashExports.shuffle(get$1(drills)), true);
     setNo(0);
-  }
-  function reveal() {
-    phase.reveal();
   }
   var root_7$2 = /* @__PURE__ */ from_html(`<br/>`);
   var root_8 = /* @__PURE__ */ from_html(`<div class="tooltip"><button></button></div>`);
@@ -13682,6 +13680,21 @@
       e.preventDefault();
       phase.untick();
     }
+    function onKeyPressed(e) {
+      let handlers = {
+        "Space": () => phase.tick(),
+        "Backspace": () => phase.untick(),
+        "KeyR": () => reveal(),
+        "KeyA": () => again(),
+        "Enter": () => next2(),
+        "KeyN": () => next2(),
+        "KeyP": () => prev()
+      };
+      if (e.repeat) return;
+      let handler = handlers[e.code];
+      if (!handler) return;
+      handler();
+    }
     function start(drill2) {
       let phases = drill2.phases;
       if (atOnce() || drill2.atOnce) phases = [];
@@ -13694,6 +13707,13 @@
       start(get$1(drill));
     }
     let next2 = () => setNo(get$1(indx) + 1);
+    let prev = () => setNo(get$1(indx) - 1);
+    function again() {
+      start(get$1(drill));
+    }
+    function reveal() {
+      phase.reveal();
+    }
     document.addEventListener("DOMContentLoaded", () => {
       let all = buildDrills({ noTodoDrills });
       set(drills, orderDrills(all, order, shuffle()), true);
@@ -13702,7 +13722,7 @@
     var fragment = root$a();
     event("click", $window, onclick2);
     event("contextmenu", $window, onRightClick);
-    event("dblclick", $window, next2);
+    event("keyup", $window, onKeyPressed);
     var div = first_child(fragment);
     var div_1 = child(div);
     var text$1 = child(div_1, true);
@@ -13767,14 +13787,14 @@
     button.__click = [shuffleDrills, shuffleCount, drills, setNo];
     var button_1 = sibling(button, 2);
     let classes;
-    button_1.__click = [prev, setNo, indx];
+    button_1.__click = prev;
     var button_2 = sibling(button_1, 2);
     let classes_1;
     button_2.__click = next2;
     var button_3 = sibling(button_2, 2);
-    button_3.__click = [reveal];
+    button_3.__click = reveal;
     var button_4 = sibling(button_3, 2);
-    button_4.__click = [again, start, drill];
+    button_4.__click = again;
     var node_6 = sibling(button_4, 2);
     {
       var consequent_1 = ($$anchor2) => {
