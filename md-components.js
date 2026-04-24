@@ -4441,7 +4441,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.20.1";
+  const VERSION = "0.20.2";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -13138,8 +13138,9 @@
   function buildDrills(args) {
     let drills = [];
     function parseDrills() {
-      let phaseNoRegex = /\{(\d+)\}(\!?)/;
+      let phaseNoRegex = /\{(\d+)\}(\!?)$/;
       let phaseSwitchRegex = /\{\+\}/;
+      let indentRegex = /^([+|-]\d\d?)\s?/;
       function makeSrc(id, content, html2, _$) {
         let lines = content.split(/\r?\n/);
         let htmlLines = html2.split(/\r?\n/);
@@ -13219,10 +13220,18 @@
           return !line2().includes(_$);
         }
         function rightLineRemoved() {
-          return line2().startsWith("- ");
+          if (line2().startsWith("- ")) return true;
+          if (indentRegex.test(line2())) {
+            return false;
+          }
+          return line2().startsWith("-");
         }
         function wrongLineAdded() {
-          return line2().startsWith("+ ");
+          if (line2().startsWith("+ ")) return true;
+          if (indentRegex.test(line2())) {
+            return false;
+          }
+          return line2().startsWith("+");
         }
         function parse$Line() {
           let spans = lineWithNoMarkup().split(_$);
@@ -13259,7 +13268,6 @@
           let span = replacement[1].split("~")[0].trimEnd();
           return trimEnd$(span);
         }
-        let indentRegex = /^([+|-]\d\d?)\s?/;
         function parseIndent() {
           let indent = indentRegex.exec(line2());
           if (indent === null) return 0;
