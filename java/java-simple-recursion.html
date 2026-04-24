@@ -81,14 +81,14 @@ print($factorOf3$(6301));               // $false$
 <drill lang="java" id="prefix()" no-wrong-phase>
 public static boolean prefix(String a, String b) {
     if ($b.length() == 0$) {
-            ^... ~o ht complete            {1}
+            ^... ~o ht complete
         return $true$;
-            ^... ~o ht complete            {1}
+            ^... ~o ht complete
     }
     if ($a.length() == 0$) {
-            ^... ~o ht complete            {2}
+            ^... ~o ht complete
         return $false$;
-            ^... ~o ht complete            {2}
+            ^... ~o ht complete
     }
     if (a.charAt(0) $!=$ b.charAt(0)) {
             ^... ~o ht complete            {3}
@@ -110,9 +110,9 @@ print(prefix("abc", "abcdef"));     // false
 <drill lang="java" id="contains()" no-wrong-phase>
 public static boolean contains(String a, String b) {
     if ($a.length() < b.length()$) {
-            ^... ~o ht complete         {1}
+            ^... ~o ht complete
         return $false$;
-            ^... ~o ht complete         {1}
+            ^... ~o ht complete
     }
     if (prefix(a, b)) {     // prefix(a, b) same as a.startsWith(b)
         return true;

@@ -65,3 +65,83 @@ PostOrder:  L-R-$me$
     ^? ~g ht complete
     ^? ~g ht complete
 </drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="countNodes()">
+public static int countNodes(BinNode&lt;<Integer> node) {
+    if (node == $null$) {
+            ^0 ~r ht int-vs-null
+        return 0;
+    }
++    $int left$ = countNodes(node.getLeft());         {1}
+        ~o ht more-common
++    $int right$ = countNodes(node.getRight());       {1}
+        ~o ht more-common
++    return 1 + left + right;                       {1}
+-    return 1 +                                     {1}
+-        countNodes(node.getLeft()) +               {1}
+-        countNodes(node.getRight());               {1}
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="contains()">
+public static boolean contains($BinNode$$&lt;Integer>$ node, int num) {
+        ~r hb generic-type
+        ^$
+    if (node $==$ null) {
+            ^= ~r ht assign-vs-comp
+        return $false$;
+            ^true ~r ht wrong-logic
+    }
+    if (node$.getValue()$ $==$ num) {
+            ^$
+            ~r ht ref-vs-value
+        return true;
+    }
+    return contains(node.$getLeft$$()$, num) ||     {1}
+                ~r ht func-call
+                ^$
+           contains(node.$getRight$$()$, num);      {1}
+                ~r ht func-call
+                ^$
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="height()!">
+public static int height($BinNode$$&lt;T>$ node) {
+        ~r hb type-T
+        ^$
+    if (node == null) {
+        return $-1$;
+            ^0 ~r ht wrong-logic
+    }
+    $return$ $1 + $Math.$max$(
+            ~r ht me-is-missing
+            ^$
+            ^? ~r hr min-or-max         {+}
+        height($node.$$getLeft$()),     {1}
+            ^$
+            ~r ht func-with-no-obj
+        height($node.$$getRigh$t())     {1}
+            ^$
+            ~r ht func-with-no-obj
+    );
+}
+$!html:w-h-r+ {
+    <img src="./img/tree.root-only.png" class="absolute" width="120px"
+         style="top:30%;right:10%">
+    <img src="./img/tree.1-2-3.png" class="absolute" width="140px"
+         style="top:70%;right:10%">
+}
+print(height(null));                    // $-1$
+    ^? ~g hr result
+print(height(tree("root-only")));       // $0$
+    ^? ~g hr result
+print(height(tree("1-2-3")));           // $1$
+    ^? ~g hr result
+</drill>
