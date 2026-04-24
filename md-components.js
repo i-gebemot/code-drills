@@ -4441,7 +4441,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.20.4";
+  const VERSION = "0.20.5";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -13562,7 +13562,8 @@
       if (htmls.length === 0) throw new Error("No <drill></drill> are found");
       let ids = /* @__PURE__ */ new Set();
       htmls.forEach((el, no) => {
-        let id = el.getAttribute("id") || `drill-${no + 1}`;
+        let id = el.getAttribute("id");
+        if (id === null || id.length === 0) return;
         if (ids.has(id)) throw new Error(`Two drills with a same id '${id}'`);
         ids.add(id);
         let lang = el.getAttribute("lang") || "java";
@@ -13580,7 +13581,10 @@
           let innerHtml = el.innerHTML;
           let content = el.textContent;
           let tokens = parseDrill(id, content, innerHtml, _$);
-          if (tokens.length === 0) throw new Error(`Drill is empty`);
+          if (tokens.length === 0) {
+            log.info(`Drill '${id}' is empty; skipped`);
+            return;
+          }
           let drill = buildDrill(id, tokens, atOnce, noWrongPhase);
           drills.push(drill);
           log.info(`Drill '${id}' is parsed: ${tokens.length} tokens`);
