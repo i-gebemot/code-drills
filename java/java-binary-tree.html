@@ -35,7 +35,7 @@ List level 2:            $[13, 12, 14]$
 Path (מסלול) to node 23:  $[19, 17,12, 23]$
     ^? ~g ht complete
 
-PreOrder:   $me$-L-R
+PreOrder:   $me$-L-R    (קדם-סדר או קדמית)
     ^me ~t
 [19,17,13,11,$12$,$23$,$10$,$16$,15,14,21,22,18]
     ^? ~g ht complete
@@ -43,7 +43,7 @@ PreOrder:   $me$-L-R
     ^? ~g ht complete
     ^? ~g ht complete
 
-InOrder:    L-$me$-R
+InOrder:    L-$me$-R    (תוך-סדר או תוכית)
     ^me ~t
 [11,13,17,$23$,$12$,$16$,$10$,19,15,$21$,$22$,14,18]
     ^? ~g ht complete
@@ -53,7 +53,7 @@ InOrder:    L-$me$-R
     ^? ~g ht complete       {+}
     ^? ~g ht complete
 
-PostOrder:  L-R-$me$
+PostOrder:  L-R-$me$    (סוף-סדר או סופית)
     ^me ~t
 [11,13,$23$,$16$,$10$,$12$,17,$22$,$21$,$18$,$14$,15,19]
     ^? ~g ht complete
