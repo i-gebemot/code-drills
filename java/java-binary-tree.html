@@ -74,9 +74,9 @@ public static int countNodes(BinNode&lt;<Integer> node) {
             ^0 ~r ht int-vs-null
         return 0;
     }
-+    $int left$ = countNodes(node.getLeft());         {1}
++   $int left$ = countNodes(node.getLeft());         {1}
         ~o ht more-common
-+    $int right$ = countNodes(node.getRight());       {1}
++   $int right$ = countNodes(node.getRight());       {1}
         ~o ht more-common
 +    return 1 + left + right;                       {1}
 -    return 1 +                                     {1}
@@ -148,30 +148,52 @@ print(height(tree("1-2-3")));           // $1$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="countPositiveNodes()" todo>
-public static int countPositiveNodes(BinNode node) {
-    if (node == null) {
-        return 0;
+<drill lang="java" id="countPositiveNodes()">
+public static int countPositiveNodes(BinNode&lt;Integer> node) {
+-    if (node == null) {        {1}
+-        return 0;              {1}
+-    }                          {1}
+    int me = 0;
+    if (node.getValue() > 0) {
+        me = $1$;
+            ^? ~o hr implement
     }
-    int me = node.getValue() > 0 ? 1 : 0;
     return me +
-        countPositiveNodes(node.getLeft()) +
-        countPositiveNodes(node.getRight());
-}
+        $countP$$ositiveNodes$($node.$$getLeft()$) +
+            ^p ~r ht no-such-func   {2}
+            ~r ht no-such-func      {2}
+            ^$ ~t                   {3}
+            ~r ht func-with-no-obj
+        $countP$$ositiveNodes$($node.$$getRight()$);
+            ^p ~r ht no-such-func   {2}
+            ~r ht no-such-func      {2}
+            ^$ ~t                   {3}
+            ~r ht func-with-no-obj
+$} $
+    ~r hr stop-condition        {1}!
 </drill>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="min()" todo>
-public static int min(BinNode node) {
-    if (node == null) {
-        return Integer.MAX_VALUE;
+<drill lang="java" id="min()">
+public static int min($BinNode$$&lt;Integer>$ node) {
+        ~r ht generic-type
+        ^$
+    if (node == $null$) {
+            ^0 ~r hr ref-vs-value
+        return $Integer.MAX_VALUE$;
+            ^... ~o hr implement
     }
     int leftRight = Math.min(
-        min(node.getLeft()),
-        min(node.getRight()));
+        $min($node.getLeft()$)$,    {1}
+            ^$
+            ^$
+        $min($node.getRight()$)$);  {1}
+            ^$
+            ^$
     return Math.min(node.getValue(), leftRight);
-}
+$} $                                {1}
+    ~r hr where-is-recursion
 </drill>
 
 <!---------------------------------------------------------->
