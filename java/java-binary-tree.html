@@ -148,6 +148,152 @@ print(height(tree("1-2-3")));           // $1$
 
 <!---------------------------------------------------------->
 
+<drill lang="java" id="countPositiveNodes()" todo>
+public static int countPositiveNodes(BinNode node) {
+    if (node == null) {
+        return 0;
+    }
+    int me = node.getValue() > 0 ? 1 : 0;
+    return me +
+        countPositiveNodes(node.getLeft()) +
+        countPositiveNodes(node.getRight());
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="min()" todo>
+public static int min(BinNode node) {
+    if (node == null) {
+        return Integer.MAX_VALUE;
+    }
+    int leftRight = Math.min(
+        min(node.getLeft()),
+        min(node.getRight()));
+    return Math.min(node.getValue(), leftRight);
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="countLeaves()" todo>
+public static int countLeaves(BinNode node) {
+    if (node == null) {
+        return 0;
+    }
+    if (node.getLeft() == null && node.getRight() == null) {
+        return 1;
+    }
+    return 
+        countLeaves(node.getLeft()) +
+        countLeaves(node.getRight());
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="same()" todo>
+public static boolean same(BinNode a, BinNode b) {
+    if (a == null && b == null) {
+        return true;
+    }
+    if (a == null || b == null) {
+        return false;
+    }
+    printInLine(a.getValue(), b.getValue());
+    return
+        a.getValue() == b.getValue() &&
+        same(a.getLeft(), b.getLeft()) &&
+        same(a.getRight(), b.getRight());
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="maxLeaf()" todo>
+int maxLeaf(BinNode node) {
+    if (node == null) {
+        return Integer.MIN_VALUE;
+    }
+    if (node.getLeft() == null && node.getRight() == null) {
+        return node.getValue();
+    }
+    return Math.max(
+        maxLeaf(node.getLeft()),
+        maxLeaf(node.getRight())
+    );
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="noSingleChild()" todo>
+public static boolean noSingleChild(BinNode node) {
+    if (node == null) {
+        return true;
+    }
+    if (node.getLeft() == null && node.getRight() == null) {
+        return true;
+    }
+    if (node.getLeft() == null || node.getRight() == null) {
+        return false;
+    }
+    return
+        noSingleChild(node.getLeft()) &&
+        noSingleChild(node.getRight());
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="negative()" todo>
+public static int sum(BinNode node) {
+    if (node == null) {
+        return 0;
+    }
+    return node.getValue() +
+        sum(node.getLeft()) +
+        sum(node.getRight());
+}
+
+public static boolean negative(BinNode node) {
+    return sum(node) < 0;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="countNodesOfLevel()" todo>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="ascending()" todo>
+boolean isAscending(BinNode node, int parentValue) {
+    if (node == null) {
+        return true;
+    }
+    int myValue = node.getValue();
+    if (myValue <= parentValue) {
+        return false;
+    }
+    return
+        isAscending(node.getLeft(), myValue) &&
+        isAscending(node.getRight(), myValue);
+}
+
+boolean isAscending(BinNode node) {
+    return isAscending(node, Integer.MIN_VALUE);
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="balanced()" todo>
+</drill>
+
+<!---------------------------------------------------------->
+
 <drill lang="java" id="">
 </drill>
 

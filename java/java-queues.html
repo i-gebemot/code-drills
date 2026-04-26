@@ -17,9 +17,217 @@
     תור לא משוחזר...
 </hint>
 
+<hint id="why-temp-queue" dir="rtl">
+    למה יצרנו תור זמני?
+</hint>
+
+<hint id="que-is-not-bool" dir="rtl">
+    תור זה לא ערך בוליאני...
+</hint>
+
 <!---------------------------------------------------------->
 
-<drill lang="java" id="same()">
+<drill lang="java" id="count()">
+public static int count($Queue$$&lt;Integer>$ que) {    {1}
+        ~r hr generic-type
+        ^$
+    $Queue$$&lt;Integer>$ tmp = new $Queue$$&lt;Integer>$();    {1}
+        ~r hr generic-type
+        ^$
+        ~r hr generic-type
+        ^$
+    int count = 0;
+
+    while ($!$$que.isEmpty()$) {
+            ^$
+            ~r ht wrong-logic
+        int x = que.remove();
+-        tmp.insert(x);                 {2}
+        count++;
+    $} $
+        ~r hb why-temp-queue             {2}
+
+-    while (!tmp.isEmpty()) {           {3}
+-        que.insert(tmp.remove());      {3}
+-    }                                  {3}
+-                                       {3}    
+    return count;
+$} $
+        ~r hb queue-is-destroyed        {3}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="findMin()">
+public static $int $$findMin$(Queue&lt;Integer> que) {
+        ^$
+        ~r hb missing-ret-type
+    Queue&lt;Integer> tmp = $new $$Queue&lt;Integer>()$;
+        ^$
+        ~r ht new-is-missing
+    int min = $Integer.MAX_VALUE$;
+        ^... ~o ht implement
+
+    while (!$que$$.isEmpty()$) {
+            ~r ht que-is-not-bool
+            ^$
+        int x = que.remove();
+        tmp.insert(x);
+        min = $Math.min(min, x);$
+            ^... ~o hb implement
+    }
+
+    while ($!$$tmp.isEmpty()$) {
+            ^$
+            ~r ht wrong-logic
+        que.insert($tmp$$.remove()$);
+            ~r hb מה בדיוק מכניסים לתור?
+            ^$
+    }
+-                               {1}
+-    return min;                {1}
+$} $                            {1}
+    ~r hr return-is-missing
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="findByName()">
+public static Person findByName(Queue&lt;Person> que, String name) {
+    Queue&lt;Person> $tmp$$ = new Queue&lt;Person>()$;
+        ~r ht init-value
+        ^$
+-    Person person = null;                  {1}
+
+    while (!que.$isEmpty$$()$) {
+            ~r ht func-call
+            ^$
+        Person x = que.remove();
+        tmp.insert(x);
+        if (x.getName()$.equals($name$)$) {
+                ^ == $ ~r ht strings-are-refs
+                ^$
+-            person = x;                    {1}
++           $return$ person;                {1}!
+                ~r hb  queue-is-destroyed
+        }
+    }
+
+    while (!tmp.$isEmpty$$()$) {
+            ~r ht func-call
+            ^$
+        que.insert(tmp.remove());
+    }
+    
+    return $person$;                        {1}
+        ^null ~r ht wrong-logic
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="getByIndex()">
+$public static $int $getByIndex$(Queue&lt;Integer> que, int index) {
+        ^$
+        ~r hr external-func
+    Queue&lt;Integer> tmp = $new$$ Queue&lt;Integer>$();
+        ~r ht new-what
+        ^$
+-    int num = -1;              {1}
+
+    $for (; !que.isEmpty(); index--)$ {
+            ~g ht does-it-work
+        int x = que.remove();
+        tmp.insert(x);
+        if (index == 0) {
++           $return$ x;                        {1}
+                ~r hb  queue-is-destroyed
+-            num = x;                          {1}!
+        }
+    }
+
+    while (!tmp.isEmpty()) {
+        $que$.insert($tmp$.remove());
+            ^tmp ~r ht wrong-logic
+            ^que ~r ht wrong-logic
+    }
+    
+    return $num$;                               {1}
+        ^-1 ~r ht wrong-logic
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="fibonacci()">
+// לבדוק שתור מכיל את סידרת פיבונצ'י
+// אפשר להניח שתור מכיל לפחות 3 מספרים
+public static boolean fibonacci(Queue&lt;Integer> que) {
+    Queue&lt;Integer> tmp = new $Queue&lt;$$Integer$$>$();
+        ~o ht new-generic-with-no-type
+        ^$
+        ~o ht new-generic-with-no-type
+    boolean no = false;
+    int a = 0;
+    int b = $que.remove();$
+        ^... ~o hr implement
+    int c = $que.remove();$
+        ^... ~o hr implement
+-    tmp.insert(b);             {2}
+-    tmp.insert(c);             {2}
++   $...$                       {2}
+        ~o hr להכניס לתור זמני?
+    while (!que.isEmpty()) {
+        a = $b;$
+            ^... ~o hr implement
+        b = $c;$
+            ^... ~o hr implement
+        c = que.remove();
+-        tmp.insert(c);         {3}
+        if (a + b != c) {
+            no = true;
+        }
+    $} $
+        ~r hr not-in-tmp-queue  {3}
+    while (!tmp.isEmpty()) {
+        que.insert(tmp.remove());
+    }
+    return $no$$ == false$;
+        ~r ht wrong-logic
+        ^$
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="remove()">
+public static $void $$remove$(Queue&lt;Person> que, String name) {
+        ^$
+        ~r ht missing-ret-type
+    $Queue$$&lt;Person>$ tmp = new Queue&lt;Person>();
+        ~r ht generic-type
+        ^$
+    while (!que$.$isEmpty()) {
+            ^ $ ~r ht syntax-error
+        Person p = que.head();
+        if ($p == null || $!p.getName$()$$.equals($name$)$) {
+                ^$ ~t                              {1}
+                ^$ ~t                              {+}
+                ^ == $ ~r ht strings-are-refs
+                ^$
+            tmp.insert($p$);                       {1}!
+                ~r hr can-be-null
+        }
+    }
+    while (!tmp.isEmpty()) {
+        que.insert(tmp.remove());
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="sameWithList()">
 // הפונקציה בודקת האם תור זהה לרשימה מקושרת
 public static boolean same(Queue&lt;Integer> que, Node&lt;Integer> lst) {
     Queue&lt;Integer> tmp = new Queue&lt;Integer>();
@@ -43,3 +251,145 @@ public static boolean same(Queue&lt;Integer> que, Node&lt;Integer> lst) {
 }
 </drill>
 
+<!---------------------------------------------------------->
+
+<drill lang="java" id="sameWithQueue()!" no-wrong-phase>
+public static boolean sameQueue(Queue<Integer> a, Queue<Integer> b) {
+    Queue<Integer> tmpA = new Queue<Integer>();
+    Queue<Integer> tmpB = new Queue<Integer>();
+    boolean same = $true$;
+        ^... ~o hr complete
+    while ($!a.isEmpty()$ $&&$ $!b.isEmpty()$) {
+            ^... ~o hr complete     {1}
+            ^... ~o hr complete     {+}
+            ^... ~o hr complete     {1}
+        int xA = $a.remove()$;
+            ^... ~o hr complete
+        int xB = $b.remove()$;
+            ^... ~o hr complete
+        if (xA != xB) {
+            same = false;
+        }
++       $...$                       {2}
+            ~o hr complete
+-        tmpA.insert(xA);           {2}
+-        tmpB.insert(xB);           {2}
+    }
+    if ($!a.isEmpty()$ $||$ $!b.isEmpty()$) {
+            ^... ~o hr complete     {7}
+            ^... ~o hr complete     {+}
+            ^... ~o hr complete     {7}
+        same = false;
+    }
+-    while (!a.isEmpty()) {         {3}
+-        tmpA.insert(a.remove());   {3}
+-    }                              {3}
++   $...$                          {3}
+        ~o hr מה עם ב-a נשארו איברים?
+-    while (!b.isEmpty()) {         {4}
+-        tmpB.insert(b.remove());   {4}
+-    }                              {4}
++   $...$                          {4}
+        ~o hr מה עם ב-b נשארו איברים?
+-    while (!tmpA.isEmpty()) {      {5}
+-        a.insert(tmpA.remove());   {5}
+-    }                              {5}
++   $...$                          {5}
+        ~o hr לשחזר את a
+-    while (!tmpB.isEmpty()) {      {6}
+-        b.insert(tmpB.remove());   {6}
+-    }                              {6}
++   $...$                          {6}
+        ~o hr לשחזר את b
+    return same;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="deepCopy()">
+public static $Queue&lt;Person> $$deepCopy$(Queue&lt;Person> que) {
+        ^$
+        ~r ht missing-ret-type
+    Queue&lt;Person> tmp = new $Queue$&lt;$Person$>();  {3}
+        ~o ht new-generic-with-no-type
+        ^$
+    Queue&lt;Person> que2 = new $Queue$&lt;$Person$>(); {3}
+        ~o ht new-generic-with-no-type
+        ^$
+    while (!que.isEmpty()) {
+        $Person $$p$ = que.remove();
+            ^$
+            ~r ht type-is-missing
+        tmp.insert(p);
+-        if (p == null) {               {1}
+-            que2.insert(null);         {1}
+-        } else {                       {1}
+-4          que2.insert($new $$Person$($p$.$getName()$, $p$.$getAge()$));   {1}
+                ^$ ~t                           {+}
+                ~r ht new-is-missing
+                ~r ht can-be-null               {1}!
+                ^name ~r ht access-modifier     {2}
+                ~r ht can-be-null               {1}
+                ^age ~r ht access-modifier      {2}
+-        }                                      {1}
+    }
+    while (!$tmp$.isEmpty()) {
+            ^que ~r ht wrong-logic
+        que.insert(tmp.remove());
+    }
+    return $que$$2$;
+        ~r hr wrong-logic
+        ^$
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="printAscending()" no-wrong-phase>
+public static void printAscending(Queue&lt;Integer> a, Queue&lt;Integer> b) {
+    Queue&lt;Integer> tmpA = new Queue&lt;Integer>();
+    Queue&lt;Integer> tmpB = new Queue&lt;Integer>(); 
+    while ($!a.isEmpty() && !b.isEmpty()$) {
+            ^... ~o complete
+        int ax = $a.head();$
+            ^... ~o complete
+        int bx = $b.head();$
+            ^... ~o complete
+        if (ax < bx) {
++           $...$                           {1}
+                ~o hr לשחזר את b
+-            System.out.println(ax);        {1}
+-            tmpA.insert(a.remove());
+        } else {
++           $...$                           {2}
+                ~o hr לשחזר את b
+-            System.out.println(bx);        {2}
+-            tmpB.insert(b.remove());
+        }
+    }
+-    while (!a.isEmpty()) {                 {3}
+-        System.out.println(a.head());      {3}
+-        tmpA.insert(a.remove());           {3}
+-    }                                      {3}
++   $...$                                   {3}
+        ~o hr מה עם ב-a נשארו איברים?
+-    while (!b.isEmpty()) {                 {4}
+-        System.out.println(b.head());      {4}
+-        tmpB.insert(b.remove());           {4}
+-    }                                      {4}
++   $...$                                   {4}
+        ~o hr מה עם ב-b נשארו איברים?
+    while (!tmpA.isEmpty()) {
+        a.insert(tmpA.remove());
+    }
+    while (!tmpB.isEmpty()) {
+        b.insert(tmpB.remove());
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="">
+</drill>
