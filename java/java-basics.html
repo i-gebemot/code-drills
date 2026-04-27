@@ -13,7 +13,7 @@
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="variables-and-values">
+<drill lang="java" id="variables-and-values" no-wrong-phase>
 int a = 10;         // 10
 int b = a + 10;     // $20$
                         ^? ~g hr result
@@ -37,8 +37,8 @@ String name = $"$$Java$$"$;
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="types-and-conversions">
-int n = 123;        // 5
+<drill lang="java" id="types-and-conversions" no-wrong-phase>
+int n = 123;        // 123
 double pi = 3.14;   // 3.14
 double x = "pi";    // $❌ Can't assing string to double$
                             ^? ~g hr result
@@ -59,7 +59,7 @@ int n2 = 123.0;     // $error: can't assign double to int$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="module-and-int-div">
+<drill lang="java" id="module-and-int-div" no-wrong-phase>
 11 % 2          // $1$
                     ^? ~g hr result
 10 % 2          // $0$
@@ -97,7 +97,7 @@ int n2 = 123.0;     // $error: can't assign double to int$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="variables-and-operations">
+<drill lang="java" id="variables-and-operations" no-wrong-phase>
 int x = 5;
 double y = 3.14;
 boolean ok = true;
@@ -119,7 +119,7 @@ x != 5 && ok        // $false$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="basic-logic">
+<drill lang="java" id="basic-logic" no-wrong-phase>
 System.out.println(10 + 20);        // $30$
                                         ^? ~g hr result
 System.out.println("10" + "20");    // $1020$
@@ -146,7 +146,7 @@ n = ?                       // $22$                     {2}
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="more-logic">
+<drill lang="java" id="more-logic" no-wrong-phase>
 int n1 = 10;
 int n2 = 20;
 
@@ -213,7 +213,7 @@ $min$(20, 10);     // $10$
 <!---------------------------------------------------------->
 
 <drill lang="java" id="itsTriangle()">
-$boolean $$itsTriangle$(int a$,$ int b$,$ int c) {
+public static $boolean $$itsTriangle$(int a$,$ int b$,$ int c) {
 ^$
 ~r hr return-type
                             ^; ~r hb syntax-error   {+}
@@ -439,11 +439,11 @@ public static boolean $primeNumber$(int num) {
     for (int $i = 2$; i < num; i++) {
         ~g ht למה זה מתחיל ב-2?
         $if$ $($factor($num$$,$ i)$)$ {
-                    ~r ht if-syntax
+                    ~r ht if-syntax             {2}
                     ^$
-                    ~r ht comma-is-missing
+                    ~r ht comma-is-missing      {+}
                     ^$
-                    ^$
+                    ^$ ~t                       {2}
             return false;
         }
     }

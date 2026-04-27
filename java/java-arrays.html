@@ -22,7 +22,7 @@ $public static $int $arrayMax$(int$[]$ $arr$) {
 -   int max = arr[0];                             {1}
     for (int i = 0; i < arr.length; i++) {
         if (arr[i] > $max$) {                     {1}
-                   ~r hb missing-declaration
+                   ~r ht missing-declaration
             $max$ = arr[i];                       {1}
             ~r ht missing-declaration
         }
@@ -113,7 +113,7 @@ $calculateSum$(new double[] {1,2,3,4,5,6,7,8,9});   // $45.0$
 
 <drill lang="java" id="prefix()">
 $public static$ $boolean $$prefix$(int[] a, int[] b) {
-        ~r hr external-func
+        ~r hr return-type
         ^$ ~t                   
         ^what ~g hr func-name       {+}{1}
 -    if (b.length > a.length) {     {2}
@@ -122,7 +122,7 @@ $public static$ $boolean $$prefix$(int[] a, int[] b) {
     for ($int $$i$ = 0; i $<$ b.length; i++) {
             ^$
             ~r hr type-is-missing
-            ^<= ~r ht index-vs-length
+            ^<= ~r ht index-vs-length   {+}
         if (a[i] != b[i]) {
             return false;
         }
@@ -243,7 +243,7 @@ print($ascending$($new double[] {$2,$13.0,10$,15$}$));    // $false$
 <drill lang="java" id="palindrome()">
 $public $$static boolean$ $palindrome$($int[] $$a$) {
         ^$
-        ~r hr external-func
+        ~r hr return-type
         ^what ~g hr func-name                   {1}
         ^$ ~t                                   {+}
         ~r hr type-is-missing
@@ -274,7 +274,7 @@ print($palindrome$(new int[] {1,2,3,1,2,3}));         // $false$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="arithmeticProgression()">
+<drill lang="java" id="arithmeticProgression()" no-wrong-phase>
 public static boolean $arithmeticProgression$(int[] a, int a0, int d) {
         ^what ~g hr func-name                   {1}
     for (int i = 0; i < a.length; i++) {
