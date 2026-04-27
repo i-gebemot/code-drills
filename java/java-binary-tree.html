@@ -198,120 +198,117 @@ $} $                                {1}
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="countLeaves()" todo>
-public static int countLeaves(BinNode node) {
+<drill lang="java" id="countLeaves()">
+public static int countLeaves(BinNode&lt;Integer> node) {
     if (node == null) {
         return 0;
     }
-    if (node.getLeft() == null && node.getRight() == null) {
-        return 1;
+    if (node.$getLeft() == null$ && node.$hasRight()$) {
+            ^hasLeft() ~g ht is-there-any-diff
+            ^getRight() == null ~g ht is-there-any-diff
+        return $1$;
+            ^0 ~r hr wrong-logic
     }
-    return 
-        countLeaves(node.getLeft()) +
-        countLeaves(node.getRight());
+    return $$
+            ^1 + ~r hr wrong-logic
+        countLeaves(node.$getLeft$$()$) +       {1}
+            ~r hr func-call
+            ^$
+        countLeaves(node.$getRight$$()$);       {1}
+            ~r hr func-call
+            ^$
 }
 </drill>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="same()" todo>
-public static boolean same(BinNode a, BinNode b) {
-    if (a == null && b == null) {
+<drill lang="java" id="same()" no-wrong-phase>
+public static boolean same(BinNode&lt;Integer> a, BinNode&lt;Integer> b) {
+    if ($a == null$ $&&$ $b == null$) {     $// why AND must be here?$
+            ^... ~o ht implement        {1}
+            ^... ~o ht implement        {2}
+            ^... ~o ht implement        {1}
+            ^$ ~t                       {2}
         return true;
     }
-    if (a == null || b == null) {
+    if ($a == null$ $||$ $b == null$) {       $// why OR works here?$
+            ^... ~o ht implement        {3}
+            ^... ~o ht implement        {4}
+            ^... ~o ht implement        {3}
+            ^$ ~t                       {4}
         return false;
     }
-    printInLine(a.getValue(), b.getValue());
     return
-        a.getValue() == b.getValue() &&
-        same(a.getLeft(), b.getLeft()) &&
-        same(a.getRight(), b.getRight());
+        a$.getValue()$ == b$.getValue()$ &&
+            ^... ~o ht implement
+            ^... ~o ht implement
+        same($a.getLeft()$, $b.getLeft()$) &&
+            ^... ~o ht implement
+            ^... ~o ht implement
+        same($a.getRight()$, $b.getRight()$);
+            ^... ~o ht implement
+            ^... ~o ht implement
 }
 </drill>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="maxLeaf()" todo>
-int maxLeaf(BinNode node) {
-    if (node == null) {
-        return Integer.MIN_VALUE;
+<drill lang="java" id="maxLeaf()">
+$public $static int $maxLeaf$($BinNode$$&lt;Integer>$ node) {
+        ^$
+        ~r ht external-func
+        ~r ht generic-type      {+}
+        ^$
+    if (node $==$ null) {
+            ^= ~r hr assign-vs-comp
+        return $Integer.MIN_VALUE;$
+            ^? ~o hr implement
     }
-    if (node.getLeft() == null && node.getRight() == null) {
-        return node.getValue();
+    if (node.$hasLeft()$ $&&$ node.$getRight() == null$) {
+            ^getLight() == null ~g ht is-there-any-diff     {1}
+            ^|| ~r ht wrong-logic                           {+}
+            ^hasRight() ~g ht is-there-any-diff             {1}
+        return $node.getValue();$
+            ^? ~o hr implement
     }
-    return Math.max(
-        maxLeaf(node.getLeft()),
-        maxLeaf(node.getRight())
+    return Math.$max$(
+            ^min ~r hr wrong-logic
+        maxLeaf(node.get$Left$()),          {2}
+            ^Value ~r hr what
+        maxLeaf(node.get$Right$())          {2}
+            ^Value ~r hr what
     );
 }
 </drill>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="noSingleChild()" todo>
-public static boolean noSingleChild(BinNode node) {
-    if (node == null) {
+<drill lang="java" id="noSingleChild()" no-wrong-phase>
+// רק צמתים עם שני בנים או עלים
+public static boolean noSingleChild(BinNode&lt;Integer> node) {
++   $...$                           {1}
+        ~o hr implement
+-    if (node == null) {            {1}
+-        return true;               {1}
+-    }                              {1}
+    if ($node.hasLeft()$ $&&$ $node.hasRight()$) {
+            ^... ~o ht implement                {4}
+            ^... ~o ht implement                {+}
+            ^... ~o ht implement                {4}
         return true;
     }
-    if (node.getLeft() == null && node.getRight() == null) {
-        return true;
+    if ($node.hasLeft()$ $||$ $node.hasRight()$) {
+            ^... ~o ht implement                {3}
+            ^... ~o ht implement                {+}
+            ^... ~o ht implement                {3}
+        return $false;$
+            ^... ~o ht implement
     }
-    if (node.getLeft() == null || node.getRight() == null) {
-        return false;
-    }
-    return
-        noSingleChild(node.getLeft()) &&
-        noSingleChild(node.getRight());
+    return $$                                   {2}
+            ^... ~o ht implement
+-        noSingleChild(node.getLeft()) &&       {2}
+-        noSingleChild(node.getRight());        {2}
 }
-</drill>
-
-<!---------------------------------------------------------->
-
-<drill lang="java" id="negative()" todo>
-public static int sum(BinNode node) {
-    if (node == null) {
-        return 0;
-    }
-    return node.getValue() +
-        sum(node.getLeft()) +
-        sum(node.getRight());
-}
-
-public static boolean negative(BinNode node) {
-    return sum(node) < 0;
-}
-</drill>
-
-<!---------------------------------------------------------->
-
-<drill lang="java" id="countNodesOfLevel()" todo>
-</drill>
-
-<!---------------------------------------------------------->
-
-<drill lang="java" id="ascending()" todo>
-boolean isAscending(BinNode node, int parentValue) {
-    if (node == null) {
-        return true;
-    }
-    int myValue = node.getValue();
-    if (myValue <= parentValue) {
-        return false;
-    }
-    return
-        isAscending(node.getLeft(), myValue) &&
-        isAscending(node.getRight(), myValue);
-}
-
-boolean isAscending(BinNode node) {
-    return isAscending(node, Integer.MIN_VALUE);
-}
-</drill>
-
-<!---------------------------------------------------------->
-
-<drill lang="java" id="balanced()" todo>
 </drill>
 
 <!---------------------------------------------------------->

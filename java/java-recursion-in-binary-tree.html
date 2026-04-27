@@ -13,5 +13,53 @@
 
 <!---------------------------------------------------------->
 
+<drill lang="java" id="negative()" todo>
+public static int sum(BinNode node) {
+    if (node == null) {
+        return 0;
+    }
+    return node.getValue() +
+        sum(node.getLeft()) +
+        sum(node.getRight());
+}
+
+public static boolean negative(BinNode node) {
+    return sum(node) < 0;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="countNodesOfLevel()" todo>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="ascending()" todo>
+boolean isAscending(BinNode node, int parentValue) {
+    if (node == null) {
+        return true;
+    }
+    int myValue = node.getValue();
+    if (myValue <= parentValue) {
+        return false;
+    }
+    return
+        isAscending(node.getLeft(), myValue) &&
+        isAscending(node.getRight(), myValue);
+}
+
+boolean isAscending(BinNode node) {
+    return isAscending(node, Integer.MIN_VALUE);
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="balanced()" todo>
+</drill>
+
+<!---------------------------------------------------------->
+
 <drill lang="java" id="">
 </drill>
