@@ -65,14 +65,15 @@ A a2 $= a$;
 System.out.println(a.$getNum()$);
     ^num ~r ht cant-access-private
 System.out.println(a.$getNum$$()$);
-    ~r ht getter is a funciton...
+    ~r ht func-call
     ^$
-a.$setNum(321)$;
-    ^num = 321 ~r hr cant-access-private
-a.$setNum(321)$;
-    ^setNum = 321 ~r hr setter is a function call
-a.setNum$(321)$;
-    ^() = 321 ~r ht setter can't be assinged
+a.$setNum$$($321$)$;
+    ^num ~t
+    ^ = $ ~r hr cant-access-private
+    ^$
+a.setNum$($321$)$;
+    ^ = $ ~r ht setter can't be assinged
+    ^$
 System.out.println($a2$.getNum());    // $321$ is printed
     ~g
     ^? ~g ht whats-printed
@@ -85,17 +86,17 @@ class B {
     private A[] arr;
 
     $public $$A$$[]$ $getArr$() { $return $$this.arr$; }
+    ^$ ~t                                   {1}
+    ~r hr מחזירים אבייקט או מערך?         {+}
     ^$
-    ~r hr מחזירים אבייקט או מערך?
-    ^$
-    ~r ht access-modifier
-    ^$
-    ~r ht זה פקודה או ביטוי? 
+    ~r ht access-modifier                   {1}!
+    ^$ ~t                                   {+}
+    ~r ht זה פקודה או ביטוי?
 
     $public $$int$ $getSum$$()$ {
     ^$
     ~r ht access-modifier
-    ~r ht משתנה או פונקציה?
+    ~r ht משתנה או פונקציה?                 {+}
     ^$
         $int $$sum$ = 0;
         ~^
@@ -103,12 +104,12 @@ class B {
         for ($int $$i$ = 0; i < $this.$$arr$.length; i++) {
              ^$
              ~r ht syntax-error
-            ^$
+            ^$ ~t                             {+}
             ~o ht better-with-this
             sum += $this.$$arr$[i].$getNum()$;
                    ^$
                    ~o ht better-with-this
-                   ^num ~r ht cant-access-private
+                   ^num ~r ht cant-access-private   {+}
         }
         return sum$;$
                   ^ $ ~r ht end-of-op
@@ -139,17 +140,18 @@ class B {
 
 A a = new A(12);
 A a2 = new A(21);
-B b = $new B$($new A[] {a, a2, a}$);    
+B b = $new B$($new A[] {$a, a2, a$}$);    
     ~r ht constructor is missing        {1}
-    ^[a, a2, a] ~r ht syntax error      {+}
+    ^[ ~r ht new-array                  {+}
+    ^] ~r ht new-array
 System.out.println(b.$getArr()$[2].$getNum()$);     // $12$
     ^arr ~r ht cant-access-private      
-    ^num ~r ht cant-access-private
-    ^? ~g hl whats-printed    {+}
+    ^num ~r ht cant-access-private      {+}
+    ^? ~g hl whats-printed              {+}
 System.out.println(b.$getSum$$()$);                 // $45$
     ~r ht func-call
     ^$
-    ^? ~g hl whats-printed    {+}
+    ^? ~g hl whats-printed              {+}
 
 // How many classes are used here?  - $2$ classes ($A and B$)
     ^? ~g
@@ -170,13 +172,16 @@ public class Person {
     public String getName() { return this.name; }
     public int getAge() { return this.age; }
 
-    public boolean same($Person other$) {
-                       ^Person p1, Person p2 ~r ht not-internal-external
+    public boolean same(Person $other$$$) {
+                       ^p1 ~r ht not-internal-external
+                       ^, Person p2 ~r ht not-internal-external
         return 
-            $this.age == other.getAge()$ &&
-                ^p1.getAge() == p2.getAge() ~r ht not-internal-external
-            $this.name.equals(other.getName())$;
-                ^p1.getName().equals(p2.getName()) ~r hb not-internal-external
+            $this.age$ == $other$.getAge() &&
+                ^p1.getAge() ~r ht not-internal-external
+                ^p2 ~r ht not-internal-external
+            $this.name$.equals($other$.getName());
+                ^p1.getName() ~r hb not-internal-external
+                ^p2 ~r hb not-internal-external
     }
 }
 </drill>
@@ -195,12 +200,14 @@ $public $$static $$boolean same$(Person p1, Person p2) {
 ~r hr not-internal-external
       ^$
                ~r hr not-internal-external
-    if ($p1.getAge() != p2.getAge()$) {
-        ^p1.this.age != p2.this.age ~r ht syntax-error
+    if (p1.$getAge()$ != p2.$getAge()$) {
+        ^this.age ~r ht syntax-error
+        ^this.age ~r ht syntax-error
         return false;
     }
-    return $p1.getName().equals(p2.getName())$;
-           ^p1.this.name.equals(p2.this.name) ~r ht syntax-error
+    return p1.$getName()$.equals(p2.$getName()$);
+           ^this.name ~r ht syntax-error
+           ^this.name ~r ht syntax-error
 }
 </drill>
 

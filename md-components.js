@@ -4441,7 +4441,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.20.9";
+  const VERSION = "0.20.10";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -13079,7 +13079,7 @@
   const hints = /* @__PURE__ */ (() => {
     let db = {};
     function makeHint(html2) {
-      let id = html2.getAttribute("id");
+      let id = html2.getAttribute("id")?.toLowerCase();
       let dir = html2.getAttribute("dir") || "ltr";
       let text2 = html2.textContent.trim();
       if (!id) {
@@ -13209,7 +13209,7 @@
           };
           if (ch.length === 0) return "red";
           let color = colors[ch.toLowerCase()];
-          if (!color) log.warn(`Line ${lineNo}: Unrecognized color '${ch}'`);
+          if (!color) log.warn(`${id}.${lineNo}: Unrecognized color '${ch}'`);
           return color || "red";
         }
         function parseWhere(ch, name) {
@@ -13233,7 +13233,7 @@
           ch ||= "";
           name ||= "";
           let where = positions[ch.toLocaleLowerCase()] || positions[name.toLocaleLowerCase()];
-          if (!where) log.warn(`Line ${lineNo}: Unrecognized position '${ch}' or '${name}' in where selector`);
+          if (!where) log.warn(`${id}.${lineNo}: Unrecognized position '${ch}' or '${name}' in where selector`);
           return where || "bottom";
         }
         function parseHint(hintId, whereCh, whereName) {
@@ -13288,12 +13288,12 @@
           let wavedWithHint = /~(\w?\s*)(?:h(\w)|hint-(\w+))\s+(.+)/.exec(ln);
           if (!wavedWithHint) {
             let maybeHintId = hints.endsWithHintId(ln);
-            if (maybeHintId) log.warn(`Line ${lineNo}: possible hint '${maybeHintId}' with no where selector (ht,hb,hl,hr)`);
+            if (maybeHintId) log.warn(`${id}.${lineNo}: possible hint '${maybeHintId}' with no where selector (ht,hb,hl,hr)`);
             return void 0;
           }
           let whereCh = wavedWithHint[2];
           let whereName = wavedWithHint[3];
-          let hintId = wavedWithHint[4].split("^")[0].trimEnd();
+          let hintId = wavedWithHint[4].split("^")[0].trimEnd().toLowerCase();
           return parseHint(hintId, whereCh, whereName);
         }
         function replaceSpan() {

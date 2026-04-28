@@ -228,13 +228,13 @@ $public static$ $boolean $$ascending$(double[] a) {
 
 print($ascending$($new double[] {$2,10,13,15.0$}$));    // true
         ^what ~g hr func-name                 {1}
-        ^[ ~r ht java-not-python              {2}
-        ^] ~r ht java-not-python
+        ^[ ~r ht new-array                    {2}
+        ^] ~r ht new-array
 print($ascending$($new double[] {$2,$13.0,10$,15$}$));    // $false$
         ^what ~g hr func-name                 {1}
-        ^[ ~r ht java-not-python              {2}
+        ^[ ~r ht new-array                    {2}
         ~o ht not-ascending                   {3}
-        ^] ~r ht java-not-python              {2}
+        ^] ~r ht new-array                    {2}
         ^? ~g ht result                       {3}
 </drill>
 

@@ -89,13 +89,13 @@ public class Person {
 
 $Person $$p1$ = $new$$ Person$("Avi", 123);
     ^$ ~t                           {1}
-    ~r rt missing-declaration
-    ~r rt class-is-missing          {2}
+    ~r hr var-is-not-defined
+    ~r ht new-what                  {2}
     ^$
 $Person $$p2$ = $new$$ Person$("Yoda", 321);
     ^$ ~t                           {1}
-    ~r rt missing-declaration
-    ~r rt class-is-missing          {2}
+    ~r hr var-is-not-defined
+    ~r ht new-what                  {2}
     ^$
 
 print(p1);                  // [Avi: 123]
@@ -153,8 +153,8 @@ public static $void $$foo$(int[] a) {
 }
 
 int[] a2 = $new int[] {$1, 2, 3$}$;
-    ^[ ~r ht java-not-python
-    ^] ~r ht java-not-python
+    ^[ ~r ht new-array
+    ^] ~r ht new-array
 
 print(a2);               // [1, 2, 3]
 foo($a2$);
