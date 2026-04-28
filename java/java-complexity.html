@@ -14,40 +14,68 @@
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="hasLoop()" todo>
+<drill lang="java" id="hasLoop()" no-wrong-phase>
 // Detect if a linked list has a loop
-boolean hasLoop(Node head) {
-    Node node = head;
+public static boolean hasLoop(Node&lt;Integer> head) {
+    Node&lt;Integer> node = $head;$
+        ^... ~g ~o hr implement
     int indx = 0;
-    while (node != null) {
-        Node node2 = head;
-        for (int i = 0; i < indx; i++) {
-            if (node2 == node) {
+$👉$  while ($node != null$) {
+            ^  $ ~t                         {4}
+            ^... ~o ht implement            {+}
+        Node&lt;Integer> node2 = $head;$
+            ^... ~o ht implement
+$👉$     for (int i = 0; $i < indx$; i++) {
+                ^  $ ~t                     {5}
+                ^... ~o ht implement        {+}
+            if ($node2 == node$) {
+                    ^... ~o ht implement
                 return true;
             }
-            node2 = node2.getNext();
-        }
-        node = node.getNext();
-        indx++;
-    }
+-            node2 = node2.getNext();       {1}
+        $} $                                {1}
+            ~o hr something-is-missing
+-        node = node.getNext();
+-        indx++;                            {2}
+    $} $                                    {2}
+            ~o hr something-is-missing
     return false;
 }
+
+// ?complexity לפי איזו שורות קוד אנחנו חושבים על: 
+// lines: $5$ and $7$
+        ^? ~g hb find-the-line              {4}!
+        ^? ~g hb find-the-line              {5}!
+
+// מה היא סיבוכיות זמן ריצה?:    $O(n^2)$
+        ^? ~g hb result
 </drill>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="hasLoop2()" todo>
-boolean hasLoop(Node head) {
-    Node l1 = head;
-    Node l2 = head;
-    while (l1 != null && l2 != null && l2.getNext() != null) {
+<drill lang="java" id="hasLoop2()!" no-wrong-phase>
+public static boolean hasLoop(Node&lt;Integer> head) {
+    Node&lt;Integer> l1 = head;
+    Node&lt;Integer> l2 = head;
+$👉$ while (l1 != null && l2 != null && l2.getNext() != null) {
+            ^   $ ~t                         {4}
         l1 = l1.getNext();
         l2 = l2.getNext().getNext();
 
         if (l2 == l1) {
-            return true;
+            return $true$;
+                ^... ~o ht implement
         }
     }
-    return false;
+    return $false$;
+                ^... ~o ht implement
+
+// ?complexity לפי איזו שורות קוד אנחנו חושבים על: 
+// lines: $4$
+        ^? ~g hb find-the-line     {4}!
+
+// מה היא סיבוכיות זמן ריצה?:    $O(n)$
+        ^? ~g hb result
+
 }
 </drill>

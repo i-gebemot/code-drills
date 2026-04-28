@@ -4441,7 +4441,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.20.7";
+  const VERSION = "0.20.9";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -12719,7 +12719,7 @@
     append_styles$1($$anchor, $$css$i);
     const [$$stores, $$cleanup] = setup_stores();
     const $ticks = () => store_get(ticks, "$ticks", $$stores);
-    let phaseNo = prop($$props, "phaseNo", 7), code = prop($$props, "code", 7);
+    let phaseNo = prop($$props, "phaseNo", 7), code = prop($$props, "code", 7), bgColor = prop($$props, "bgColor", 7);
     let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
     var span = root$i();
     let classes;
@@ -12753,12 +12753,19 @@
       set code($$value) {
         code($$value);
         flushSync();
+      },
+      get bgColor() {
+        return bgColor();
+      },
+      set bgColor($$value) {
+        bgColor($$value);
+        flushSync();
       }
     });
     $$cleanup();
     return $$pop;
   }
-  create_custom_element(RightSpan, { phaseNo: {}, code: {} }, [], [], true);
+  create_custom_element(RightSpan, { phaseNo: {}, code: {}, bgColor: {} }, [], [], true);
   var root$h = /* @__PURE__ */ from_html(`<span> </span>`);
   const $$css$h = {
     hash: "svelte-mtqyq9",
@@ -12769,7 +12776,7 @@
     append_styles$1($$anchor, $$css$h);
     const [$$stores, $$cleanup] = setup_stores();
     const $ticks = () => store_get(ticks, "$ticks", $$stores);
-    let phaseNo = prop($$props, "phaseNo", 7), code = prop($$props, "code", 7), color = prop($$props, "color", 7, "red"), hint = prop($$props, "hint", 7);
+    let phaseNo = prop($$props, "phaseNo", 7), code = prop($$props, "code", 7), bgColor = prop($$props, "bgColor", 7), color = prop($$props, "color", 7, "red"), hint = prop($$props, "hint", 7);
     let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
     var span = root$h();
     let classes;
@@ -12810,6 +12817,13 @@
         code($$value);
         flushSync();
       },
+      get bgColor() {
+        return bgColor();
+      },
+      set bgColor($$value) {
+        bgColor($$value);
+        flushSync();
+      },
       get color() {
         return color();
       },
@@ -12828,7 +12842,7 @@
     $$cleanup();
     return $$pop;
   }
-  create_custom_element(Waved, { phaseNo: {}, code: {}, color: {}, hint: {} }, [], [], true);
+  create_custom_element(Waved, { phaseNo: {}, code: {}, bgColor: {}, color: {}, hint: {} }, [], [], true);
   var root$g = /* @__PURE__ */ from_html(`<new-line></new-line>`, 2);
   const $$css$g = {
     hash: "svelte-1xhsnn0",
@@ -13118,7 +13132,15 @@
       let ids = Object.keys(db);
       return ids.join(",");
     }
-    return { parseMyDocument, importHints, get: get2, names };
+    function endsWithHintId(text2) {
+      text2 = text2.trimEnd().toLowerCase();
+      let ids = Object.keys(db);
+      for (let id of ids) {
+        if (text2.endsWith(id)) return id;
+      }
+      return "";
+    }
+    return { parseMyDocument, importHints, get: get2, names, endsWithHintId };
   })();
   function Hint($$anchor) {
   }
@@ -13177,7 +13199,14 @@
           return str.endsWith(_$) ? str.substring(0, str.length - 1) : str;
         }
         function parseColor(ch) {
-          let colors = { "r": "red", "o": "orange", "g": "green", "t": "transparent" };
+          let colors = {
+            "r": "red",
+            "o": "orange",
+            "g": "green",
+            "t": "transparent",
+            "y": "yellow",
+            "m": "yellow"
+          };
           if (ch.length === 0) return "red";
           let color = colors[ch.toLowerCase()];
           if (!color) log.warn(`Line ${lineNo}: Unrecognized color '${ch}'`);
@@ -13204,7 +13233,7 @@
           ch ||= "";
           name ||= "";
           let where = positions[ch.toLocaleLowerCase()] || positions[name.toLocaleLowerCase()];
-          if (!where) log.warn(`Line ${lineNo}: Unregocnized position '${ch}'`);
+          if (!where) log.warn(`Line ${lineNo}: Unrecognized position '${ch}' or '${name}' in where selector`);
           return where || "bottom";
         }
         function parseHint(hintId, whereCh, whereName) {
@@ -13245,6 +13274,10 @@
           }
           return spans;
         }
+        function parseWaveColors() {
+          const res = [...line2().matchAll(/~(\w)(?:\s|$)/g)].map((m) => parseColor(m[1]));
+          return res.length ? res : ["red"];
+        }
         function parseWaveColor() {
           let ch = /~(\w)(?:\s|$)/.exec(line2());
           if (!ch) return "red";
@@ -13253,7 +13286,11 @@
         function parseHintProps() {
           let ln = lineWithNoMarkup();
           let wavedWithHint = /~(\w?\s*)(?:h(\w)|hint-(\w+))\s+(.+)/.exec(ln);
-          if (!wavedWithHint) return void 0;
+          if (!wavedWithHint) {
+            let maybeHintId = hints.endsWithHintId(ln);
+            if (maybeHintId) log.warn(`Line ${lineNo}: possible hint '${maybeHintId}' with no where selector (ht,hb,hl,hr)`);
+            return void 0;
+          }
           let whereCh = wavedWithHint[2];
           let whereName = wavedWithHint[3];
           let hintId = wavedWithHint[4].split("^")[0].trimEnd();
@@ -13345,6 +13382,7 @@
           wrongLineAdded,
           parse$Line,
           parseWaveColor,
+          parseWaveColors,
           parseHintProps,
           replaceSpan,
           parseReplacement,
@@ -13387,12 +13425,16 @@
         function addAsIsSpan(code) {
           add("as-is", { code });
         }
-        function addReplaceSpan(phaseNo, rightSpan, wrongSpan, color, hint) {
-          if (rightSpan.length > 0) add("right-span", { phaseNo, code: rightSpan });
+        function addReplaceSpan(phaseNo, rightSpan, wrongSpan, colors, hint) {
+          let bgColor = colors.length > 1 ? colors[0] : "green";
+          let color = colors.length > 1 ? colors[1] : colors[0];
+          if (rightSpan.length > 0) add("right-span", { phaseNo, code: rightSpan, bgColor });
           if (wrongSpan.length > 0) add("wrong-span", { phaseNo, code: wrongSpan, color, hint });
         }
-        function addWavedSpan(phaseNo, span, color, hint) {
-          if (span.length > 0) add("waved", { phaseNo, code: span, color, hint });
+        function addWavedSpan(phaseNo, span, colors, hint) {
+          let bgColor = colors.length > 1 ? colors[0] : "green";
+          let color = colors.length > 1 ? colors[1] : colors[0];
+          if (span.length > 0) add("waved", { phaseNo, code: span, bgColor, color, hint });
         }
         function addRightLine(phaseNo, code) {
           code = fixIndentation(code);
@@ -13514,13 +13556,13 @@
               if (src.hasPhaseSwitch()) {
                 phaseNo.next(src);
               }
-              let color = src.parseWaveColor();
+              let colors = src.parseWaveColors();
               let hint = src.parseHintProps();
               if (src.replaceSpan()) {
                 let wrongSpan = src.parseReplacement();
-                drill.addReplaceSpan(phaseNo.get(), rightSpan, wrongSpan, color, hint);
+                drill.addReplaceSpan(phaseNo.get(), rightSpan, wrongSpan, colors, hint);
               } else {
-                drill.addWavedSpan(phaseNo.get(), rightSpan, color, hint);
+                drill.addWavedSpan(phaseNo.get(), rightSpan, colors, hint);
               }
             }
           }
@@ -13745,7 +13787,8 @@
     set_style(div_2, "", {}, {
       "--animation-time": "1s",
       "--line-no-font-size": "0.6em",
-      "--right-color": "rgb(200, 255, 200);"
+      "--right-color": "rgb(200, 255, 200);",
+      "--mark-color": "yellow;"
     });
     var node_1 = child(div_2);
     {
