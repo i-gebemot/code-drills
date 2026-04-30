@@ -4441,7 +4441,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.20.10";
+  const VERSION = "0.20.11";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -12425,6 +12425,19 @@
     }
     return { tick, untick, start, reveal, meAt };
   })();
+  const vars = /* @__PURE__ */ (() => {
+    function color(name) {
+      switch (name) {
+        case "green":
+          return "rgb(200, 255, 200);";
+        case "mark":
+          return "yellow";
+        default:
+          return name;
+      }
+    }
+    return { color };
+  })();
   let log = (() => {
     let lines = writable([]);
     let minLevel = "E";
@@ -12723,11 +12736,13 @@
     let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
     var span = root$i();
     let classes;
+    let styles;
     var text2 = child(span, true);
     reset(span);
     template_effect(
-      ($0) => {
+      ($0, $1) => {
         classes = set_class(span, 1, "svelte-12p80z8", null, classes, $0);
+        styles = set_style(span, "", styles, $1);
         set_text(text2, code());
       },
       [
@@ -12735,7 +12750,8 @@
           wrong: get$1(meAt).wrong,
           hint: get$1(meAt).hint,
           right: get$1(meAt).right
-        })
+        }),
+        () => ({ "background-color": bgColor() })
       ]
     );
     append($$anchor, span);
@@ -12798,7 +12814,7 @@
           hint: get$1(meAt).hint,
           right: get$1(meAt).right
         }),
-        () => ({ "--color": color() })
+        () => ({ "--color": color(), "background-color": bgColor() })
       ]
     );
     append($$anchor, span);
@@ -13425,15 +13441,26 @@
         function addAsIsSpan(code) {
           add("as-is", { code });
         }
+        function getColor(colors, indx, $default) {
+          $default = vars.color($default);
+          switch (indx) {
+            case 0:
+              return vars.color(colors[0]);
+            case 1:
+              return colors.length > 1 ? vars.color(colors[1]) : $default;
+            default:
+              return $default;
+          }
+        }
         function addReplaceSpan(phaseNo, rightSpan, wrongSpan, colors, hint) {
-          let bgColor = colors.length > 1 ? colors[0] : "green";
-          let color = colors.length > 1 ? colors[1] : colors[0];
+          let color = getColor(colors, 0, "red");
+          let bgColor = getColor(colors, 1, "green");
           if (rightSpan.length > 0) add("right-span", { phaseNo, code: rightSpan, bgColor });
           if (wrongSpan.length > 0) add("wrong-span", { phaseNo, code: wrongSpan, color, hint });
         }
         function addWavedSpan(phaseNo, span, colors, hint) {
-          let bgColor = colors.length > 1 ? colors[0] : "green";
-          let color = colors.length > 1 ? colors[1] : colors[0];
+          let color = getColor(colors, 0, "red");
+          let bgColor = getColor(colors, 1, "transparent");
           if (span.length > 0) add("waved", { phaseNo, code: span, bgColor, color, hint });
         }
         function addRightLine(phaseNo, code) {
@@ -13784,12 +13811,7 @@
     var node = sibling(div_1, 2);
     Logger(node, {});
     var div_2 = sibling(node, 2);
-    set_style(div_2, "", {}, {
-      "--animation-time": "1s",
-      "--line-no-font-size": "0.6em",
-      "--right-color": "rgb(200, 255, 200);",
-      "--mark-color": "yellow;"
-    });
+    let styles;
     var node_1 = child(div_2);
     {
       var consequent = ($$anchor2) => {
@@ -13882,12 +13904,18 @@
     var node_8 = sibling(div, 2);
     PoweredBy(node_8);
     template_effect(
-      ($0, $1) => {
+      ($0, $1, $2) => {
         set_text(text$1, heading());
-        classes = set_class(button_1, 1, "prev btn btn-xs btn-accent", null, classes, $0);
-        classes_1 = set_class(button_2, 1, "next btn btn-xs btn-accent", null, classes_1, $1);
+        styles = set_style(div_2, "", styles, $0);
+        classes = set_class(button_1, 1, "prev btn btn-xs btn-accent", null, classes, $1);
+        classes_1 = set_class(button_2, 1, "next btn btn-xs btn-accent", null, classes_1, $2);
       },
       [
+        () => ({
+          "--animation-time": "1s",
+          "--line-no-font-size": "0.6em",
+          "--right-color": vars.color("green")
+        }),
         () => ({ "btn-disabled": get$1(indx) === 0 }),
         () => ({ "btn-disabled": get$1(indx) === get$1(drills).length - 1 })
       ]
