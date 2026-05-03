@@ -1,0 +1,52 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="../md-components.js"></script>
+
+<import-hints from="./java-hints.html"></import-hints>
+
+<!---------------------------------------------------------->
+
+<code-drills heading="Demo">
+</code-drills>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="demo-01">
+public static int modulo(int n1, int n2) {
+    while (n1 >= n2) {
+        n1 -= n2;
+    }
+    return n1;
+}
+
+System.out.println(modulo(7, 3));      // 1
+System.out.println(modulo(14, 5));     // 4
+System.out.println(modulo(12, 3));     // 0
+System.out.println(modulo(7, 10));     // 7
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="demo-02">
+$public static $int $modulo$(int n1, int n2) {
+        ^$
+        ~r hb external-func
+    while $($$n1 >= n2$$)$ {
+            ^$
+            ~r ht while-syntax
+            ^$
+        n1 -= n2;
+    }
+-    return n1;                 {1}
+$} $
+    ~r hr return-is-missing     {1}
+
+System.out.println(modulo(7, 3));      // $1$
+    ^? ~g hr result
+System.out.println(modulo(14, 5));     // $4$
+    ^? ~g hr result
+System.out.println(modulo(12, 3));     // $0$
+    ^? ~g hr result
+System.out.println(modulo(7, 10));     // $7$
+    ^? ~g hr result
+</drill>
