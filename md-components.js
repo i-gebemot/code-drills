@@ -105,7 +105,14 @@
       "daisy-ui": () => addCss(root2, "https://cdn.jsdelivr.net/npm/daisyui@latest/dist/full.min.css"),
       "google-fonts": () => addCss(root2, "https://fonts.googleapis.com/css2?family=Amatic+SC&family=Patrick+Hand&display=swap"),
       "jquery": () => addJs(root2, "https://code.jquery.com/jquery-3.6.0.min.js"),
-      "mathjax": () => addJs(root2, "https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js")
+      "mathjax": () => {
+        if (window.MathJax)
+          return;
+        window.MathJax = {
+          loader: { load: ["input/asciimath", "output/chtml"] }
+        };
+        addJs(root2, "https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js");
+      }
     };
     libs.forEach((lib2) => {
       if (deps[lib2]) return;
@@ -526,6 +533,8 @@
     async_effect(() => {
       try {
         var p = fn();
+        if (prev) Promise.resolve(p).catch(() => {
+        });
       } catch (error) {
         p = Promise.reject(error);
       }
@@ -639,10 +648,10 @@
       derived2.v = value;
       derived2.wv = increment_write_version();
     }
-    if (is_destroying_effect) return;
-    if (batch_deriveds !== null) {
-      batch_deriveds.set(derived2, derived2.v);
-    } else {
+    if (is_destroying_effect) {
+      return;
+    }
+    {
       var status = (skip_reaction || (derived2.f & UNOWNED) !== 0) && derived2.deps !== null ? MAYBE_DIRTY : CLEAN;
       set_signal_status(derived2, status);
     }
@@ -680,10 +689,12 @@
     var previous_effect = active_effect;
     var previous_reaction = active_reaction;
     var previous_component_context = component_context;
+    var previous_batch = current_batch;
     return function restore() {
       set_active_effect(previous_effect);
       set_active_reaction(previous_reaction);
       set_component_context(previous_component_context);
+      previous_batch?.activate();
     };
   }
   function unset_context() {
@@ -693,7 +704,6 @@
   }
   const batches = /* @__PURE__ */ new Set();
   let current_batch = null;
-  let batch_deriveds = null;
   let effect_pending_updates = /* @__PURE__ */ new Set();
   let tasks = [];
   function dequeue() {
@@ -709,13 +719,14 @@
   let queued_root_effects = [];
   let last_scheduled_effect = null;
   let is_flushing = false;
+  let is_flushing_sync = false;
   class Batch {
     /**
      * The current values of any sources that are updated in this batch
      * They keys of this map are identical to `this.#previous`
      * @type {Map<Source, any>}
      */
-    #current = /* @__PURE__ */ new Map();
+    current = /* @__PURE__ */ new Map();
     /**
      * The values of any sources that are updated in this batch _before_ those updates took place.
      * They keys of this map are identical to `this.#current`
@@ -774,6 +785,16 @@
      */
     #block_effects = [];
     /**
+     * Deferred effects (which run after async work has completed) that are DIRTY
+     * @type {Effect[]}
+     */
+    #dirty_effects = [];
+    /**
+     * Deferred effects that are MAYBE_DIRTY
+     * @type {Effect[]}
+     */
+    #maybe_dirty_effects = [];
+    /**
      * A set of branches that still exist, but will be destroyed when this batch
      * is committed — we skip over these during `process`
      * @type {Set<Effect>}
@@ -783,51 +804,31 @@
      *
      * @param {Effect[]} root_effects
      */
-    #process(root_effects) {
+    process(root_effects) {
       queued_root_effects = [];
-      var current_values = null;
-      if (batches.size > 1) {
-        current_values = /* @__PURE__ */ new Map();
-        batch_deriveds = /* @__PURE__ */ new Map();
-        for (const [source2, current2] of this.#current) {
-          current_values.set(source2, { v: source2.v, wv: source2.wv });
-          source2.v = current2;
-        }
-        for (const batch of batches) {
-          if (batch === this) continue;
-          for (const [source2, previous] of batch.#previous) {
-            if (!current_values.has(source2)) {
-              current_values.set(source2, { v: source2.v, wv: source2.wv });
-              source2.v = previous;
-            }
-          }
-        }
-      }
       for (const root2 of root_effects) {
         this.#traverse_effect_tree(root2);
       }
       if (this.#async_effects.length === 0 && this.#pending === 0) {
+        this.#commit();
         var render_effects = this.#render_effects;
         var effects = this.#effects;
         this.#render_effects = [];
         this.#effects = [];
         this.#block_effects = [];
-        this.#commit();
+        current_batch = null;
         flush_queued_effects(render_effects);
         flush_queued_effects(effects);
+        if (current_batch === null) {
+          current_batch = this;
+        } else {
+          batches.delete(this);
+        }
         this.#deferred?.resolve();
       } else {
-        for (const e of this.#render_effects) set_signal_status(e, CLEAN);
-        for (const e of this.#effects) set_signal_status(e, CLEAN);
-        for (const e of this.#block_effects) set_signal_status(e, CLEAN);
-      }
-      if (current_values) {
-        for (const [source2, { v, wv }] of current_values) {
-          if (source2.wv <= wv) {
-            source2.v = v;
-          }
-        }
-        batch_deriveds = null;
+        this.#defer_effects(this.#render_effects);
+        this.#defer_effects(this.#effects);
+        this.#defer_effects(this.#block_effects);
       }
       for (const effect2 of this.#async_effects) {
         update_effect(effect2);
@@ -856,11 +857,11 @@
             effect2.f ^= CLEAN;
           } else if ((flags & EFFECT) !== 0) {
             this.#effects.push(effect2);
-          } else if (is_dirty(effect2)) {
+          } else if ((flags & CLEAN) === 0) {
             if ((flags & ASYNC) !== 0) {
               var effects = effect2.b?.pending ? this.#boundary_async_effects : this.#async_effects;
               effects.push(effect2);
-            } else {
+            } else if (is_dirty(effect2)) {
               if ((effect2.f & BLOCK_EFFECT) !== 0) this.#block_effects.push(effect2);
               update_effect(effect2);
             }
@@ -880,6 +881,17 @@
       }
     }
     /**
+     * @param {Effect[]} effects
+     */
+    #defer_effects(effects) {
+      for (const e of effects) {
+        const target = (e.f & DIRTY) !== 0 ? this.#dirty_effects : this.#maybe_dirty_effects;
+        target.push(e);
+        set_signal_status(e, CLEAN);
+      }
+      effects.length = 0;
+    }
+    /**
      * Associate a change to a given source with the current
      * batch, noting its previous and current values
      * @param {Source} source
@@ -889,7 +901,7 @@
       if (!this.#previous.has(source2)) {
         this.#previous.set(source2, value);
       }
-      this.#current.set(source2, source2.v);
+      this.current.set(source2, source2.v);
     }
     activate() {
       current_batch = this;
@@ -909,7 +921,7 @@
     }
     flush() {
       if (queued_root_effects.length > 0) {
-        this.flush_effects();
+        flush_effects();
       } else {
         this.#commit();
       }
@@ -920,27 +932,6 @@
         batches.delete(this);
       }
       this.deactivate();
-    }
-    flush_effects() {
-      var was_updating_effect = is_updating_effect;
-      is_flushing = true;
-      try {
-        var flush_count = 0;
-        set_is_updating_effect(true);
-        while (queued_root_effects.length > 0) {
-          if (flush_count++ > 1e3) {
-            var updates, entry;
-            if (DEV) ;
-            infinite_loop_guard();
-          }
-          this.#process(queued_root_effects);
-          old_values.clear();
-        }
-      } finally {
-        is_flushing = false;
-        set_is_updating_effect(was_updating_effect);
-        last_scheduled_effect = null;
-      }
     }
     /**
      * Append and remove branches to/from the DOM
@@ -959,16 +950,12 @@
     decrement() {
       this.#pending -= 1;
       if (this.#pending === 0) {
-        for (const e of this.#render_effects) {
+        for (const e of this.#dirty_effects) {
           set_signal_status(e, DIRTY);
           schedule_effect(e);
         }
-        for (const e of this.#effects) {
-          set_signal_status(e, DIRTY);
-          schedule_effect(e);
-        }
-        for (const e of this.#block_effects) {
-          set_signal_status(e, DIRTY);
+        for (const e of this.#maybe_dirty_effects) {
+          set_signal_status(e, MAYBE_DIRTY);
           schedule_effect(e);
         }
         this.#render_effects = [];
@@ -985,11 +972,11 @@
     settled() {
       return (this.#deferred ??= deferred()).promise;
     }
-    static ensure(autoflush = true) {
+    static ensure() {
       if (current_batch === null) {
         const batch = current_batch = new Batch();
         batches.add(current_batch);
-        if (autoflush) {
+        if (!is_flushing_sync) {
           Batch.enqueue(() => {
             if (current_batch !== batch) {
               return;
@@ -1009,21 +996,49 @@
     }
   }
   function flushSync(fn) {
-    var result;
-    const batch = Batch.ensure(false);
-    while (true) {
-      flush_tasks();
-      if (queued_root_effects.length === 0) {
-        if (batch === current_batch) {
-          batch.flush();
+    var was_flushing_sync = is_flushing_sync;
+    is_flushing_sync = true;
+    try {
+      var result;
+      if (fn) ;
+      while (true) {
+        flush_tasks();
+        if (queued_root_effects.length === 0) {
+          current_batch?.flush();
+          if (queued_root_effects.length === 0) {
+            last_scheduled_effect = null;
+            return (
+              /** @type {T} */
+              result
+            );
+          }
         }
-        last_scheduled_effect = null;
-        return (
-          /** @type {T} */
-          result
-        );
+        flush_effects();
       }
-      batch.flush_effects();
+    } finally {
+      is_flushing_sync = was_flushing_sync;
+    }
+  }
+  function flush_effects() {
+    var was_updating_effect = is_updating_effect;
+    is_flushing = true;
+    try {
+      var flush_count = 0;
+      set_is_updating_effect(true);
+      while (queued_root_effects.length > 0) {
+        var batch = Batch.ensure();
+        if (flush_count++ > 1e3) {
+          var updates, entry;
+          if (DEV) ;
+          infinite_loop_guard();
+        }
+        batch.process(queued_root_effects);
+        old_values.clear();
+      }
+    } finally {
+      is_flushing = false;
+      set_is_updating_effect(was_updating_effect);
+      last_scheduled_effect = null;
     }
   }
   function infinite_loop_guard() {
@@ -1033,31 +1048,33 @@
       invoke_error_boundary(error, last_scheduled_effect);
     }
   }
+  let eager_block_effects = null;
   function flush_queued_effects(effects) {
     var length = effects.length;
     if (length === 0) return;
-    for (var i = 0; i < length; i++) {
-      var effect2 = effects[i];
-      if ((effect2.f & (DESTROYED | INERT)) === 0) {
-        if (is_dirty(effect2)) {
-          var wv = write_version;
-          update_effect(effect2);
-          if (effect2.deps === null && effect2.first === null && effect2.nodes_start === null) {
-            if (effect2.teardown === null && effect2.ac === null) {
-              unlink_effect(effect2);
-            } else {
-              effect2.fn = null;
-            }
+    var i = 0;
+    while (i < length) {
+      var effect2 = effects[i++];
+      if ((effect2.f & (DESTROYED | INERT)) === 0 && is_dirty(effect2)) {
+        eager_block_effects = [];
+        update_effect(effect2);
+        if (effect2.deps === null && effect2.first === null && effect2.nodes_start === null) {
+          if (effect2.teardown === null && effect2.ac === null) {
+            unlink_effect(effect2);
+          } else {
+            effect2.fn = null;
           }
-          if (write_version > wv && (effect2.f & USER_EFFECT) !== 0) {
-            break;
+        }
+        if (eager_block_effects?.length > 0) {
+          old_values.clear();
+          for (const e of eager_block_effects) {
+            update_effect(e);
           }
+          eager_block_effects = [];
         }
       }
     }
-    for (; i < length; i += 1) {
-      schedule_effect(effects[i]);
-    }
+    eager_block_effects = null;
   }
   function schedule_effect(signal) {
     var effect2 = last_scheduled_effect = signal;
@@ -1122,7 +1139,7 @@
         old_values.set(source2, old_value);
       }
       source2.v = value;
-      const batch = Batch.ensure();
+      var batch = Batch.ensure();
       batch.capture(source2, old_value);
       if ((source2.f & DERIVED) !== 0) {
         if ((source2.f & DIRTY) !== 0) {
@@ -1162,22 +1179,30 @@
     for (var i = 0; i < length; i++) {
       var reaction = reactions[i];
       var flags = reaction.f;
-      if ((flags & DIRTY) !== 0) continue;
       if (!runes && reaction === active_effect) continue;
-      set_signal_status(reaction, status);
-      if ((flags & (CLEAN | UNOWNED)) !== 0) {
-        if ((flags & DERIVED) !== 0) {
-          mark_reactions(
-            /** @type {Derived} */
-            reaction,
-            MAYBE_DIRTY
-          );
-        } else {
-          schedule_effect(
-            /** @type {Effect} */
-            reaction
-          );
+      var not_dirty = (flags & DIRTY) === 0;
+      if (not_dirty) {
+        set_signal_status(reaction, status);
+      }
+      if ((flags & DERIVED) !== 0) {
+        mark_reactions(
+          /** @type {Derived} */
+          reaction,
+          MAYBE_DIRTY
+        );
+      } else if (not_dirty) {
+        if ((flags & BLOCK_EFFECT) !== 0) {
+          if (eager_block_effects !== null) {
+            eager_block_effects.push(
+              /** @type {Effect} */
+              reaction
+            );
+          }
         }
+        schedule_effect(
+          /** @type {Effect} */
+          reaction
+        );
       }
     }
   }
@@ -1474,6 +1499,18 @@
   function should_defer_append() {
     return false;
   }
+  function without_reactive_context(fn) {
+    var previous_reaction = active_reaction;
+    var previous_effect = active_effect;
+    set_active_reaction(null);
+    set_active_effect(null);
+    try {
+      return fn();
+    } finally {
+      set_active_reaction(previous_reaction);
+      set_active_effect(previous_effect);
+    }
+  }
   function validate_effect(rune) {
     if (active_effect === null && active_reaction === null) {
       effect_orphan();
@@ -1522,24 +1559,31 @@
       try {
         update_effect(effect2);
         effect2.f |= EFFECT_RAN;
-      } catch (e) {
+      } catch (e2) {
         destroy_effect(effect2);
-        throw e;
+        throw e2;
       }
     } else if (fn !== null) {
       schedule_effect(effect2);
     }
-    var inert = sync && effect2.deps === null && effect2.first === null && effect2.nodes_start === null && effect2.teardown === null && (effect2.f & EFFECT_PRESERVED) === 0;
-    if (!inert && push2) {
-      if (parent !== null) {
-        push_effect(effect2, parent);
+    if (push2) {
+      var e = effect2;
+      if (sync && e.deps === null && e.teardown === null && e.nodes_start === null && e.first === e.last && // either `null`, or a singular child
+      (e.f & EFFECT_PRESERVED) === 0) {
+        e = e.first;
       }
-      if (active_reaction !== null && (active_reaction.f & DERIVED) !== 0) {
-        var derived2 = (
-          /** @type {Derived} */
-          active_reaction
-        );
-        (derived2.effects ??= []).push(effect2);
+      if (e !== null) {
+        e.parent = parent;
+        if (parent !== null) {
+          push_effect(e, parent);
+        }
+        if (active_reaction !== null && (active_reaction.f & DERIVED) !== 0 && (type & ROOT_EFFECT) === 0) {
+          var derived2 = (
+            /** @type {Derived} */
+            active_reaction
+          );
+          (derived2.effects ??= []).push(e);
+        }
       }
     }
     return effect2;
@@ -1576,14 +1620,14 @@
   }
   function effect_root(fn) {
     Batch.ensure();
-    const effect2 = create_effect(ROOT_EFFECT, fn, true);
+    const effect2 = create_effect(ROOT_EFFECT | EFFECT_PRESERVED, fn, true);
     return () => {
       destroy_effect(effect2);
     };
   }
   function component_root(fn) {
     Batch.ensure();
-    const effect2 = create_effect(ROOT_EFFECT, fn, true);
+    const effect2 = create_effect(ROOT_EFFECT | EFFECT_PRESERVED, fn, true);
     return (options = {}) => {
       return new Promise((fulfil) => {
         if (options.outro) {
@@ -1617,7 +1661,7 @@
     return effect2;
   }
   function branch(fn, push2 = true) {
-    return create_effect(BRANCH_EFFECT, fn, true, push2);
+    return create_effect(BRANCH_EFFECT | EFFECT_PRESERVED, fn, true, push2);
   }
   function execute_effect_teardown(effect2) {
     var teardown2 = effect2.teardown;
@@ -1638,7 +1682,12 @@
     var effect2 = signal.first;
     signal.first = signal.last = null;
     while (effect2 !== null) {
-      effect2.ac?.abort(STALE_REACTION);
+      const controller = effect2.ac;
+      if (controller !== null) {
+        without_reactive_context(() => {
+          controller.abort(STALE_REACTION);
+        });
+      }
       var next2 = effect2.next;
       if ((effect2.f & ROOT_EFFECT) !== 0) {
         effect2.parent = null;
@@ -1915,15 +1964,18 @@
     untracking = false;
     update_version = ++read_version;
     if (reaction.ac !== null) {
-      reaction.ac.abort(STALE_REACTION);
+      without_reactive_context(() => {
+        reaction.ac.abort(STALE_REACTION);
+      });
       reaction.ac = null;
     }
     try {
       reaction.f |= REACTION_IS_UPDATING;
-      var result = (
+      var fn = (
         /** @type {Function} */
-        (0, reaction.fn)()
+        reaction.fn
       );
+      var result = fn();
       var deps = reaction.deps;
       if (new_deps !== null) {
         var i;
@@ -2111,9 +2163,6 @@
     } else if (is_derived) {
       derived2 = /** @type {Derived} */
       signal;
-      if (batch_deriveds?.has(derived2)) {
-        return batch_deriveds.get(derived2);
-      }
       if (is_dirty(derived2)) {
         update_derived(derived2);
       }
@@ -2195,18 +2244,6 @@
       }
     }
   }
-  function without_reactive_context(fn) {
-    var previous_reaction = active_reaction;
-    var previous_effect = active_effect;
-    set_active_reaction(null);
-    set_active_effect(null);
-    try {
-      return fn();
-    } finally {
-      set_active_reaction(previous_reaction);
-      set_active_effect(previous_effect);
-    }
-  }
   const all_registered_events = /* @__PURE__ */ new Set();
   const root_event_handles = /* @__PURE__ */ new Set();
   function replay_events(dom) {
@@ -2263,6 +2300,7 @@
       fn(events);
     }
   }
+  let last_propagated_event = null;
   function handle_event_propagation(event2) {
     var handler_element = this;
     var owner_document = (
@@ -2275,8 +2313,9 @@
       /** @type {null | Element} */
       path[0] || event2.target
     );
+    last_propagated_event = event2;
     var path_idx = 0;
-    var handled_at = event2.__root;
+    var handled_at = last_propagated_event === event2 && event2.__root;
     if (handled_at) {
       var at_idx = path.indexOf(handled_at);
       if (at_idx !== -1 && (handler_element === document || handler_element === /** @type {any} */
@@ -2493,16 +2532,19 @@
         instance
       );
     } catch (error) {
-      if (error === HYDRATION_ERROR) {
-        if (options.recover === false) {
-          hydration_failed();
-        }
-        init_operations();
-        clear_text_content(target);
-        set_hydrating(false);
-        return mount(component2, options);
+      if (error instanceof Error && error.message.split("\n").some((line2) => line2.startsWith("https://svelte.dev/e/"))) {
+        throw error;
       }
-      throw error;
+      if (error !== HYDRATION_ERROR) {
+        console.warn("Failed to hydrate: ", error);
+      }
+      if (options.recover === false) {
+        hydration_failed();
+      }
+      init_operations();
+      clear_text_content(target);
+      set_hydrating(false);
+      return mount(component2, options);
     } finally {
       set_hydrating(was_hydrating);
       set_hydrate_node(previous_hydrate_node);
@@ -2971,7 +3013,8 @@
     block(() => {
       each_effect ??= /** @type {Effect} */
       active_effect;
-      array = get$1(each_array);
+      array = /** @type {V[]} */
+      get$1(each_array);
       var length = array.length;
       if (was_empty && length === 0) {
         return;
@@ -3426,6 +3469,9 @@
         if (defer) {
           offscreen_fragment = document.createDocumentFragment();
           offscreen_fragment.append(target = create_text());
+          if (effect2) {
+            current_batch.skipped_effects.add(effect2);
+          }
         }
         pending_effect = branch(() => render_fn(target, component2));
       }
@@ -3440,7 +3486,7 @@
     }
   }
   function append_styles$1(anchor, css) {
-    queue_micro_task(() => {
+    effect(() => {
       var root2 = anchor.getRootNode();
       var target = (
         /** @type {ShadowRoot} */
@@ -3700,9 +3746,10 @@
   }
   var setters_cache = /* @__PURE__ */ new Map();
   function get_setters(element) {
-    var setters = setters_cache.get(element.nodeName);
+    var cache_key = element.getAttribute("is") || element.nodeName;
+    var setters = setters_cache.get(cache_key);
     if (setters) return setters;
-    setters_cache.set(element.nodeName, setters = []);
+    setters_cache.set(cache_key, setters = []);
     var descriptors;
     var proto = element;
     var element_proto = Element.prototype;
@@ -4071,21 +4118,24 @@
       /** @type {Effect} */
       active_effect
     );
-    return function(value, mutation) {
-      if (arguments.length > 0) {
-        const new_value = mutation ? get$1(d) : runes && bindable ? proxy(value) : value;
-        set(d, new_value);
-        overridden = true;
-        if (fallback_value !== void 0) {
-          fallback_value = new_value;
+    return (
+      /** @type {() => V} */
+      (function(value, mutation) {
+        if (arguments.length > 0) {
+          const new_value = mutation ? get$1(d) : runes && bindable ? proxy(value) : value;
+          set(d, new_value);
+          overridden = true;
+          if (fallback_value !== void 0) {
+            fallback_value = new_value;
+          }
+          return value;
         }
-        return value;
-      }
-      if (is_destroying_effect && overridden || (parent_effect.f & DESTROYED) !== 0) {
-        return d.v;
-      }
-      return get$1(d);
-    };
+        if (is_destroying_effect && overridden || (parent_effect.f & DESTROYED) !== 0) {
+          return d.v;
+        }
+        return get$1(d);
+      })
+    );
   }
   function createClassComponent(options) {
     return new Svelte4Component(options);
@@ -4441,7 +4491,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.20.11";
+  const VERSION = "0.22.1";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -4652,7 +4702,6 @@
   function MyPage($$anchor, $$props) {
     push$1($$props, true);
     append_styles$1($$anchor, $$css$v);
-    const [$$stores, $$cleanup] = setup_stores();
     const $name = () => store_get(name, "$name", $$stores);
     const $streak = () => store_get(streak, "$streak", $$stores);
     const $rightsToday = () => store_get(rightsToday, "$rightsToday", $$stores);
@@ -4660,6 +4709,7 @@
     const $branch = () => store_get(branch2, "$branch", $$stores);
     const $wrongBranch = () => store_get(wrongBranch, "$wrongBranch", $$stores);
     const $sVersion = () => store_get(sVersion, "$sVersion", $$stores);
+    const [$$stores, $$cleanup] = setup_stores();
     let mdArgs = /* @__PURE__ */ rest_props($$props, ["$$slots", "$$events", "$$legacy", "$$host"]);
     let { path } = mdArgs;
     let takeAt = Number(mdArgs["take-at"] ?? 0);
@@ -4762,7 +4812,7 @@
     onDestroy(() => {
       console.log(`${prefix()}: the component is being destroyed`);
     });
-    return pop$1({
+    var $$exports = {
       get prefix() {
         return prefix();
       },
@@ -4770,7 +4820,8 @@
         prefix($$value);
         flushSync();
       }
-    });
+    };
+    return pop$1($$exports);
   }
   customElements.define("lifecycle-hooks", create_custom_element(LifecycleHooks, { prefix: {} }, [], [], false));
   var root$B = /* @__PURE__ */ from_html(`<div> </div>`);
@@ -4779,16 +4830,7 @@
     let type = prop($$props, "type", 7), message = prop($$props, "message", 7), inline = prop($$props, "inline", 7, false), outline = prop($$props, "outline", 7, false);
     let display = inline() ? "inline-block" : "block";
     let more = outline() ? "badge-outline" : "";
-    var div = root$B();
-    var text2 = child(div, true);
-    reset(div);
-    template_effect(() => {
-      set_class(div, 1, `badge badge-${type() ?? ""} budge-xl mb-2 mt-2 ${more}`);
-      set_style(div, `width:fit-content; display: ${display};`);
-      set_text(text2, message());
-    });
-    append($$anchor, div);
-    return pop$1({
+    var $$exports = {
       get type() {
         return type();
       },
@@ -4817,27 +4859,24 @@
         outline($$value);
         flushSync();
       }
+    };
+    var div = root$B();
+    var text2 = child(div, true);
+    reset(div);
+    template_effect(() => {
+      set_class(div, 1, `badge badge-${type() ?? ""} budge-xl mb-2 mt-2 ${more}`);
+      set_style(div, `width:fit-content; display: ${display};`);
+      set_text(text2, message());
     });
+    append($$anchor, div);
+    return pop$1($$exports);
   }
   create_custom_element(Alert, { type: {}, message: {}, inline: {}, outline: {} }, [], [], true);
   var root$A = /* @__PURE__ */ from_html(`<!> <!>`, 1);
   function ShowMsg($$anchor, $$props) {
     push$1($$props, true);
     let type = prop($$props, "type", 7, "info"), msg = prop($$props, "msg", 7);
-    var fragment = root$A();
-    var node = first_child(fragment);
-    WithTailwind(node, {});
-    var node_1 = sibling(node, 2);
-    Alert(node_1, {
-      get type() {
-        return type();
-      },
-      get message() {
-        return msg();
-      }
-    });
-    append($$anchor, fragment);
-    return pop$1({
+    var $$exports = {
       get type() {
         return type();
       },
@@ -4852,7 +4891,21 @@
         msg($$value);
         flushSync();
       }
+    };
+    var fragment = root$A();
+    var node = first_child(fragment);
+    WithTailwind(node, {});
+    var node_1 = sibling(node, 2);
+    Alert(node_1, {
+      get type() {
+        return type();
+      },
+      get message() {
+        return msg();
+      }
     });
+    append($$anchor, fragment);
+    return pop$1($$exports);
   }
   customElements.define("show-msg", create_custom_element(ShowMsg, { type: {}, msg: {} }, [], [], false));
   const btn = ($$anchor, txt = noop, onclick2 = noop) => {
@@ -4870,13 +4923,7 @@
   function IncDec($$anchor, $$props) {
     push$1($$props, true);
     let inc = prop($$props, "inc", 7), dec = prop($$props, "dec", 7);
-    var fragment = root$z();
-    var node = first_child(fragment);
-    btn(node, () => "+", () => () => inc()());
-    var node_1 = sibling(node, 2);
-    btn(node_1, () => "-", () => () => dec()());
-    append($$anchor, fragment);
-    return pop$1({
+    var $$exports = {
       get inc() {
         return inc();
       },
@@ -4891,7 +4938,14 @@
         dec($$value);
         flushSync();
       }
-    });
+    };
+    var fragment = root$z();
+    var node = first_child(fragment);
+    btn(node, () => "+", () => () => inc()());
+    var node_1 = sibling(node, 2);
+    btn(node_1, () => "-", () => () => dec()());
+    append($$anchor, fragment);
+    return pop$1($$exports);
   }
   delegate(["click"]);
   create_custom_element(IncDec, { inc: {}, dec: {} }, [], [], true);
@@ -4899,6 +4953,15 @@
   function ElementOne($$anchor, $$props) {
     push$1($$props, true);
     let name = prop($$props, "name", 7, "world");
+    var $$exports = {
+      get name() {
+        return name();
+      },
+      set name($$value = "world") {
+        name($$value);
+        flushSync();
+      }
+    };
     var fragment = root$y();
     var node = first_child(fragment);
     WithTailwind(node, {});
@@ -4909,21 +4972,22 @@
     IncDec(node_1, { inc: () => myPage.count++, dec: () => myPage.count-- });
     template_effect(() => set_text(text2, `Hello ${name() ?? ""} ${myPage.count ?? ""}`));
     append($$anchor, fragment);
-    return pop$1({
-      get name() {
-        return name();
-      },
-      set name($$value = "world") {
-        name($$value);
-        flushSync();
-      }
-    });
+    return pop$1($$exports);
   }
   customElements.define("my-element-one", create_custom_element(ElementOne, { name: {} }, [], [], false));
   var root$x = /* @__PURE__ */ from_html(`<!> <div class="w-fit p-4 bg-green-200 text-white rounded-xl shadow-md" style="width:fit-content">🌱 <strong> </strong> <!> <span class="text-2xl font-bold"> </span></div>`, 1);
   function ElementTwo($$anchor, $$props) {
     push$1($$props, true);
     let message = prop($$props, "message", 7, "OK");
+    var $$exports = {
+      get message() {
+        return message();
+      },
+      set message($$value = "OK") {
+        message($$value);
+        flushSync();
+      }
+    };
     var fragment = root$x();
     var node = first_child(fragment);
     WithTailwind(node, {});
@@ -4942,15 +5006,7 @@
       set_text(text_1, myPage.count2);
     });
     append($$anchor, fragment);
-    return pop$1({
-      get message() {
-        return message();
-      },
-      set message($$value = "OK") {
-        message($$value);
-        flushSync();
-      }
-    });
+    return pop$1($$exports);
   }
   customElements.define("my-element-two", create_custom_element(ElementTwo, { message: {} }, [], [], false));
   enable_legacy_mode_flag();
@@ -4992,17 +5048,7 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$u);
     let Character = prop($$props, "Character", 7), size = prop($$props, "size", 7), paddingLeft = prop($$props, "paddingLeft", 7), paddingTop = prop($$props, "paddingTop", 7), scale = prop($$props, "scale", 7), bgColor = prop($$props, "bgColor", 7);
-    var div = root$u();
-    var div_1 = child(div);
-    var node = child(div_1);
-    component(node, Character, ($$anchor2, Character_1) => {
-      Character_1($$anchor2, {});
-    });
-    reset(div_1);
-    reset(div);
-    template_effect(() => set_style(div, `--size: ${size() ?? ""}; --padding-left: ${paddingLeft() ?? ""}; --padding-top: ${paddingTop() ?? ""}; --scale: ${scale() ?? ""}; --bgColor: ${bgColor() ?? ""}`));
-    append($$anchor, div);
-    return pop$1({
+    var $$exports = {
       get Character() {
         return Character();
       },
@@ -5045,7 +5091,18 @@
         bgColor($$value);
         flushSync();
       }
+    };
+    var div = root$u();
+    var div_1 = child(div);
+    var node = child(div_1);
+    component(node, Character, ($$anchor2, Character_1) => {
+      Character_1($$anchor2, {});
     });
+    reset(div_1);
+    reset(div);
+    template_effect(() => set_style(div, `--size: ${size() ?? ""}; --padding-left: ${paddingLeft() ?? ""}; --padding-top: ${paddingTop() ?? ""}; --scale: ${scale() ?? ""}; --bgColor: ${bgColor() ?? ""}`));
+    append($$anchor, div);
+    return pop$1($$exports);
   }
   create_custom_element(
     Container,
@@ -5115,8 +5172,7 @@
     ]);
     let info = characters.get(character()) || characters.get("hippo");
     info.size = size();
-    Container($$anchor, spread_props(() => info));
-    return pop$1({
+    var $$exports = {
       get character() {
         return character();
       },
@@ -5131,7 +5187,9 @@
         size($$value);
         flushSync();
       }
-    });
+    };
+    Container($$anchor, spread_props(() => info));
+    return pop$1($$exports);
   }
   customElements.define("cartoon-badge", create_custom_element(CartoonBadge, { character: {}, size: {} }, [], [], true));
   var Space_Separator = /[\u1680\u2000-\u200A\u202F\u205F\u3000]/;
@@ -6226,6 +6284,22 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$r);
     let rounds = prop($$props, "rounds", 7), children = prop($$props, "children", 7);
+    var $$exports = {
+      get rounds() {
+        return rounds();
+      },
+      set rounds($$value) {
+        rounds($$value);
+        flushSync();
+      },
+      get children() {
+        return children();
+      },
+      set children($$value) {
+        children($$value);
+        flushSync();
+      }
+    };
     var fragment = root$q();
     var node = first_child(fragment);
     snippet(node, children);
@@ -6242,22 +6316,7 @@
       });
     }
     append($$anchor, fragment);
-    return pop$1({
-      get rounds() {
-        return rounds();
-      },
-      set rounds($$value) {
-        rounds($$value);
-        flushSync();
-      },
-      get children() {
-        return children();
-      },
-      set children($$value) {
-        children($$value);
-        flushSync();
-      }
-    });
+    return pop$1($$exports);
   }
   create_custom_element(DrillCard, { rounds: {}, children: {} }, [], [], true);
   var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
@@ -11800,9 +11859,9 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$q);
     const ansbtn = ($$anchor2, indx = noop) => {
-      var button = root_1$b();
       const color = /* @__PURE__ */ user_derived(() => btnColor(indx()));
       const word = /* @__PURE__ */ user_derived(() => answers[indx()]);
+      var button = root_1$b();
       button.__click = [on_click$2, clicked2, indx];
       each(button, 21, () => get$1(word), index, ($$anchor3, n) => {
         var span = root_2$6();
@@ -11825,8 +11884,8 @@
     const desk = ($$anchor2, words = noop, right2 = noop, deskClass = noop) => {
       var div = root_3$2();
       each(div, 21, words, index, ($$anchor3, word) => {
-        var div_1 = root_4$1();
         const cnt = /* @__PURE__ */ user_derived(() => countBulls(get$1(word), right2()));
+        var div_1 = root_4$1();
         var span_1 = child(div_1);
         var text_1 = child(span_1);
         reset(span_1);
@@ -11913,6 +11972,16 @@
     function completed() {
       return true;
     }
+    var $$exports = {
+      completed,
+      get config() {
+        return config();
+      },
+      set config($$value) {
+        config($$value);
+        flushSync();
+      }
+    };
     var fragment = root$p();
     var node = first_child(fragment);
     {
@@ -11957,16 +12026,7 @@
       });
     }
     append($$anchor, fragment);
-    return pop$1({
-      completed,
-      get config() {
-        return config();
-      },
-      set config($$value) {
-        config($$value);
-        flushSync();
-      }
-    });
+    return pop$1($$exports);
   }
   delegate(["click"]);
   create_custom_element(Wordle, { config: {} }, [], ["completed"], true);
@@ -11977,6 +12037,22 @@
     rounds(rounds() || 1);
     let wordle;
     let card;
+    var $$exports = {
+      get config() {
+        return config();
+      },
+      set config($$value) {
+        config($$value);
+        flushSync();
+      },
+      get rounds() {
+        return rounds();
+      },
+      set rounds($$value) {
+        rounds($$value);
+        flushSync();
+      }
+    };
     bind_this(
       DrillCard($$anchor, {
         get rounds() {
@@ -11998,22 +12074,7 @@
       ($$value) => card = $$value,
       () => card
     );
-    return pop$1({
-      get config() {
-        return config();
-      },
-      set config($$value) {
-        config($$value);
-        flushSync();
-      },
-      get rounds() {
-        return rounds();
-      },
-      set rounds($$value) {
-        rounds($$value);
-        flushSync();
-      }
-    });
+    return pop$1($$exports);
   }
   customElements.define("drill-wordle", create_custom_element(Drill_wordle, { config: {}, rounds: {} }, [], [], false));
   var root$o = /* @__PURE__ */ from_html(`<div class="panel svelte-1nkqiir"><div><span><!></span></div></div>`);
@@ -12025,17 +12086,7 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$p);
     let clazz = prop($$props, "clazz", 7, ""), children = prop($$props, "children", 7);
-    var div = root$o();
-    var div_1 = child(div);
-    var span = child(div_1);
-    var node = child(span);
-    snippet(node, children);
-    reset(span);
-    reset(div_1);
-    reset(div);
-    template_effect(() => set_class(div_1, 1, `heb ${clazz()}`, "svelte-1nkqiir"));
-    append($$anchor, div);
-    return pop$1({
+    var $$exports = {
       get clazz() {
         return clazz();
       },
@@ -12050,12 +12101,32 @@
         children($$value);
         flushSync();
       }
-    });
+    };
+    var div = root$o();
+    var div_1 = child(div);
+    var span = child(div_1);
+    var node = child(span);
+    snippet(node, children);
+    reset(span);
+    reset(div_1);
+    reset(div);
+    template_effect(() => set_class(div_1, 1, `heb ${clazz()}`, "svelte-1nkqiir"));
+    append($$anchor, div);
+    return pop$1($$exports);
   }
   create_custom_element(H, { clazz: {}, children: {} }, [], [], true);
   function Q($$anchor, $$props) {
     push$1($$props, true);
     let children = prop($$props, "children", 7);
+    var $$exports = {
+      get children() {
+        return children();
+      },
+      set children($$value) {
+        children($$value);
+        flushSync();
+      }
+    };
     H($$anchor, {
       clazz: "bg-green-100",
       children: ($$anchor2, $$slotProps) => {
@@ -12066,15 +12137,7 @@
       },
       $$slots: { default: true }
     });
-    return pop$1({
-      get children() {
-        return children();
-      },
-      set children($$value) {
-        children($$value);
-        flushSync();
-      }
-    });
+    return pop$1($$exports);
   }
   create_custom_element(Q, { children: {} }, [], [], true);
   const _ruleset = ($$anchor) => {
@@ -12169,6 +12232,22 @@
     let flow = prop($$props, "flow", 7), problemSet = prop($$props, "problemSet", 7);
     function answerIsHere(text2) {
     }
+    var $$exports = {
+      get flow() {
+        return flow();
+      },
+      set flow($$value) {
+        flow($$value);
+        flushSync();
+      },
+      get problemSet() {
+        return problemSet();
+      },
+      set problemSet($$value) {
+        problemSet($$value);
+        flushSync();
+      }
+    };
     var div = root$n();
     var node = child(div);
     _let(node);
@@ -12290,22 +12369,7 @@
     ansBtn(node_10, () => "no", () => "red");
     reset(div);
     append($$anchor, div);
-    return pop$1({
-      get flow() {
-        return flow();
-      },
-      set flow($$value) {
-        flow($$value);
-        flushSync();
-      },
-      get problemSet() {
-        return problemSet();
-      },
-      set problemSet($$value) {
-        problemSet($$value);
-        flushSync();
-      }
-    });
+    return pop$1($$exports);
   }
   delegate(["click"]);
   create_custom_element(Grira, { flow: {}, problemSet: {} }, [], [], true);
@@ -12318,31 +12382,7 @@
     rounds(rounds() || 1);
     let grira;
     let card;
-    bind_this(
-      DrillCard($$anchor, {
-        get rounds() {
-          return rounds();
-        },
-        children: ($$anchor2, $$slotProps) => {
-          bind_this(
-            Grira($$anchor2, {
-              get flow() {
-                return flow();
-              },
-              get problemSet() {
-                return problemSet();
-              }
-            }),
-            ($$value) => grira = $$value,
-            () => grira
-          );
-        },
-        $$slots: { default: true }
-      }),
-      ($$value) => card = $$value,
-      () => card
-    );
-    return pop$1({
+    var $$exports = {
       get config() {
         return config();
       },
@@ -12371,7 +12411,32 @@
         rounds($$value);
         flushSync();
       }
-    });
+    };
+    bind_this(
+      DrillCard($$anchor, {
+        get rounds() {
+          return rounds();
+        },
+        children: ($$anchor2, $$slotProps) => {
+          bind_this(
+            Grira($$anchor2, {
+              get flow() {
+                return flow();
+              },
+              get problemSet() {
+                return problemSet();
+              }
+            }),
+            ($$value) => grira = $$value,
+            () => grira
+          );
+        },
+        $$slots: { default: true }
+      }),
+      ($$value) => card = $$value,
+      () => card
+    );
+    return pop$1($$exports);
   }
   customElements.define("drill-grira", create_custom_element(Drill_grira, { config: {}, flow: {}, problemSet: {}, rounds: {} }, [], [], false));
   function assert(expr) {
@@ -12446,7 +12511,7 @@
     function write(level, msg) {
       if (levels[level] > levels[minLevel]) return;
       let ln = { level, msg };
-      console.log(ln);
+      console.log(`${level}: ${msg}`);
       lines.update((prev) => [...prev, ln]);
     }
     function setLevel(level) {
@@ -12486,8 +12551,8 @@
   function Logger($$anchor, $$props) {
     push$1($$props, false);
     append_styles$1($$anchor, $$css$n);
-    const [$$stores, $$cleanup] = setup_stores();
     const $lines = () => store_get(lines, "$lines", $$stores);
+    const [$$stores, $$cleanup] = setup_stores();
     let lines = log.lines;
     init();
     var div = root$m();
@@ -12532,12 +12597,7 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$m);
     let lineNo = prop($$props, "lineNo", 7);
-    var span = root$l();
-    var text2 = child(span, true);
-    reset(span);
-    template_effect(() => set_text(text2, lineNo()));
-    append($$anchor, span);
-    return pop$1({
+    var $$exports = {
       get lineNo() {
         return lineNo();
       },
@@ -12545,7 +12605,13 @@
         lineNo($$value);
         flushSync();
       }
-    });
+    };
+    var span = root$l();
+    var text2 = child(span, true);
+    reset(span);
+    template_effect(() => set_text(text2, lineNo()));
+    append($$anchor, span);
+    return pop$1($$exports);
   }
   create_custom_element(LineNo, { lineNo: {} }, [], [], true);
   var root_1$8 = /* @__PURE__ */ from_html(`<div><!></div>`);
@@ -12557,10 +12623,33 @@
   function Line($$anchor, $$props) {
     push$1($$props, true);
     append_styles$1($$anchor, $$css$l);
-    const [$$stores, $$cleanup] = setup_stores();
     const $ticks = () => store_get(ticks, "$ticks", $$stores);
+    const [$$stores, $$cleanup] = setup_stores();
     let phaseNo = prop($$props, "phaseNo", 7), wrongLine = prop($$props, "wrongLine", 7), children = prop($$props, "children", 7);
     let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
+    var $$exports = {
+      get phaseNo() {
+        return phaseNo();
+      },
+      set phaseNo($$value) {
+        phaseNo($$value);
+        flushSync();
+      },
+      get wrongLine() {
+        return wrongLine();
+      },
+      set wrongLine($$value) {
+        wrongLine($$value);
+        flushSync();
+      },
+      get children() {
+        return children();
+      },
+      set children($$value) {
+        children($$value);
+        flushSync();
+      }
+    };
     var fragment = comment();
     var node = first_child(fragment);
     {
@@ -12592,29 +12681,7 @@
       });
     }
     append($$anchor, fragment);
-    var $$pop = pop$1({
-      get phaseNo() {
-        return phaseNo();
-      },
-      set phaseNo($$value) {
-        phaseNo($$value);
-        flushSync();
-      },
-      get wrongLine() {
-        return wrongLine();
-      },
-      set wrongLine($$value) {
-        wrongLine($$value);
-        flushSync();
-      },
-      get children() {
-        return children();
-      },
-      set children($$value) {
-        children($$value);
-        flushSync();
-      }
-    });
+    var $$pop = pop$1($$exports);
     $$cleanup();
     return $$pop;
   }
@@ -12628,12 +12695,7 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$k);
     let code = prop($$props, "code", 7);
-    var span = root$k();
-    var text2 = child(span, true);
-    reset(span);
-    template_effect(() => set_text(text2, code()));
-    append($$anchor, span);
-    return pop$1({
+    var $$exports = {
       get code() {
         return code();
       },
@@ -12641,7 +12703,13 @@
         code($$value);
         flushSync();
       }
-    });
+    };
+    var span = root$k();
+    var text2 = child(span, true);
+    reset(span);
+    template_effect(() => set_text(text2, code()));
+    append($$anchor, span);
+    return pop$1($$exports);
   }
   create_custom_element(AsIs, { code: {} }, [], [], true);
   var root$j = /* @__PURE__ */ from_html(`<span> </span>`);
@@ -12652,8 +12720,8 @@
   function WrongSpan($$anchor, $$props) {
     push$1($$props, true);
     append_styles$1($$anchor, $$css$j);
-    const [$$stores, $$cleanup] = setup_stores();
     const $ticks = () => store_get(ticks, "$ticks", $$stores);
+    const [$$stores, $$cleanup] = setup_stores();
     let phaseNo = prop($$props, "phaseNo", 7), code = prop($$props, "code", 7), color = prop($$props, "color", 7, "red"), hint = prop($$props, "hint", 7);
     let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
     let isEmpty = code().trim().length === 0;
@@ -12663,6 +12731,36 @@
         // spaces has no glyphes, so are not decorated
       );
     }
+    var $$exports = {
+      get phaseNo() {
+        return phaseNo();
+      },
+      set phaseNo($$value) {
+        phaseNo($$value);
+        flushSync();
+      },
+      get code() {
+        return code();
+      },
+      set code($$value) {
+        code($$value);
+        flushSync();
+      },
+      get color() {
+        return color();
+      },
+      set color($$value = "red") {
+        color($$value);
+        flushSync();
+      },
+      get hint() {
+        return hint();
+      },
+      set hint($$value) {
+        hint($$value);
+        flushSync();
+      }
+    };
     var span = root$j();
     let classes;
     let styles;
@@ -12688,36 +12786,7 @@
       ]
     );
     append($$anchor, span);
-    var $$pop = pop$1({
-      get phaseNo() {
-        return phaseNo();
-      },
-      set phaseNo($$value) {
-        phaseNo($$value);
-        flushSync();
-      },
-      get code() {
-        return code();
-      },
-      set code($$value) {
-        code($$value);
-        flushSync();
-      },
-      get color() {
-        return color();
-      },
-      set color($$value = "red") {
-        color($$value);
-        flushSync();
-      },
-      get hint() {
-        return hint();
-      },
-      set hint($$value) {
-        hint($$value);
-        flushSync();
-      }
-    });
+    var $$pop = pop$1($$exports);
     $$cleanup();
     return $$pop;
   }
@@ -12730,32 +12799,11 @@
   function RightSpan($$anchor, $$props) {
     push$1($$props, true);
     append_styles$1($$anchor, $$css$i);
-    const [$$stores, $$cleanup] = setup_stores();
     const $ticks = () => store_get(ticks, "$ticks", $$stores);
+    const [$$stores, $$cleanup] = setup_stores();
     let phaseNo = prop($$props, "phaseNo", 7), code = prop($$props, "code", 7), bgColor = prop($$props, "bgColor", 7);
     let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
-    var span = root$i();
-    let classes;
-    let styles;
-    var text2 = child(span, true);
-    reset(span);
-    template_effect(
-      ($0, $1) => {
-        classes = set_class(span, 1, "svelte-12p80z8", null, classes, $0);
-        styles = set_style(span, "", styles, $1);
-        set_text(text2, code());
-      },
-      [
-        () => ({
-          wrong: get$1(meAt).wrong,
-          hint: get$1(meAt).hint,
-          right: get$1(meAt).right
-        }),
-        () => ({ "background-color": bgColor() })
-      ]
-    );
-    append($$anchor, span);
-    var $$pop = pop$1({
+    var $$exports = {
       get phaseNo() {
         return phaseNo();
       },
@@ -12777,7 +12825,29 @@
         bgColor($$value);
         flushSync();
       }
-    });
+    };
+    var span = root$i();
+    let classes;
+    let styles;
+    var text2 = child(span, true);
+    reset(span);
+    template_effect(
+      ($0, $1) => {
+        classes = set_class(span, 1, "svelte-12p80z8", null, classes, $0);
+        styles = set_style(span, "", styles, $1);
+        set_text(text2, code());
+      },
+      [
+        () => ({
+          wrong: get$1(meAt).wrong,
+          hint: get$1(meAt).hint,
+          right: get$1(meAt).right
+        }),
+        () => ({ "background-color": bgColor() })
+      ]
+    );
+    append($$anchor, span);
+    var $$pop = pop$1($$exports);
     $$cleanup();
     return $$pop;
   }
@@ -12790,10 +12860,47 @@
   function Waved($$anchor, $$props) {
     push$1($$props, true);
     append_styles$1($$anchor, $$css$h);
-    const [$$stores, $$cleanup] = setup_stores();
     const $ticks = () => store_get(ticks, "$ticks", $$stores);
+    const [$$stores, $$cleanup] = setup_stores();
     let phaseNo = prop($$props, "phaseNo", 7), code = prop($$props, "code", 7), bgColor = prop($$props, "bgColor", 7), color = prop($$props, "color", 7, "red"), hint = prop($$props, "hint", 7);
     let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
+    var $$exports = {
+      get phaseNo() {
+        return phaseNo();
+      },
+      set phaseNo($$value) {
+        phaseNo($$value);
+        flushSync();
+      },
+      get code() {
+        return code();
+      },
+      set code($$value) {
+        code($$value);
+        flushSync();
+      },
+      get bgColor() {
+        return bgColor();
+      },
+      set bgColor($$value) {
+        bgColor($$value);
+        flushSync();
+      },
+      get color() {
+        return color();
+      },
+      set color($$value = "red") {
+        color($$value);
+        flushSync();
+      },
+      get hint() {
+        return hint();
+      },
+      set hint($$value) {
+        hint($$value);
+        flushSync();
+      }
+    };
     var span = root$h();
     let classes;
     let styles;
@@ -12818,43 +12925,7 @@
       ]
     );
     append($$anchor, span);
-    var $$pop = pop$1({
-      get phaseNo() {
-        return phaseNo();
-      },
-      set phaseNo($$value) {
-        phaseNo($$value);
-        flushSync();
-      },
-      get code() {
-        return code();
-      },
-      set code($$value) {
-        code($$value);
-        flushSync();
-      },
-      get bgColor() {
-        return bgColor();
-      },
-      set bgColor($$value) {
-        bgColor($$value);
-        flushSync();
-      },
-      get color() {
-        return color();
-      },
-      set color($$value = "red") {
-        color($$value);
-        flushSync();
-      },
-      get hint() {
-        return hint();
-      },
-      set hint($$value) {
-        hint($$value);
-        flushSync();
-      }
-    });
+    var $$pop = pop$1($$exports);
     $$cleanup();
     return $$pop;
   }
@@ -12879,10 +12950,26 @@
   function RightLine($$anchor, $$props) {
     push$1($$props, true);
     append_styles$1($$anchor, $$css$f);
-    const [$$stores, $$cleanup] = setup_stores();
     const $ticks = () => store_get(ticks, "$ticks", $$stores);
+    const [$$stores, $$cleanup] = setup_stores();
     let phaseNo = prop($$props, "phaseNo", 7), code = prop($$props, "code", 7);
     let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
+    var $$exports = {
+      get phaseNo() {
+        return phaseNo();
+      },
+      set phaseNo($$value) {
+        phaseNo($$value);
+        flushSync();
+      },
+      get code() {
+        return code();
+      },
+      set code($$value) {
+        code($$value);
+        flushSync();
+      }
+    };
     var div = root$f();
     let classes;
     var span = child(div);
@@ -12905,22 +12992,7 @@
       ]
     );
     append($$anchor, div);
-    var $$pop = pop$1({
-      get phaseNo() {
-        return phaseNo();
-      },
-      set phaseNo($$value) {
-        phaseNo($$value);
-        flushSync();
-      },
-      get code() {
-        return code();
-      },
-      set code($$value) {
-        code($$value);
-        flushSync();
-      }
-    });
+    var $$pop = pop$1($$exports);
     $$cleanup();
     return $$pop;
   }
@@ -12933,11 +13005,27 @@
   function LeftIndent($$anchor, $$props) {
     push$1($$props, true);
     append_styles$1($$anchor, $$css$e);
-    const [$$stores, $$cleanup] = setup_stores();
     const $ticks = () => store_get(ticks, "$ticks", $$stores);
+    const [$$stores, $$cleanup] = setup_stores();
     let phaseNo = prop($$props, "phaseNo", 7), spaceCount = prop($$props, "spaceCount", 7);
     let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
     let code = "".padStart(spaceCount());
+    var $$exports = {
+      get phaseNo() {
+        return phaseNo();
+      },
+      set phaseNo($$value) {
+        phaseNo($$value);
+        flushSync();
+      },
+      get spaceCount() {
+        return spaceCount();
+      },
+      set spaceCount($$value) {
+        spaceCount($$value);
+        flushSync();
+      }
+    };
     var span = root$e();
     let classes;
     var text2 = child(span, true);
@@ -12956,7 +13044,25 @@
       ]
     );
     append($$anchor, span);
-    var $$pop = pop$1({
+    var $$pop = pop$1($$exports);
+    $$cleanup();
+    return $$pop;
+  }
+  create_custom_element(LeftIndent, { phaseNo: {}, spaceCount: {} }, [], [], true);
+  var root$d = /* @__PURE__ */ from_html(`<span> </span>`);
+  const $$css$d = {
+    hash: "svelte-eg6z97",
+    code: "span.svelte-eg6z97 {transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.wrong.svelte-eg6z97 {font-size:0px;}.hint.svelte-eg6z97 {font-size:0px;}"
+  };
+  function RightIndent($$anchor, $$props) {
+    push$1($$props, true);
+    append_styles$1($$anchor, $$css$d);
+    const $ticks = () => store_get(ticks, "$ticks", $$stores);
+    const [$$stores, $$cleanup] = setup_stores();
+    let phaseNo = prop($$props, "phaseNo", 7), spaceCount = prop($$props, "spaceCount", 7);
+    let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
+    let code = "".padStart(spaceCount());
+    var $$exports = {
       get phaseNo() {
         return phaseNo();
       },
@@ -12971,24 +13077,7 @@
         spaceCount($$value);
         flushSync();
       }
-    });
-    $$cleanup();
-    return $$pop;
-  }
-  create_custom_element(LeftIndent, { phaseNo: {}, spaceCount: {} }, [], [], true);
-  var root$d = /* @__PURE__ */ from_html(`<span> </span>`);
-  const $$css$d = {
-    hash: "svelte-eg6z97",
-    code: "span.svelte-eg6z97 {transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.wrong.svelte-eg6z97 {font-size:0px;}.hint.svelte-eg6z97 {font-size:0px;}"
-  };
-  function RightIndent($$anchor, $$props) {
-    push$1($$props, true);
-    append_styles$1($$anchor, $$css$d);
-    const [$$stores, $$cleanup] = setup_stores();
-    const $ticks = () => store_get(ticks, "$ticks", $$stores);
-    let phaseNo = prop($$props, "phaseNo", 7), spaceCount = prop($$props, "spaceCount", 7);
-    let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
-    let code = "".padStart(spaceCount());
+    };
     var span = root$d();
     let classes;
     var text2 = child(span, true);
@@ -13007,22 +13096,7 @@
       ]
     );
     append($$anchor, span);
-    var $$pop = pop$1({
-      get phaseNo() {
-        return phaseNo();
-      },
-      set phaseNo($$value) {
-        phaseNo($$value);
-        flushSync();
-      },
-      get spaceCount() {
-        return spaceCount();
-      },
-      set spaceCount($$value) {
-        spaceCount($$value);
-        flushSync();
-      }
-    });
+    var $$pop = pop$1($$exports);
     $$cleanup();
     return $$pop;
   }
@@ -13049,23 +13123,15 @@
   function HtmlContent($$anchor, $$props) {
     push$1($$props, true);
     append_styles$1($$anchor, $$css$b);
-    const [$$stores, $$cleanup] = setup_stores();
     const $ticks = () => store_get(ticks, "$ticks", $$stores);
+    const [$$stores, $$cleanup] = setup_stores();
     let phaseNo = prop($$props, "phaseNo", 7), content = prop($$props, "content", 7), phaseSelector = prop($$props, "phaseSelector", 7);
     let meAt = /* @__PURE__ */ user_derived(() => phase.meAt($ticks(), phaseNo()));
     function getOnOff(meAt2, phaseSelector2) {
       return meAt2.wrong && phaseSelector2.wrong || meAt2.hint && phaseSelector2.hint || meAt2.right && phaseSelector2.right;
     }
     let onOff = /* @__PURE__ */ user_derived(() => getOnOff(get$1(meAt), phaseSelector()));
-    var div = root$b();
-    let classes;
-    set_style(div, "", {}, { "--width": "600" });
-    var node = child(div);
-    html(node, content);
-    reset(div);
-    template_effect(($0) => classes = set_class(div, 1, "svelte-fhtu8n", null, classes, $0), [() => ({ on: get$1(onOff), off: !get$1(onOff) })]);
-    append($$anchor, div);
-    var $$pop = pop$1({
+    var $$exports = {
       get phaseNo() {
         return phaseNo();
       },
@@ -13087,7 +13153,16 @@
         phaseSelector($$value);
         flushSync();
       }
-    });
+    };
+    var div = root$b();
+    let classes;
+    set_style(div, "", {}, { "--width": "600" });
+    var node = child(div);
+    html(node, content);
+    reset(div);
+    template_effect(($0) => classes = set_class(div, 1, "svelte-fhtu8n", null, classes, $0), [() => ({ on: get$1(onOff), off: !get$1(onOff) })]);
+    append($$anchor, div);
+    var $$pop = pop$1($$exports);
     $$cleanup();
     return $$pop;
   }
@@ -13453,13 +13528,13 @@
           }
         }
         function addReplaceSpan(phaseNo, rightSpan, wrongSpan, colors, hint) {
-          let color = getColor(colors, 0, "red");
+          let color = colors[0];
           let bgColor = getColor(colors, 1, "green");
           if (rightSpan.length > 0) add("right-span", { phaseNo, code: rightSpan, bgColor });
           if (wrongSpan.length > 0) add("wrong-span", { phaseNo, code: wrongSpan, color, hint });
         }
         function addWavedSpan(phaseNo, span, colors, hint) {
-          let color = getColor(colors, 0, "red");
+          let color = colors[0];
           let bgColor = getColor(colors, 1, "transparent");
           if (span.length > 0) add("waved", { phaseNo, code: span, bgColor, color, hint });
         }
@@ -13800,6 +13875,50 @@
       set(drills, orderDrills(all, order, shuffle()), true);
       setNo(0);
     });
+    var $$exports = {
+      get heading() {
+        return heading();
+      },
+      set heading($$value) {
+        heading($$value);
+        flushSync();
+      },
+      get "log-level"() {
+        return logLevel();
+      },
+      set "log-level"($$value) {
+        logLevel($$value);
+        flushSync();
+      },
+      get show() {
+        return show();
+      },
+      set show($$value) {
+        show($$value);
+        flushSync();
+      },
+      get shuffle() {
+        return shuffle();
+      },
+      set shuffle($$value) {
+        shuffle($$value);
+        flushSync();
+      },
+      get "no-wrong-phase"() {
+        return noWrongPhase();
+      },
+      set "no-wrong-phase"($$value) {
+        noWrongPhase($$value);
+        flushSync();
+      },
+      get "at-once"() {
+        return atOnce();
+      },
+      set "at-once"($$value) {
+        atOnce($$value);
+        flushSync();
+      }
+    };
     var fragment = root$a();
     event("click", $window, onclick2);
     event("contextmenu", $window, onRightClick);
@@ -13832,8 +13951,8 @@
                 var fragment_4 = comment();
                 var node_4 = first_child(fragment_4);
                 each(node_4, 17, () => get$1(line2).tokens, index, ($$anchor6, token2) => {
-                  var fragment_5 = comment();
                   const C = /* @__PURE__ */ user_derived(() => components.get(get$1(token2).type));
+                  var fragment_5 = comment();
                   var node_5 = first_child(fragment_5);
                   component(node_5, () => get$1(C), ($$anchor7, C_1) => {
                     C_1($$anchor7, spread_props(() => get$1(token2).props));
@@ -13921,50 +14040,7 @@
       ]
     );
     append($$anchor, fragment);
-    return pop$1({
-      get heading() {
-        return heading();
-      },
-      set heading($$value) {
-        heading($$value);
-        flushSync();
-      },
-      get "log-level"() {
-        return logLevel();
-      },
-      set "log-level"($$value) {
-        logLevel($$value);
-        flushSync();
-      },
-      get show() {
-        return show();
-      },
-      set show($$value) {
-        show($$value);
-        flushSync();
-      },
-      get shuffle() {
-        return shuffle();
-      },
-      set shuffle($$value) {
-        shuffle($$value);
-        flushSync();
-      },
-      get "no-wrong-phase"() {
-        return noWrongPhase();
-      },
-      set "no-wrong-phase"($$value) {
-        noWrongPhase($$value);
-        flushSync();
-      },
-      get "at-once"() {
-        return atOnce();
-      },
-      set "at-once"($$value) {
-        atOnce($$value);
-        flushSync();
-      }
-    });
+    return pop$1($$exports);
   }
   delegate(["click"]);
   customElements.define("code-drills", create_custom_element(
@@ -13992,8 +14068,8 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$9);
     const iframe = ($$anchor2, name = noop) => {
-      var iframe_1 = root_1$7();
       const src = /* @__PURE__ */ user_derived(() => makeSrcUrl(name()));
+      var iframe_1 = root_1$7();
       template_effect(() => {
         set_attribute(iframe_1, "src", get$1(src));
         set_attribute(iframe_1, "title", name());
@@ -14017,34 +14093,7 @@
       return `${base()}/${name}.html${args}`;
     }
     let drills = parseDrillsList(drillsList());
-    var div = root$9();
-    let styles;
-    var node = child(div);
-    {
-      var consequent = ($$anchor2) => {
-        var span = root_2$4();
-        var text2 = sibling(child(span), 2);
-        reset(span);
-        template_effect(() => set_text(text2, ` ${get$1(errorMsg) ?? ""}`));
-        append($$anchor2, span);
-      };
-      if_block(node, ($$render) => {
-        if (drills.length === 0) $$render(consequent);
-      });
-    }
-    var node_1 = sibling(node, 2);
-    each(node_1, 17, () => drills, index, ($$anchor2, drill) => {
-      iframe($$anchor2, () => get$1(drill));
-    });
-    reset(div);
-    template_effect(($0) => styles = set_style(div, "", styles, $0), [
-      () => ({
-        "--drill-width": `${width()}px`,
-        "--drill-height": `${height()}px`
-      })
-    ]);
-    append($$anchor, div);
-    return pop$1({
+    var $$exports = {
       get width() {
         return width();
       },
@@ -14080,7 +14129,35 @@
         drillsList($$value);
         flushSync();
       }
+    };
+    var div = root$9();
+    let styles;
+    var node = child(div);
+    {
+      var consequent = ($$anchor2) => {
+        var span = root_2$4();
+        var text2 = sibling(child(span), 2);
+        reset(span);
+        template_effect(() => set_text(text2, ` ${get$1(errorMsg) ?? ""}`));
+        append($$anchor2, span);
+      };
+      if_block(node, ($$render) => {
+        if (drills.length === 0) $$render(consequent);
+      });
+    }
+    var node_1 = sibling(node, 2);
+    each(node_1, 17, () => drills, index, ($$anchor2, drill) => {
+      iframe($$anchor2, () => get$1(drill));
     });
+    reset(div);
+    template_effect(($0) => styles = set_style(div, "", styles, $0), [
+      () => ({
+        "--drill-width": `${width()}px`,
+        "--drill-height": `${height()}px`
+      })
+    ]);
+    append($$anchor, div);
+    return pop$1($$exports);
   }
   customElements.define("drills-page", create_custom_element(
     Drills_page,
@@ -14104,7 +14181,7 @@
     } else {
       console.warn(`Can't loading hints from '${from()}' (attribute 'from' is missing?)`);
     }
-    return pop$1({
+    var $$exports = {
       get from() {
         return from();
       },
@@ -14112,7 +14189,8 @@
         from($$value);
         flushSync();
       }
-    });
+    };
+    return pop$1($$exports);
   }
   customElements.define("import-hints", create_custom_element(Import_hints, { from: {} }, [], [], false));
   const preventDblClick = (me) => {
@@ -14287,8 +14365,8 @@
     return data ? data[2] : [num];
   }
   const number = ($$anchor, value = noop) => {
-    var span = root_1$6();
     const long = /* @__PURE__ */ user_derived(() => value() < 100 ? "" : "long");
+    var span = root_1$6();
     var span_1 = child(span);
     var text2 = child(span_1, true);
     reset(span_1);
@@ -14309,9 +14387,9 @@
     append($$anchor, span_2);
   };
   const factor = ($$anchor, value = noop) => {
-    var span_4 = root_3$1();
     const long = /* @__PURE__ */ user_derived(() => value().length < 3 ? "" : "long");
     const fontBold = /* @__PURE__ */ user_derived(() => value().length < 3 ? "font-bold" : "");
+    var span_4 = root_3$1();
     var span_5 = child(span_4);
     var text_2 = child(span_5, true);
     reset(span_5);
@@ -14408,16 +14486,7 @@
       let factors = lodashExports.shuffle(factorsOf(num));
       return factors.length === 0 ? ["p", "r", "i", "m", "e"] : factors.map((num2) => num2.toString());
     }
-    var fragment_3 = root$8();
-    var node_3 = first_child(fragment_3);
-    WithTailwind(node_3, {});
-    var div_4 = sibling(node_3, 2);
-    var node_4 = child(div_4);
-    gridOfNumbers(node_4, () => numbers);
-    reset(div_4);
-    attach(div_4, () => preventDblClick);
-    append($$anchor, fragment_3);
-    return pop$1({
+    var $$exports = {
       get list() {
         return list();
       },
@@ -14439,7 +14508,17 @@
         take($$value);
         flushSync();
       }
-    });
+    };
+    var fragment_3 = root$8();
+    var node_3 = first_child(fragment_3);
+    WithTailwind(node_3, {});
+    var div_4 = sibling(node_3, 2);
+    var node_4 = child(div_4);
+    gridOfNumbers(node_4, () => numbers);
+    reset(div_4);
+    attach(div_4, () => preventDblClick);
+    append($$anchor, fragment_3);
+    return pop$1($$exports);
   }
   delegate(["click"]);
   customElements.define("va-numbers", create_custom_element(Va_numbers, { list: {}, asis: {}, take: {} }, [], [], false));
@@ -14467,13 +14546,7 @@
     push$1($$props, true);
     append_styles$1($$anchor, $$css$7);
     let tooltip = prop($$props, "tooltip", 7), copyOnClick = prop($$props, "copyOnClick", 7, true);
-    var div = root$6();
-    div.__click = [clicked, copyOnClick, tooltip];
-    var text2 = child(div, true);
-    reset(div);
-    template_effect(() => set_text(text2, tooltip()));
-    append($$anchor, div);
-    return pop$1({
+    var $$exports = {
       get tooltip() {
         return tooltip();
       },
@@ -14488,7 +14561,14 @@
         copyOnClick($$value);
         flushSync();
       }
-    });
+    };
+    var div = root$6();
+    div.__click = [clicked, copyOnClick, tooltip];
+    var text2 = child(div, true);
+    reset(div);
+    template_effect(() => set_text(text2, tooltip()));
+    append($$anchor, div);
+    return pop$1($$exports);
   }
   delegate(["click"]);
   create_custom_element(TopHoverTooltip, { tooltip: {}, copyOnClick: {} }, [], [], true);
@@ -14575,12 +14655,12 @@
   function AnkiStat($$anchor, $$props) {
     push$1($$props, true);
     append_styles$1($$anchor, $$css$6);
-    const [$$stores, $$cleanup] = setup_stores();
     const $cRight = () => store_get(cRight, "$cRight", $$stores);
     const $cWrong = () => store_get(cWrong, "$cWrong", $$stores);
     const $tRight = () => store_get(tRight, "$tRight", $$stores);
     const $tWrong = () => store_get(tWrong, "$tWrong", $$stores);
     const $complete = () => store_get(complete, "$complete", $$stores);
+    const [$$stores, $$cleanup] = setup_stores();
     let id = prop($$props, "id", 7), width = prop($$props, "width", 7), refreshIsClicked = prop($$props, "refreshIsClicked", 7), video = prop($$props, "video", 7);
     let counters = ankiCounters.getOrCreateCounters(id());
     let { complete, tRight, tWrong, cRight, cWrong } = {
@@ -14593,6 +14673,36 @@
     onMount(() => {
       ankiCounters.show(id());
     });
+    var $$exports = {
+      get id() {
+        return id();
+      },
+      set id($$value) {
+        id($$value);
+        flushSync();
+      },
+      get width() {
+        return width();
+      },
+      set width($$value) {
+        width($$value);
+        flushSync();
+      },
+      get refreshIsClicked() {
+        return refreshIsClicked();
+      },
+      set refreshIsClicked($$value) {
+        refreshIsClicked($$value);
+        flushSync();
+      },
+      get video() {
+        return video();
+      },
+      set video($$value) {
+        video($$value);
+        flushSync();
+      }
+    };
     var div = root$5();
     var div_1 = child(div);
     var node = child(div_1);
@@ -14626,36 +14736,7 @@
       set_text(text_4, $complete());
     });
     append($$anchor, div);
-    var $$pop = pop$1({
-      get id() {
-        return id();
-      },
-      set id($$value) {
-        id($$value);
-        flushSync();
-      },
-      get width() {
-        return width();
-      },
-      set width($$value) {
-        width($$value);
-        flushSync();
-      },
-      get refreshIsClicked() {
-        return refreshIsClicked();
-      },
-      set refreshIsClicked($$value) {
-        refreshIsClicked($$value);
-        flushSync();
-      },
-      get video() {
-        return video();
-      },
-      set video($$value) {
-        video($$value);
-        flushSync();
-      }
-    });
+    var $$pop = pop$1($$exports);
     $$cleanup();
     return $$pop;
   }
@@ -14677,6 +14758,22 @@
     append_styles$1($$anchor, $$css$5);
     let cardId = prop($$props, "cardId", 7), children = prop($$props, "children", 7);
     let active = /* @__PURE__ */ state$1(true);
+    var $$exports = {
+      get cardId() {
+        return cardId();
+      },
+      set cardId($$value) {
+        cardId($$value);
+        flushSync();
+      },
+      get children() {
+        return children();
+      },
+      set children($$value) {
+        children($$value);
+        flushSync();
+      }
+    };
     var fragment = comment();
     var node = first_child(fragment);
     {
@@ -14700,22 +14797,7 @@
       });
     }
     append($$anchor, fragment);
-    return pop$1({
-      get cardId() {
-        return cardId();
-      },
-      set cardId($$value) {
-        cardId($$value);
-        flushSync();
-      },
-      get children() {
-        return children();
-      },
-      set children($$value) {
-        children($$value);
-        flushSync();
-      }
-    });
+    return pop$1($$exports);
   }
   delegate(["click"]);
   create_custom_element(ClickToStart, { cardId: {}, children: {} }, [], [], true);
@@ -14836,6 +14918,57 @@
     function refreshIsClicked() {
       set(refreshId, get$1(refreshId) + 1);
     }
+    var $$exports = {
+      get id() {
+        return id();
+      },
+      set id($$value) {
+        id($$value);
+        flushSync();
+      },
+      get path() {
+        return path();
+      },
+      set path($$value) {
+        path($$value);
+        flushSync();
+      },
+      get width() {
+        return width();
+      },
+      set width($$value) {
+        width($$value);
+        flushSync();
+      },
+      get height() {
+        return height();
+      },
+      set height($$value) {
+        height($$value);
+        flushSync();
+      },
+      get port() {
+        return port();
+      },
+      set port($$value) {
+        port($$value);
+        flushSync();
+      },
+      get scale() {
+        return scale();
+      },
+      set scale($$value) {
+        scale($$value);
+        flushSync();
+      },
+      get clickToStart() {
+        return clickToStart2();
+      },
+      set clickToStart($$value) {
+        clickToStart2($$value);
+        flushSync();
+      }
+    };
     var div = root_1$3();
     var node = child(div);
     AnkiStat(node, {
@@ -14886,57 +15019,7 @@
         --scale: ${scale() ?? ""};
     `));
     append($$anchor, div);
-    return pop$1({
-      get id() {
-        return id();
-      },
-      set id($$value) {
-        id($$value);
-        flushSync();
-      },
-      get path() {
-        return path();
-      },
-      set path($$value) {
-        path($$value);
-        flushSync();
-      },
-      get width() {
-        return width();
-      },
-      set width($$value) {
-        width($$value);
-        flushSync();
-      },
-      get height() {
-        return height();
-      },
-      set height($$value) {
-        height($$value);
-        flushSync();
-      },
-      get port() {
-        return port();
-      },
-      set port($$value) {
-        port($$value);
-        flushSync();
-      },
-      get scale() {
-        return scale();
-      },
-      set scale($$value) {
-        scale($$value);
-        flushSync();
-      },
-      get clickToStart() {
-        return clickToStart2();
-      },
-      set clickToStart($$value) {
-        clickToStart2($$value);
-        flushSync();
-      }
-    });
+    return pop$1($$exports);
   }
   create_custom_element(
     AnkiCard,
@@ -15004,13 +15087,7 @@
   function Spin($$anchor, $$props) {
     push$1($$props, true);
     let msg = prop($$props, "msg", 7);
-    var span = root$3();
-    var text2 = child(span);
-    next();
-    reset(span);
-    template_effect(() => set_text(text2, `${msg() ?? ""} `));
-    append($$anchor, span);
-    return pop$1({
+    var $$exports = {
       get msg() {
         return msg();
       },
@@ -15018,7 +15095,14 @@
         msg($$value);
         flushSync();
       }
-    });
+    };
+    var span = root$3();
+    var text2 = child(span);
+    next();
+    reset(span);
+    template_effect(() => set_text(text2, `${msg() ?? ""} `));
+    append($$anchor, span);
+    return pop$1($$exports);
   }
   create_custom_element(Spin, { msg: {} }, [], [], true);
   var root_1$2 = /* @__PURE__ */ from_html(`<div></div>`);
@@ -15411,30 +15495,7 @@
     let parent = prop($$props, "parent", 7), at = prop($$props, "at", 7), parentSize = prop($$props, "parentSize", 7), bgColor = prop($$props, "bgColor", 7);
     let coords = clientToArea(parent(), parentSize());
     let visible = /* @__PURE__ */ state$1(false);
-    var div = root$1();
-    let classes;
-    div.__click = [onclick, visible];
-    template_effect(
-      ($0, $1, $2, $3, $4) => {
-        classes = set_class(div, 1, "panel svelte-18s50q7", null, classes, $0);
-        set_style(div, `
-        --left: ${$1 ?? ""}px;
-        --top: ${$2 ?? ""}px;
-        --width: ${$3 ?? ""}px;
-        --height: ${$4 ?? ""}px;
-        --bgColor: ${bgColor() ?? ""};
-    `);
-      },
-      [
-        () => ({ visible: get$1(visible) }),
-        () => coords.toClientX(at()[0]),
-        () => coords.toClientY(at()[1]),
-        () => coords.toClientX(at()[2]),
-        () => coords.toClientY(at()[3])
-      ]
-    );
-    append($$anchor, div);
-    return pop$1({
+    var $$exports = {
       get parent() {
         return parent();
       },
@@ -15463,7 +15524,31 @@
         bgColor($$value);
         flushSync();
       }
-    });
+    };
+    var div = root$1();
+    let classes;
+    div.__click = [onclick, visible];
+    template_effect(
+      ($0, $1, $2, $3, $4) => {
+        classes = set_class(div, 1, "panel svelte-18s50q7", null, classes, $0);
+        set_style(div, `
+        --left: ${$1 ?? ""}px;
+        --top: ${$2 ?? ""}px;
+        --width: ${$3 ?? ""}px;
+        --height: ${$4 ?? ""}px;
+        --bgColor: ${bgColor() ?? ""};
+    `);
+      },
+      [
+        () => ({ visible: get$1(visible) }),
+        () => coords.toClientX(at()[0]),
+        () => coords.toClientY(at()[1]),
+        () => coords.toClientX(at()[2]),
+        () => coords.toClientY(at()[3])
+      ]
+    );
+    append($$anchor, div);
+    return pop$1($$exports);
   }
   delegate(["click"]);
   create_custom_element(ImgArea, { parent: {}, at: {}, parentSize: {}, bgColor: {} }, [], [], true);
@@ -15528,6 +15613,43 @@
       }
     }
     parent().addEventListener("click", onclick2);
+    var $$exports = {
+      get parent() {
+        return parent();
+      },
+      set parent($$value) {
+        parent($$value);
+        flushSync();
+      },
+      get at() {
+        return at();
+      },
+      set at($$value) {
+        at($$value);
+        flushSync();
+      },
+      get minSize() {
+        return minSize();
+      },
+      set minSize($$value) {
+        minSize($$value);
+        flushSync();
+      },
+      get parentSize() {
+        return parentSize();
+      },
+      set parentSize($$value) {
+        parentSize($$value);
+        flushSync();
+      },
+      get showCoords() {
+        return showCoords();
+      },
+      set showCoords($$value) {
+        showCoords($$value);
+        flushSync();
+      }
+    };
     var div = root();
     div.__pointermove = onpointermove;
     div.__pointerup = onpointerup;
@@ -15565,43 +15687,7 @@
     );
     event("pointercancel", div, onpointercancel);
     append($$anchor, div);
-    return pop$1({
-      get parent() {
-        return parent();
-      },
-      set parent($$value) {
-        parent($$value);
-        flushSync();
-      },
-      get at() {
-        return at();
-      },
-      set at($$value) {
-        at($$value);
-        flushSync();
-      },
-      get minSize() {
-        return minSize();
-      },
-      set minSize($$value) {
-        minSize($$value);
-        flushSync();
-      },
-      get parentSize() {
-        return parentSize();
-      },
-      set parentSize($$value) {
-        parentSize($$value);
-        flushSync();
-      },
-      get showCoords() {
-        return showCoords();
-      },
-      set showCoords($$value) {
-        showCoords($$value);
-        flushSync();
-      }
-    });
+    return pop$1($$exports);
   }
   delegate(["pointermove", "pointerup", "pointerdown"]);
   create_custom_element(
@@ -15650,6 +15736,50 @@
         window.removeEventListener("resize", resize);
       };
     });
+    var $$exports = {
+      get src() {
+        return src();
+      },
+      set src($$value) {
+        src($$value);
+        flushSync();
+      },
+      get width() {
+        return width();
+      },
+      set width($$value = 2e3) {
+        width($$value);
+        flushSync();
+      },
+      get hide() {
+        return hide();
+      },
+      set hide($$value) {
+        hide($$value);
+        flushSync();
+      },
+      get edit() {
+        return edit();
+      },
+      set edit($$value) {
+        edit($$value);
+        flushSync();
+      },
+      get dx() {
+        return dx();
+      },
+      set dx($$value = 100) {
+        dx($$value);
+        flushSync();
+      },
+      get dy() {
+        return dy();
+      },
+      set dy($$value = 100) {
+        dy($$value);
+        flushSync();
+      }
+    };
     var fragment = comment();
     var node = first_child(fragment);
     key$1(node, () => get$1(pageWidth), ($$anchor2) => {
@@ -15715,50 +15845,7 @@
       append($$anchor2, div_1);
     });
     append($$anchor, fragment);
-    return pop$1({
-      get src() {
-        return src();
-      },
-      set src($$value) {
-        src($$value);
-        flushSync();
-      },
-      get width() {
-        return width();
-      },
-      set width($$value = 2e3) {
-        width($$value);
-        flushSync();
-      },
-      get hide() {
-        return hide();
-      },
-      set hide($$value) {
-        hide($$value);
-        flushSync();
-      },
-      get edit() {
-        return edit();
-      },
-      set edit($$value) {
-        edit($$value);
-        flushSync();
-      },
-      get dx() {
-        return dx();
-      },
-      set dx($$value = 100) {
-        dx($$value);
-        flushSync();
-      },
-      get dy() {
-        return dy();
-      },
-      set dy($$value = 100) {
-        dy($$value);
-        flushSync();
-      }
-    });
+    return pop$1($$exports);
   }
   customElements.define("img-areas", create_custom_element(Img_areas, { src: {}, width: {}, hide: {}, edit: {}, dx: {}, dy: {} }, [], [], false));
   addToMyRoot(document.head, ["tailwind", "daisy-ui"]);
