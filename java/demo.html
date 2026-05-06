@@ -12,7 +12,10 @@
 <!---------------------------------------------------------->
 
 <drill lang="java" id="demo-01">
-public static int modulo(int n1, int n2) {
+$public static $$int$ $modulo$(int n1, int n2) {
+        ^$
+        ~r ht external-func
+        ^what ~g ht func-name   {+}
     while (n1 >= n2) {
         n1 -= n2;
     }
@@ -28,25 +31,30 @@ System.out.println(modulo(7, 10));     // 7
 <!---------------------------------------------------------->
 
 <drill lang="java" id="demo-02">
-$public static $int $modulo$(int n1, int n2) {
+$public static $$int$ $modulo$(int n1, int n2) {
         ^$
-        ~r hb external-func
+        ~r ht external-func
+        ^what ~g ht func-name     {1}
     while $($$n1 >= n2$$)$ {
             ^$
             ~r ht while-syntax
             ^$
         n1 -= n2;
     }
--    return n1;                 {1}
+-    return n1;                   {2}
 $} $
-    ~r hr return-is-missing     {1}
+    ~r hr return-is-missing       {2}
 
-System.out.println(modulo(7, 3));      // $1$
-    ^? ~g hr result
-System.out.println(modulo(14, 5));     // $4$
-    ^? ~g hr result
-System.out.println(modulo(12, 3));     // $0$
-    ^? ~g hr result
-System.out.println(modulo(7, 10));     // $7$
-    ^? ~g hr result
+System.out.println($modulo$(7, 3));      // $1$
+    ^what ~g ht func-name           {1}
+    ^? ~g hr result                 {+}
+System.out.println($modulo$(14, 5));     // $4$
+    ^what ~g ht func-name           {1}
+    ^? ~g hr result                 {+}
+System.out.println($modulo$(12, 3));     // $0$
+    ^what ~g ht func-name           {1}
+    ^? ~g hr result                 {+}
+System.out.println($modulo$(7, 10));     // $7$
+    ^what ~g ht func-name           {1}
+    ^? ~g hr result                 {+}
 </drill>

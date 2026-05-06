@@ -165,3 +165,394 @@ addToAllNodes(lst, 100);
 print(list);                // $[101, 102, 103, 104, 105]$ 
     ^? ~g ht result
 </drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="same()" no-wrong-phase>
+public static boolean same(Node&lt;Integer> a, Node&lt;Integer> b) {
+    while ($a != null$ $&&$ $b != null$) {
+            ^... ~o ht complete
+            ^... ~o ht complete
+            ^... ~o ht complete
+        if (a.getValue() $!=$ b.getValue()) {
+                ^... ~o ht complete
+            $return false;$
+                ^... ~o ht complete
+        }
+        $a = a.getNext();$              {1}
+            ^... ~o ht complete
+        $b = b.getNext();$
+            ^... ~o ht complete         {1}
+    }
+    return $a == null$ $&&$ $b == null$;
+        ^... ~o ht complete
+        ^... ~o ht complete
+        ^... ~o ht complete
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="add-to-list">
+public static Node addToHead(Node&lt;Integer> lst, int value) {
+    $return $new $Node$$&lt;Integer>$(value, lst);
+        ^$ ~t                   {1}
+        ~r ht generic-type      {+}
+        ^$
+$} $                            {1}!
+    ~r hr return-is-missing
+
+public static Node&lt;Integer> addToTail(Node&lt;Integer> lst, int value) {
+    $Node$$&lt;Integer>$ node = new $Node$$&lt;Integer>$(value, null);  {3}
+        ~r ht generic-type
+        ^$ ~t
+        ~r ht generic-type
+        ^$ ~t
+-    if (lst == null) {         {2}
+-        return node;           {2}
+-    }                          {2}
+    $Node$$&lt;Integer>$ tail = $lst$;
+        ~r ht generic-type                  {3}
+        ^$ ~t                               {3}
+        ~r ht list-can-be-empty             {2}!
+    while ($tail$$.getNext()$ != null) {
+            ~r ht list-end-or-last
+            ^$
+        tail = tail.getNext();
+    }
+-    tail.setNext(node);            {4}
+    $return$ $lst$;
+        ~r hr מצאנו סוף ומה?..      {4}
+        ^node ~r hr is-it-first-node    {+}
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="addToSorted()">
+public static Node&lt;Integer> addToSorted(Node&lt;Integer> lst, int value) {
+    Node$&lt;$$Integer$$>$ node = new Node$&lt;$$>$(value, null);
+        ~r hr generic-type
+        ^$
+        ~r hr generic-type
+        ~o hr generic-with-omitted-type          {+}
+        ~o hr generic-with-omitted-type
+-    if (lst == null) {                         {2}
+-        return node;                           {2}
+-    }                                          {2}
+    if (value $<$ $lst$.getValue()) {
+            ^> ~r ht wrong-logic
+            ~r ht list-can-be-empty             {2}!
+        node.setNext(lst);
+        return $node$;
+            ^lst ~r hr is-it-first-node
+    }
+    Node&lt;Integer> prev = lst;
+    while ($prev.hasNext() && $prev$.getNext()$.$getValue() < value$) {
+            ^$ ~t                               {3}
+            ^$ ~t                               {+}
+            ~r ht prev-is-wanted
+        prev = $prev$.getNext();
+            ~r hb next-can-be-null              {3}!
+    }
+    node.setNext($prev.getNext()$);
+        ^... ~o ht complete
+    prev.setNext($node$);
+        ^... ~o ht complete
+    return $lst$;
+        ^node ~r hr is-it-first-node
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="value-at-index">
+public static int valueAt(Node&lt;Integer> lst, int i) {
+    Node&lt;Integer> node = $$lst$$;
+        ^new Node($ ~r ht reference-itr
+        ^)
+    while (node $!= null$ && $i > 0$) {
+            ^... ~o ht complete
+            ^... ~o ht complete     {+}
+        node = node.getNext();
+        i--;
+    }
+    return node == null ? 0 : $node$$.getValue()$;
+        ~r ht wrong-ret-value
+        ^$
+}
+
+public static Node&lt;Integer> nodeAt(Node&lt;Integer> lst, int i) {
+    Node&lt;Integer> node = lst;
+    while (node != null$ && i > 0$) {   {2}
+            ^$
+        node = node.getNext();
+        $i--$;                          {2}
+            ~r hr when-its-over
+    }
+    return node$$;
+        ^.getValue() ~r ht wrong-ret-value
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="getMiddleNode()" todo>
+Node getMiddleNode(Node lst) {
+    Node slow = lst;
+    Node fast = lst;
+    while (fast != null && fast.hasNext()) {
+        slow = slow.getNext();
+        fast = fast.getNext().getNext();
+    }
+    return slow;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="ascending()" todo>
+boolean ascending(Node lst) {
+    if (lst == null || lst.getNext() == null) {
+        return true;
+    }
+    Node node = lst;
+    while (node.hasNext()) {
+        if (node.getValue() > node.getNext().getValue()) {
+            return false;
+        }
+        node = node.getNext();
+    }
+    return true;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="same-as-array" todo>
+boolean areSame(Node lst, int[] a) {
+    Node node = lst;
+    int i = 0;
+    while (node != null && i < a.length) {
+        if (node.getValue() != a[i]) {
+            return false;
+        }
+        node = node.getNext();
+        i++;
+    }
+    return node == null && i == a.length;
+}
+</drill>
+
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="findByName()" todo>
+Node<Person> find(Node<Person> lst, String name) {
+    while (lst != null) {
+        if (lst.getValue().getName().equals(name)) {
+            return lst;
+        }
+        lst = lst.getNext();
+    }
+    return null;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="copy()" todo>
+Node deepCopy(Node<Person> lst) {
+    if (lst == null) {
+        return null;
+    }
+    Node lst2 = new Node(lst.getValue(), null);
+    Node tail2 = lst2;
+    Node node = lst.getNext();
+    while (node != null) {
+        Node node2 = new Node(node.getValue(), null);
+        tail2.setNext(node2);
+        tail2 = node2;
+        node = node.getNext();
+    }
+    return lst2;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="reverse" todo>
+Node reversedCopy(Node lst) {
+    Node rev = null;
+    while (lst != null) {
+        rev = new Node(lst.getValue(), rev);
+        lst = lst.getNext();
+    }
+    return rev;
+}
+
+Node reverse(Node lst) {
+    Node rev = null;
+    while (lst != null) {
+        Node node = lst;
+        lst = lst.getNext();
+        node.setNext(rev);
+        rev = node;
+    }
+    return rev;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="removeNode()" todo>
+Node removeNode(Node lst, Node node) {
+    if (lst == null) {
+        return null;
+    }
+    if (lst == node) {
+        return lst.getNext();
+    }
+    Node prev = lst;
+    while (prev.hasNext() && prev.getNext() != node) {
+        prev = prev.getNext();
+    }
+    if (prev.hasNext()) {
+        prev.setNext(prev.getNext().getNext());
+    }
+    return lst;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="removeAt()" todo>
+Node removeAt(Node lst, int i) {
+    if (lst == null) {
+        return null;
+    }
+    if (i == 0) {
+        return lst.getNext();
+    }
+    Node prev = lst;
+    while (prev.hasNext() && i != 1) {
+        prev = prev.getNext();
+        i--;
+    }
+    if (prev.hasNext()) {
+        prev.setNext(prev.getNext().getNext());
+    }
+    return lst;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="removeAll()" todo>
+Node filter(Node lst, int value) {
+    while (lst != null && lst.getValue() == value) {
+        lst = lst.getNext();
+    }
+    if (lst == null) {
+        return null;
+    }
+    Node prev = lst;
+    while (prev.hasNext()) {
+        if (prev.getNext().getValue() == value) {
+            prev.setNext(prev.getNext().getNext());
+        } else {
+            prev = prev.getNext();
+        }
+    }
+    return lst;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="merge-sorted-lists" todo>
+[1,4,5,7] \oplus [2,3,6,8] => [1,2,3,4,5,6,7,8]  
+[1,4,5,7] \oplus [2,3] => [1,2,3,4,5,7]  
+Node merge(Node a, Node b) {
+    Node lst = null;
+    Node tail = null;
+    while (a != null || b != null) {
+        boolean nextIsA = true;
+        if (a == null) {
+            nextIsA = false;
+        } else {
+            if (b != null && b.getValue() < a.getValue()) {
+                nextIsA = false;
+            }
+        }
+        if (nextIsA) {
+            if (lst == null) {
+                lst = a;
+                tail = a;
+                a = a.getNext();
+            } else {
+                tail.setNext(a);
+                tail = a;
+                a = a.getNext();
+            }
+        } else {
+            if (lst == null) {
+                lst = b;
+                tail = b;
+                b = b.getNext();
+            } else {
+                tail.setNext(b);
+                tail = b;
+                b = b.getNext();
+            }
+        }
+    }
+    return lst;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="remove-point" todo>
+Node<Point> remove(Node<Point> lst, Point pnt) {
+    if (lst == null || pnt == null) {
+        return lst;
+    }
+    Point current = lst.getValue();
+    if (current != null && current.same(pnt)) {
+        return lst.getNext();
+    }
+    Node<Point> prev = lst;
+    Node<Point> node = lst.getNext();
+    while (node != null) {
+        current = node.getValue();
+        if (current != null && current.same(pnt)) {
+            prev.setNext(node.getNext());
+            return lst;
+        }
+        prev = node;
+        node = node.getNext();
+    }
+    return lst;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="slice" todo>
+Node<Node<Person>> slice() {
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="countWords()" todo>
+Node<Counter> countWords(String[] words) {
+    ...
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="" todo>
+</drill>

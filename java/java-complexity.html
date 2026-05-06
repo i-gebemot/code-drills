@@ -147,3 +147,53 @@ boolean isBalanced(BinNode&lt;Integer> node) {
 // isBalanced() runtime complexity is:    $O(n)$
         ^? ~g hb result
 </drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="endsWith()" todo>
+iboolean areSame(Node l1, Node l2) {
+    while (l1 != null && l2 != null) {
+        if (l1.getValue() != l2.getValue()) {
+            return false;
+        }
+        l1 = l1.getNext();
+        l2 = l2.getNext();
+    }
+    return l1 == null && l2 == null;
+}
+
+boolean suffix(Node l1, Node l2) {
+    while (l1 != null) {
+        if (areSame(l1, l2)) {
+            return true;
+        }
+        l1 = l1.getNext();
+    }
+    return false;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="" todo>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="" todo>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="" todo>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="" todo>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="" todo>
+</drill>
