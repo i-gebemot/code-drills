@@ -109,7 +109,8 @@
         if (window.MathJax)
           return;
         window.MathJax = {
-          loader: { load: ["input/asciimath", "output/chtml"] }
+          loader: { load: ["input/asciimath", "output/svg"] },
+          startup: { typeset: false }
         };
         addJs(root2, "https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js");
       }
@@ -4491,17 +4492,17 @@
     Class;
     return Class;
   }
-  const VERSION = "0.22.3";
+  const VERSION = "0.23.0";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
   }
-  var root$E = /* @__PURE__ */ from_html(`<div></div>`);
+  var root$F = /* @__PURE__ */ from_html(`<div></div>`);
   function WithTailwind($$anchor, $$props) {
     push$1($$props, true);
     let self2;
     user_effect(() => addToMyRoot(self2, ["tailwind", "daisy-ui"]));
-    var div = root$E();
+    var div = root$F();
     bind_this(div, ($$value) => self2 = $$value, () => self2);
     append($$anchor, div);
     pop$1();
@@ -4694,14 +4695,14 @@
     };
   })();
   var root_1$e = /* @__PURE__ */ from_html(`<div class="badge badge-error badge-xl svelte-o0vjex">Wrong branch</div>`);
-  var root$D = /* @__PURE__ */ from_html(`<!> <div class="svelte-o0vjex"><span class="groovy svelte-o0vjex"> </span></div> <div class="svelte-o0vjex"><span class="text-gray-400 svelte-o0vjex">Streak:</span> <span class="streak svelte-o0vjex"> </span> <span class="text-gray-400 svelte-o0vjex">Right answers today:</span> <span class="rightsToday svelte-o0vjex"> </span></div> <div class="svelte-o0vjex"><div class="badge badge-outline badge-primary badge-xl svelte-o0vjex"> </div> <div class="badge badge-warning badge-xl svelte-o0vjex"> </div> <!></div> <div class="badge badge-xl svelte-o0vjex"> </div> <div class="badge badge-xs svelte-o0vjex"> </div> <div class="badge badge-xs svelte-o0vjex"> </div> <div class="badge badge-xs svelte-o0vjex"> </div>`, 1);
-  const $$css$v = {
+  var root$E = /* @__PURE__ */ from_html(`<!> <div class="svelte-o0vjex"><span class="groovy svelte-o0vjex"> </span></div> <div class="svelte-o0vjex"><span class="text-gray-400 svelte-o0vjex">Streak:</span> <span class="streak svelte-o0vjex"> </span> <span class="text-gray-400 svelte-o0vjex">Right answers today:</span> <span class="rightsToday svelte-o0vjex"> </span></div> <div class="svelte-o0vjex"><div class="badge badge-outline badge-primary badge-xl svelte-o0vjex"> </div> <div class="badge badge-warning badge-xl svelte-o0vjex"> </div> <!></div> <div class="badge badge-xl svelte-o0vjex"> </div> <div class="badge badge-xs svelte-o0vjex"> </div> <div class="badge badge-xs svelte-o0vjex"> </div> <div class="badge badge-xs svelte-o0vjex"> </div>`, 1);
+  const $$css$w = {
     hash: "svelte-o0vjex",
     code: ".groovy.svelte-o0vjex {font-size:32px;font-weight:bold;display:inline-block;vertical-align:middle;background:linear-gradient(90deg, gold, magenta, cyan);background-size:200%;-webkit-background-clip:text;background-clip:text;color:transparent; \r\n        animation: svelte-o0vjex-shine 5s linear infinite;}.streak.svelte-o0vjex {font-size:36px;font-weight:bold;color:red;}.rightsToday.svelte-o0vjex {font-size:24px;font-weight:bold;color:green;}.groovy.svelte-o0vjex:hover {\r\n        animation: svelte-o0vjex-jelly 0.6s ease-in-out infinite;}\r\n    @keyframes svelte-o0vjex-shine {to{background-position:200%}}\r\n    @keyframes svelte-o0vjex-jelly {25%{transform:scale(1.1,0.9)}50%{transform:scale(0.9,1.1)}75%{transform:scale(1.05,0.95)}}"
   };
   function MyPage($$anchor, $$props) {
     push$1($$props, true);
-    append_styles$1($$anchor, $$css$v);
+    append_styles$1($$anchor, $$css$w);
     const $name = () => store_get(name, "$name", $$stores);
     const $streak = () => store_get(streak, "$streak", $$stores);
     const $rightsToday = () => store_get(rightsToday, "$rightsToday", $$stores);
@@ -4727,7 +4728,7 @@
       sVersion
     } = myPage2;
     myPage2.connectToBackend(path);
-    var fragment = root$D();
+    var fragment = root$E();
     var node = first_child(fragment);
     WithTailwind(node, {});
     var div = sibling(node, 2);
@@ -4789,7 +4790,7 @@
     $$cleanup();
   }
   customElements.define("my-page", create_custom_element(MyPage, {}, [], [], false));
-  var root$C = /* @__PURE__ */ from_html(`<div></div>`);
+  var root$D = /* @__PURE__ */ from_html(`<div></div>`);
   function RunTheHeaderMsg($$anchor, $$props) {
     push$1($$props, true);
     let div;
@@ -4797,7 +4798,7 @@
       let self2 = div.parentNode;
       self2.innerHTML = "";
     });
-    var div_1 = root$C();
+    var div_1 = root$D();
     bind_this(div_1, ($$value) => div = $$value, () => div);
     append($$anchor, div_1);
     pop$1();
@@ -4824,7 +4825,7 @@
     return pop$1($$exports);
   }
   customElements.define("lifecycle-hooks", create_custom_element(LifecycleHooks, { prefix: {} }, [], [], false));
-  var root$B = /* @__PURE__ */ from_html(`<div> </div>`);
+  var root$C = /* @__PURE__ */ from_html(`<div> </div>`);
   function Alert($$anchor, $$props) {
     push$1($$props, true);
     let type = prop($$props, "type", 7), message = prop($$props, "message", 7), inline = prop($$props, "inline", 7, false), outline = prop($$props, "outline", 7, false);
@@ -4860,7 +4861,7 @@
         flushSync();
       }
     };
-    var div = root$B();
+    var div = root$C();
     var text2 = child(div, true);
     reset(div);
     template_effect(() => {
@@ -4872,7 +4873,7 @@
     return pop$1($$exports);
   }
   create_custom_element(Alert, { type: {}, message: {}, inline: {}, outline: {} }, [], [], true);
-  var root$A = /* @__PURE__ */ from_html(`<!> <!>`, 1);
+  var root$B = /* @__PURE__ */ from_html(`<!> <!>`, 1);
   function ShowMsg($$anchor, $$props) {
     push$1($$props, true);
     let type = prop($$props, "type", 7, "info"), msg = prop($$props, "msg", 7);
@@ -4892,7 +4893,7 @@
         flushSync();
       }
     };
-    var fragment = root$A();
+    var fragment = root$B();
     var node = first_child(fragment);
     WithTailwind(node, {});
     var node_1 = sibling(node, 2);
@@ -4919,7 +4920,7 @@
     append($$anchor, button);
   };
   var root_1$d = /* @__PURE__ */ from_html(`<button class="text-2xl px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"> </button>`);
-  var root$z = /* @__PURE__ */ from_html(`<!> <!>`, 1);
+  var root$A = /* @__PURE__ */ from_html(`<!> <!>`, 1);
   function IncDec($$anchor, $$props) {
     push$1($$props, true);
     let inc = prop($$props, "inc", 7), dec = prop($$props, "dec", 7);
@@ -4939,7 +4940,7 @@
         flushSync();
       }
     };
-    var fragment = root$z();
+    var fragment = root$A();
     var node = first_child(fragment);
     btn(node, () => "+", () => () => inc()());
     var node_1 = sibling(node, 2);
@@ -4949,7 +4950,7 @@
   }
   delegate(["click"]);
   create_custom_element(IncDec, { inc: {}, dec: {} }, [], [], true);
-  var root$y = /* @__PURE__ */ from_html(`<!> <div class="bg-yellow-100 text-xl rounded" style="width:fit-content"> </div> <!>`, 1);
+  var root$z = /* @__PURE__ */ from_html(`<!> <div class="bg-yellow-100 text-xl rounded" style="width:fit-content"> </div> <!>`, 1);
   function ElementOne($$anchor, $$props) {
     push$1($$props, true);
     let name = prop($$props, "name", 7, "world");
@@ -4962,7 +4963,7 @@
         flushSync();
       }
     };
-    var fragment = root$y();
+    var fragment = root$z();
     var node = first_child(fragment);
     WithTailwind(node, {});
     var div = sibling(node, 2);
@@ -4975,7 +4976,7 @@
     return pop$1($$exports);
   }
   customElements.define("my-element-one", create_custom_element(ElementOne, { name: {} }, [], [], false));
-  var root$x = /* @__PURE__ */ from_html(`<!> <div class="w-fit p-4 bg-green-200 text-white rounded-xl shadow-md" style="width:fit-content">🌱 <strong> </strong> <!> <span class="text-2xl font-bold"> </span></div>`, 1);
+  var root$y = /* @__PURE__ */ from_html(`<!> <div class="w-fit p-4 bg-green-200 text-white rounded-xl shadow-md" style="width:fit-content">🌱 <strong> </strong> <!> <span class="text-2xl font-bold"> </span></div>`, 1);
   function ElementTwo($$anchor, $$props) {
     push$1($$props, true);
     let message = prop($$props, "message", 7, "OK");
@@ -4988,7 +4989,7 @@
         flushSync();
       }
     };
-    var fragment = root$x();
+    var fragment = root$y();
     var node = first_child(fragment);
     WithTailwind(node, {});
     var div = sibling(node, 2);
@@ -5013,10 +5014,10 @@
   function onclick$1(_, count) {
     set(count, get$1(count) + 1);
   }
-  var root$w = /* @__PURE__ */ from_html(`<!> <button class="text-2xl px-4 py-2 bg-yellow-200 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"> </button>`, 1);
+  var root$x = /* @__PURE__ */ from_html(`<!> <button class="text-2xl px-4 py-2 bg-yellow-200 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"> </button>`, 1);
   function MyButton($$anchor) {
     let count = /* @__PURE__ */ mutable_source(0);
-    var fragment = root$w();
+    var fragment = root$x();
     var node = first_child(fragment);
     WithTailwind(node, {});
     var button = sibling(node, 2);
@@ -5028,25 +5029,25 @@
   }
   delegate(["click"]);
   customElements.define("my-button", create_custom_element(MyButton, {}, [], [], false));
-  var root$v = /* @__PURE__ */ from_html(`<iframe title="ai-frame"></iframe>`);
+  var root$w = /* @__PURE__ */ from_html(`<iframe title="ai-frame"></iframe>`);
   function AiFrame($$anchor, $$props) {
     push$1($$props, false);
     let src = fwd("http://localhost:5000/ai-frame");
     init();
-    var iframe = root$v();
+    var iframe = root$w();
     template_effect(() => set_attribute(iframe, "src", src));
     append($$anchor, iframe);
     pop$1();
   }
   customElements.define("ai-frame", create_custom_element(AiFrame, {}, [], [], false));
-  var root$u = /* @__PURE__ */ from_html(`<div class="outer svelte-1qizcrp"><div class="inner svelte-1qizcrp"><!></div></div>`);
-  const $$css$u = {
+  var root$v = /* @__PURE__ */ from_html(`<div class="outer svelte-1qizcrp"><div class="inner svelte-1qizcrp"><!></div></div>`);
+  const $$css$v = {
     hash: "svelte-1qizcrp",
     code: ".outer.svelte-1qizcrp {width:var(--size);height:var(--size);padding-left:calc(var(--size) * var(--padding-left));padding-top:calc(var(--size) * var(--padding-top));border:1px solid #333;}.inner.svelte-1qizcrp {width:calc(var(--size) * (1 - var(--padding-left)));height:calc(var(--size) * (1 - var(--padding-top)));font-size:calc(calc(var(--size) * (1 - var(--padding-top))) / var(--scale));}"
   };
   function Container($$anchor, $$props) {
     push$1($$props, true);
-    append_styles$1($$anchor, $$css$u);
+    append_styles$1($$anchor, $$css$v);
     let Character = prop($$props, "Character", 7), size = prop($$props, "size", 7), paddingLeft = prop($$props, "paddingLeft", 7), paddingTop = prop($$props, "paddingTop", 7), scale = prop($$props, "scale", 7), bgColor = prop($$props, "bgColor", 7);
     var $$exports = {
       get Character() {
@@ -5092,7 +5093,7 @@
         flushSync();
       }
     };
-    var div = root$u();
+    var div = root$v();
     var div_1 = child(div);
     var node = child(div_1);
     component(node, Character, ($$anchor2, Character_1) => {
@@ -5118,8 +5119,8 @@
     [],
     true
   );
-  var root$t = /* @__PURE__ */ from_html(`<article role="img" aria-label="Cartoon of a hippopotamus sleeping on the hypotenuse of a right triangle" class="svelte-jf96nf"><h1 class="svelte-jf96nf">Hippopotenuse</h1> <div class="hippo svelte-jf96nf"><div class="tail svelte-jf96nf"></div> <div class="body svelte-jf96nf"></div> <div class="leg svelte-jf96nf"></div> <div class="leg svelte-jf96nf"></div> <div class="ear svelte-jf96nf"></div> <div class="ear svelte-jf96nf"></div> <div class="head svelte-jf96nf"></div> <div class="snout svelte-jf96nf"></div> <div class="mouth svelte-jf96nf"></div></div> <div class="triangle svelte-jf96nf"><div class="adjacent svelte-jf96nf"></div> <div class="opposite svelte-jf96nf"></div> <div class="hypotenuse svelte-jf96nf"></div></div> <div class="letter a svelte-jf96nf">A</div> <div class="letter b svelte-jf96nf">B</div> <div class="letter c svelte-jf96nf">C</div> <div class="letter t svelte-jf96nf">&theta;</div> <div class="arc svelte-jf96nf"></div> <div class="square svelte-jf96nf"></div></article>`);
-  const $$css$t = {
+  var root$u = /* @__PURE__ */ from_html(`<article role="img" aria-label="Cartoon of a hippopotamus sleeping on the hypotenuse of a right triangle" class="svelte-jf96nf"><h1 class="svelte-jf96nf">Hippopotenuse</h1> <div class="hippo svelte-jf96nf"><div class="tail svelte-jf96nf"></div> <div class="body svelte-jf96nf"></div> <div class="leg svelte-jf96nf"></div> <div class="leg svelte-jf96nf"></div> <div class="ear svelte-jf96nf"></div> <div class="ear svelte-jf96nf"></div> <div class="head svelte-jf96nf"></div> <div class="snout svelte-jf96nf"></div> <div class="mouth svelte-jf96nf"></div></div> <div class="triangle svelte-jf96nf"><div class="adjacent svelte-jf96nf"></div> <div class="opposite svelte-jf96nf"></div> <div class="hypotenuse svelte-jf96nf"></div></div> <div class="letter a svelte-jf96nf">A</div> <div class="letter b svelte-jf96nf">B</div> <div class="letter c svelte-jf96nf">C</div> <div class="letter t svelte-jf96nf">&theta;</div> <div class="arc svelte-jf96nf"></div> <div class="square svelte-jf96nf"></div></article>`);
+  const $$css$u = {
     hash: "svelte-jf96nf",
     code: `article.svelte-jf96nf {position:relative;width:50em;aspect-ratio:1;:where(.svelte-jf96nf), :where(.svelte-jf96nf)::before, :where(.svelte-jf96nf)::after {position:absolute;box-sizing:border-box;}h1:where(.svelte-jf96nf) {font-size:10em;font-family:'Amatic SC', sans-serif;line-height:1;margin:0;translate:30% -50%;&::before {content:"";width:2em;height:2.2em;border-radius:50%;border:0.05em solid;clip-path:polygon(0 0, 50% 0, 10% 100%, 0 100%);top:0.5em;translatE:-53% 0;rotate:-6deg;}&::after {content:"";width:0.5em;aspect-ratio:1;border:0.05em solid;top:200%;left:-28.25%;border-top:0;border-left:0;}}.triangle:where(.svelte-jf96nf) {--w: 50em;--h: 37.5em;--b: 0.75em;--b2: calc(var(--b) / 2);width:var(--w);height:var(--h);bottom:0;left:0;filter:drop-shadow(-1em -1em 5em #fff4);&::before {content:"";inset:0;background:#fff;clip-path:polygon(0 100%, 100% 100%, 100% 0);}> div:where(.svelte-jf96nf) {height:var(--b);background:#000;bottom:0;border-radius:1em;&.opposite {width:var(--h);right:calc(var(--b2) / -2);transform-origin:calc(100% - var(--b2)) var(--b2);rotate:90deg;}&.adjacent {width:var(--w);}&.hypotenuse {width:hypot(var(--w), var(--h));transform-origin:var(--b2) var(--b2);rotate:atan(-37.5 / 50)}}}.letter:where(.svelte-jf96nf) {font-size:7em;font-family:'Amatic SC';font-weight:700;&.a {top:100%;left:0;translate:-150% -50%;}&.b {top:20%;left:100%;translate:50% -30%;}&.c {top:100%;left:100%;translate:50% -50%;}&.t {top:87%;left:32%;translate:50% -50%;font-weight:400;font-size:6em;}}.square:where(.svelte-jf96nf) {width:15%;aspect-ratio:1;border:0.5em solid;border-right:0;border-bottom:0;bottom:0;right:0;}.arc:where(.svelte-jf96nf) {width:40%;height:20%;left:0;bottom:0;background:radial-gradient(100% 200% at 0 100%, #0000 80%, #000 0 82%, #0000 0)}.hippo:where(.svelte-jf96nf) {--b: 0.75em solid;--c: #cbd;--cl: #edf;--cd: #a9b;--s: pink;width:100%;height:45%;left:0;bottom:0;transform-origin:0.375em calc(100% - 0.375em);rotate:atan(-37.5 / 50);translate:9% -15%;.tail:where(.svelte-jf96nf) {width:6em;aspect-ratio:1;border-radius:0 0 0 100%;border:var(--b) #0000;border-bottom:var(--b);border-left:var(--b);top:35%;left:8%;scale:1 1.2;&::after {content:"";width:80%;aspect-ratio:1;border:var(--b);border-radius:0 50% 50% 50%;rotate:40deg;translate:-50% -50%;background:var(--cd);}}.body:where(.svelte-jf96nf) {left:42%;bottom:0;translate:-50%;width:59%;height:85%;border:var(--b);border-radius:50% / 100% 100% 0 0;background:var(--c);box-shadow:inset 1em 1em var(--cd);}.leg:where(.svelte-jf96nf) {width:18%;height:40%;border:var(--b);border-right:0;border-radius:50% 0 0 50% / 100%;bottom:0;box-shadow:inset 0 3.5em 0 -2em var(--cd);background:radial-gradient(circle at 8% 90%, var(--cl) 10%, #0000 0),\r
         radial-gradient(circle at 5% 66%, var(--cl) 10%, #0000 0),\r
@@ -5127,19 +5128,19 @@
           var(--c);border-bottom:var(--b) var(--c);}&::after {left:70%;top:-18%;rotate:20deg;}}.mouth:where(.svelte-jf96nf) {width:3em;aspect-ratio:1;border-radius:0 0 0 100%;border:var(--b) #0000;border-bottom:var(--b);border-left:var(--b);border-top:0;bottom:0;left:68%;&::after {content:"";width:150%;aspect-ratio:1;border:var(--b) #0000;border-top:var(--b);border-left:var(--b);border-radius:50%;rotate:45deg;translate:-60% -20%;}}.ear:where(.svelte-jf96nf) {width:5em;aspect-ratio:0.8;border:var(--b);border-bottom:var(--b) var(--c);border-radius:100% / 80% 80% 120% 120%;background:var(--s);box-shadow:inset 0 0 0 1em var(--c);top:35%;left:53%;rotate:-60deg;& + & {top:23%;left:70%;rotate:20deg;}}}}`
   };
   function Hippopotenuse($$anchor) {
-    append_styles$1($$anchor, $$css$t);
-    var article = root$t();
+    append_styles$1($$anchor, $$css$u);
+    var article = root$u();
     append($$anchor, article);
   }
   create_custom_element(Hippopotenuse, {}, [], [], true);
-  var root$s = /* @__PURE__ */ from_html(`<article role="img" aria-labelledby="alt" class="svelte-3eq7xg"><h1 id="alt" class="svelte-3eq7xg">Cartoon of bunny in kawaii style</h1> <div class="body svelte-3eq7xg"><div class="arm svelte-3eq7xg"></div> <div class="arm svelte-3eq7xg"></div> <div class="leg svelte-3eq7xg"></div> <div class="leg svelte-3eq7xg"></div></div> <div class="ear svelte-3eq7xg"></div> <div class="ear svelte-3eq7xg"></div> <div class="hair-back svelte-3eq7xg"></div> <div class="head svelte-3eq7xg"><div class="hair svelte-3eq7xg"></div> <div class="cheek svelte-3eq7xg"></div> <div class="cheek svelte-3eq7xg"></div> <div class="eye svelte-3eq7xg"></div> <div class="eye svelte-3eq7xg"></div> <div class="mouth svelte-3eq7xg"></div> <div class="nose svelte-3eq7xg"></div></div></article>`);
-  const $$css$s = {
+  var root$t = /* @__PURE__ */ from_html(`<article role="img" aria-labelledby="alt" class="svelte-3eq7xg"><h1 id="alt" class="svelte-3eq7xg">Cartoon of bunny in kawaii style</h1> <div class="body svelte-3eq7xg"><div class="arm svelte-3eq7xg"></div> <div class="arm svelte-3eq7xg"></div> <div class="leg svelte-3eq7xg"></div> <div class="leg svelte-3eq7xg"></div></div> <div class="ear svelte-3eq7xg"></div> <div class="ear svelte-3eq7xg"></div> <div class="hair-back svelte-3eq7xg"></div> <div class="head svelte-3eq7xg"><div class="hair svelte-3eq7xg"></div> <div class="cheek svelte-3eq7xg"></div> <div class="cheek svelte-3eq7xg"></div> <div class="eye svelte-3eq7xg"></div> <div class="eye svelte-3eq7xg"></div> <div class="mouth svelte-3eq7xg"></div> <div class="nose svelte-3eq7xg"></div></div></article>`);
+  const $$css$t = {
     hash: "svelte-3eq7xg",
     code: 'article.svelte-3eq7xg {--c1: #f0fafa;--c2: #d0e0f6;width:80em;margin-top:15em;aspect-ratio:1;position:relative;:where(.svelte-3eq7xg), :where(.svelte-3eq7xg)::before, :where(.svelte-3eq7xg)::after {position:absolute;box-sizing:border-box;}#alt:where(.svelte-3eq7xg) {width:1px;height:1px;overflow:hidden;}.head:where(.svelte-3eq7xg) {width:52em;height:45em;border:1.5em solid;border-radius:100% / 130% 130% 75% 75%;left:50%;translate:-50%;top:10%;clip-path:polygon(0 -100%, 100% -100%, 100% 100%, 65% 100%, 78.5% 90%, 21.5% 90%, 35% 100%, 0 100%);background:var(--c1);box-shadow:inset 0 -2em 0 1em var(--c2);.hair:where(.svelte-3eq7xg) {width:15%;aspect-ratio:1.1;left:45%;translatE:-50% -80%;&::before {content:"";inset:0;border:1.5em solid;border-radius:50%;background:var(--c1);border-right-color:var(--c1);rotate:50deg;box-shadow:inset 1em 1em var(--c2),\r\n          2em 0em var(--c1);}}.eye:where(.svelte-3eq7xg) {--p: 28%;width:23%;aspect-ratio:1;border-radius:50%;left:var(--p);top:45%;translate:-50%;background:radial-gradient(circle at 38% 30%, #fff 24%, #0000 calc(24% + 1px)),\r\n        radial-gradient(circle at 19% 62%, #fff 12%, #0000 calc(12% + 1px)),\r\n        #000;& + & {left:calc(100% - var(--p))}}.cheek:where(.svelte-3eq7xg) {--p: 18%;--d: 60deg;width:16%;top:66.6%;left:var(--p);translate:-50%;aspect-ratio:1.35;border-radius:50%;box-shadow:inset 0 0 1em 1.25em pink;background:repeating-linear-gradient(var(--d), #0000 0 13%, #f003 0 18%),\r\n        pink;opacity:0.8;rotate:5deg;& ~ & {--d: -60deg;left:calc(100% - var(--p));rotate:-5deg;}}.mouth:where(.svelte-3eq7xg) {top:65%;left:50%;translate:-50%;width:12%;height:22%;border:1.5em solid;border-radius:50% / 0 0 100% 100%;background:radial-gradient(circle at 50% 100%, #d55 30%, #822 0)}.nose:where(.svelte-3eq7xg) {width:10%;aspect-ratio:1.8;background:radial-gradient(circle at 25% 40%, #fff 12%, #0000 0),\r\n        pink;top:58%;left:50%;translate:-50%;border-radius:50%;&::before, &::after {--p: 35%;top:100%;content:"";left:0;right:0;height:100%;border:1.25em solid;border-top:0;border-radius:50% / 0 0 100% 100%;translate:var(--p);background:var(--c1);}&::after {translate:calc(var(--p) * -1);}}}.hair-back:where(.svelte-3eq7xg) {border:1.5em solid;background:var(--c1);width:9%;aspect-ratio:1;border-radius:50%;left:48%;top:4%;box-shadow:inset -1em 1em var(--c2);}.ear:where(.svelte-3eq7xg) {width:20%;height:44%;border:1.5em solid;border-radius:50%;border-radius:100% / 125% 125% 80% 80%;overflow:hidden;background:radial-gradient(130% 100% at 50% 0, #0000 80%, var(--c2) 0),\r\n      var(--c1);rotate:-30deg;left:17%;top:-20%;& ~ & {rotate:70deg;top:-12%;left:68%;background:radial-gradient(130% 100% at 25% 0, #0000 80%, var(--c2) 0),\r\n      var(--c1);&::before {background:radial-gradient(160% 100% at 25% 0, #0000 75%, #f002 0),\r\n        pink;}}&::before {content:"";width:80%;height:80%;left:50%;top:60%;translate:-50% -50%;border:1.5em solid;background:radial-gradient(150% 100% at 50% 0, #0000 80%, #f002 0),\r\n        pink;border-radius:50%;}}.body:where(.svelte-3eq7xg) {bottom:6%;left:50%;translate:-50%;width:41em;height:36em;border:1.5em solid;border-bottom:2em solid;border-radius:100% / 130% 130% 75% 75%;background:radial-gradient(135% 110% at 50% 0%,var(--c2) 40%, #0000 calc(40% + 1px)),\r\n      var(--c1);box-shadow:inset 0 -2em 0 1em var(--c2);.arm:where(.svelte-3eq7xg) {\r\n      animation: flip 3s alternate infinite;--p: -4%;--d: 19deg;width:28%;height:36%;top:24%;left:var(--p);translate:-50%;border:1.5em solid;background:var(--c1);border-radius:100% 0 0 100% / 50%;border-right:0;box-shadow:inset 0 -1em var(--c2);transform-origin:100% 0;rotate:var(--d);box-shadow:4em 0 0 -1em var(--c1), inset 0 -1em var(--c2);& ~ & {left:auto;right:var(--p);scale:-1 1;rotate:-15deg;}}.leg:where(.svelte-3eq7xg) {--p: 18%;--d: 22deg;width:35%;aspect-ratio:1.5;border-radius:0 0 15em 15em;border:1.5em solid;top:91%;left:var(--p);background:var(--c2);border-top:0;border-bottom:1.6em solid;rotate:var(--d);translate:-50%;box-shadow:inset 0 -3.5em 0 -2em #0061;& ~ & {left:calc(100% - var(--p));--d: -22deg;}}}}'
   };
   function Bunny($$anchor) {
-    append_styles$1($$anchor, $$css$s);
-    var article = root$s();
+    append_styles$1($$anchor, $$css$t);
+    var article = root$t();
     append($$anchor, article);
   }
   create_custom_element(Bunny, {}, [], [], true);
@@ -5225,7 +5226,7 @@
   let column;
   let token;
   let key;
-  let root$r;
+  let root$s;
   var parse = function parse2(text2, reviver) {
     source = String(text2);
     parseState = "start";
@@ -5235,15 +5236,15 @@
     column = 0;
     token = void 0;
     key = void 0;
-    root$r = void 0;
+    root$s = void 0;
     do {
       token = lex();
       parseStates[parseState]();
     } while (token.type !== "eof");
     if (typeof reviver === "function") {
-      return internalize({ "": root$r }, "", reviver);
+      return internalize({ "": root$s }, "", reviver);
     }
-    return root$r;
+    return root$s;
   };
   function internalize(holder, name, reviver) {
     const value = holder[name];
@@ -5967,8 +5968,8 @@
         value = token.value;
         break;
     }
-    if (root$r === void 0) {
-      root$r = value;
+    if (root$s === void 0) {
+      root$s = value;
     } else {
       const parent = stack[stack.length - 1];
       if (Array.isArray(parent)) {
@@ -6275,14 +6276,14 @@
   };
   var lib = JSON5;
   var root_1$c = /* @__PURE__ */ from_html(`<progress class="progress progress-primary svelte-18i2ml5"></progress>`);
-  var root$q = /* @__PURE__ */ from_html(`<!> <!>`, 1);
-  const $$css$r = {
+  var root$r = /* @__PURE__ */ from_html(`<!> <!>`, 1);
+  const $$css$s = {
     hash: "svelte-18i2ml5",
     code: "progress.svelte-18i2ml5 {position:fixed;bottom:1px;width:90%;left:10px;}"
   };
   function DrillCard($$anchor, $$props) {
     push$1($$props, true);
-    append_styles$1($$anchor, $$css$r);
+    append_styles$1($$anchor, $$css$s);
     let rounds = prop($$props, "rounds", 7), children = prop($$props, "children", 7);
     var $$exports = {
       get rounds() {
@@ -6300,7 +6301,7 @@
         flushSync();
       }
     };
-    var fragment = root$q();
+    var fragment = root$r();
     var node = first_child(fragment);
     snippet(node, children);
     var node_1 = sibling(node, 2);
@@ -11850,14 +11851,14 @@
   var root_3$2 = /* @__PURE__ */ from_html(`<div></div>`);
   var root_6 = /* @__PURE__ */ from_html(`<div class="case ml-4 mt-4 badge badge-accent svelte-qx0naz">A = a</div>`);
   var root_7$3 = /* @__PURE__ */ from_html(`<div class="case ml-4 mt-4 badge badge-accent svelte-qx0naz">A ≠ a</div>`);
-  var root$p = /* @__PURE__ */ from_html(`<!> <!> <!> <div class="answers grid2x2 svelte-qx0naz"><!> <!> <!> <!></div> <!>`, 1);
-  const $$css$q = {
+  var root$q = /* @__PURE__ */ from_html(`<!> <!> <!> <div class="answers grid2x2 svelte-qx0naz"><!> <!> <!> <!></div> <!>`, 1);
+  const $$css$r = {
     hash: "svelte-qx0naz",
     code: ".case.svelte-qx0naz {font-weight:bold;font-size:18px;}.main-desk.svelte-qx0naz {margin-top:12px;zoom:1;}.answer-btn.svelte-qx0naz {display:flex;gap:8px;align-items:center;}.answer-desk.svelte-qx0naz {margin-top:16px;margin-left:35%;width:60%;zoom:0.6;}.grid2x2.svelte-qx0naz {display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;width:100%;height:100%;}.grid2x2.svelte-qx0naz > button:where(.svelte-qx0naz) {justify-self:center;align-self:center;padding:1px 4px;}.answers.svelte-qx0naz {width:80%;margin-top:12px;margin-left:10%;}.row.svelte-qx0naz {display:flex;align-items:center;margin:8px 2px;}.label.svelte-qx0naz {width:40px;text-align:right;margin-right:10px;margin-left:1px;font-family:monospace;font-size:22px;}.cells.svelte-qx0naz {display:flex;border:1px solid #000;}.cell.svelte-qx0naz {width:48px;height:42px;border-left:1px solid #000;display:flex;align-items:center;justify-content:center;font-size:28px;}.cell.svelte-qx0naz:first-child {border-left:none;}.red.svelte-qx0naz {color:red;}"
   };
   function Wordle($$anchor, $$props) {
     push$1($$props, true);
-    append_styles$1($$anchor, $$css$q);
+    append_styles$1($$anchor, $$css$r);
     const ansbtn = ($$anchor2, indx = noop) => {
       const color = /* @__PURE__ */ user_derived(() => btnColor(indx()));
       const word = /* @__PURE__ */ user_derived(() => answers[indx()]);
@@ -11982,7 +11983,7 @@
         flushSync();
       }
     };
-    var fragment = root$p();
+    var fragment = root$q();
     var node = first_child(fragment);
     {
       var consequent = ($$anchor2) => {
@@ -12077,14 +12078,14 @@
     return pop$1($$exports);
   }
   customElements.define("drill-wordle", create_custom_element(Drill_wordle, { config: {}, rounds: {} }, [], [], false));
-  var root$o = /* @__PURE__ */ from_html(`<div class="panel svelte-1nkqiir"><div><span><!></span></div></div>`);
-  const $$css$p = {
+  var root$p = /* @__PURE__ */ from_html(`<div class="panel svelte-1nkqiir"><div><span><!></span></div></div>`);
+  const $$css$q = {
     hash: "svelte-1nkqiir",
     code: ".panel.svelte-1nkqiir {display:flex;justify-content:center;}.heb.svelte-1nkqiir {direction:rtl;text-align:right;display:inline-block;width:90%;}"
   };
   function H($$anchor, $$props) {
     push$1($$props, true);
-    append_styles$1($$anchor, $$css$p);
+    append_styles$1($$anchor, $$css$q);
     let clazz = prop($$props, "clazz", 7, ""), children = prop($$props, "children", 7);
     var $$exports = {
       get clazz() {
@@ -12102,7 +12103,7 @@
         flushSync();
       }
     };
-    var div = root$o();
+    var div = root$p();
     var div_1 = child(div);
     var span = child(div_1);
     var node = child(span);
@@ -12203,14 +12204,14 @@
   };
   var on_click$1 = (_, answerIsHere, text2) => answerIsHere(text2());
   var root_1$a = /* @__PURE__ */ from_html(`<button> </button>`);
-  var root$n = /* @__PURE__ */ from_html(`<div class="my-card svelte-1tx0ras"><!> <!> <!> <!> <!> <!></div>`);
-  const $$css$o = {
+  var root$o = /* @__PURE__ */ from_html(`<div class="my-card svelte-1tx0ras"><!> <!> <!> <!> <!> <!></div>`);
+  const $$css$p = {
     hash: "svelte-1tx0ras",
     code: ".my-card.svelte-1tx0ras {font-size:18px;}.ans-btn.svelte-1tx0ras {font-size:18px;padding:0px 10px;}"
   };
   function Grira($$anchor, $$props) {
     push$1($$props, true);
-    append_styles$1($$anchor, $$css$o);
+    append_styles$1($$anchor, $$css$p);
     const ansBtn = ($$anchor2, text2 = noop, color = noop) => {
       var button = root_1$a();
       button.__click = [on_click$1, answerIsHere, text2];
@@ -12248,7 +12249,7 @@
         flushSync();
       }
     };
-    var div = root$n();
+    var div = root$o();
     var node = child(div);
     _let(node);
     var node_1 = sibling(node, 2);
@@ -12543,19 +12544,19 @@
     };
   })();
   var root_1$9 = /* @__PURE__ */ from_html(`<div><span> </span> <span class="msg"> </span></div>`);
-  var root$m = /* @__PURE__ */ from_html(`<div class="panel svelte-1ba5k7a"></div>`);
-  const $$css$n = {
+  var root$n = /* @__PURE__ */ from_html(`<div class="panel svelte-1ba5k7a"></div>`);
+  const $$css$o = {
     hash: "svelte-1ba5k7a",
     code: ".panel.svelte-1ba5k7a {font-size:12px;font-family:monospace;background-color:white;color:black;}.info.svelte-1ba5k7a {color:black;}.warn.svelte-1ba5k7a {background-color:cornsilk;}.error.svelte-1ba5k7a {color:red;font-weight:bold;background-color:yellow;}"
   };
   function Logger($$anchor, $$props) {
     push$1($$props, false);
-    append_styles$1($$anchor, $$css$n);
+    append_styles$1($$anchor, $$css$o);
     const $lines = () => store_get(lines, "$lines", $$stores);
     const [$$stores, $$cleanup] = setup_stores();
     let lines = log.lines;
     init();
-    var div = root$m();
+    var div = root$n();
     each(div, 5, $lines, index, ($$anchor2, ln) => {
       var div_1 = root_1$9();
       let classes;
@@ -12588,14 +12589,14 @@
     $$cleanup();
   }
   create_custom_element(Logger, {}, [], [], true);
-  var root$l = /* @__PURE__ */ from_html(`<span class="svelte-h87r00"> </span>`);
-  const $$css$m = {
+  var root$m = /* @__PURE__ */ from_html(`<span class="svelte-h87r00"> </span>`);
+  const $$css$n = {
     hash: "svelte-h87r00",
     code: "span.svelte-h87r00 {font-size:var(--line-no-font-size);color:gray;}"
   };
   function LineNo($$anchor, $$props) {
     push$1($$props, true);
-    append_styles$1($$anchor, $$css$m);
+    append_styles$1($$anchor, $$css$n);
     let lineNo = prop($$props, "lineNo", 7);
     var $$exports = {
       get lineNo() {
@@ -12606,7 +12607,7 @@
         flushSync();
       }
     };
-    var span = root$l();
+    var span = root$m();
     var text2 = child(span, true);
     reset(span);
     template_effect(() => set_text(text2, lineNo()));
@@ -12616,13 +12617,13 @@
   create_custom_element(LineNo, { lineNo: {} }, [], [], true);
   var root_1$8 = /* @__PURE__ */ from_html(`<div><!></div>`);
   var root_2$5 = /* @__PURE__ */ from_html(`<div class="svelte-gy0mow"><!></div>`);
-  const $$css$l = {
+  const $$css$m = {
     hash: "svelte-gy0mow",
     code: "div.svelte-gy0mow {transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.right.svelte-gy0mow {font-size:0px;}"
   };
   function Line($$anchor, $$props) {
     push$1($$props, true);
-    append_styles$1($$anchor, $$css$l);
+    append_styles$1($$anchor, $$css$m);
     const $ticks = () => store_get(ticks, "$ticks", $$stores);
     const [$$stores, $$cleanup] = setup_stores();
     let phaseNo = prop($$props, "phaseNo", 7), wrongLine = prop($$props, "wrongLine", 7), children = prop($$props, "children", 7);
@@ -12686,14 +12687,14 @@
     return $$pop;
   }
   create_custom_element(Line, { phaseNo: {}, wrongLine: {}, children: {} }, [], [], true);
-  var root$k = /* @__PURE__ */ from_html(`<span class="svelte-wikzf9"> </span>`);
-  const $$css$k = {
+  var root$l = /* @__PURE__ */ from_html(`<span class="svelte-wikzf9"> </span>`);
+  const $$css$l = {
     hash: "svelte-wikzf9",
     code: "span.svelte-wikzf9 {position:relative;transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}"
   };
   function AsIs($$anchor, $$props) {
     push$1($$props, true);
-    append_styles$1($$anchor, $$css$k);
+    append_styles$1($$anchor, $$css$l);
     let code = prop($$props, "code", 7);
     var $$exports = {
       get code() {
@@ -12704,7 +12705,7 @@
         flushSync();
       }
     };
-    var span = root$k();
+    var span = root$l();
     var text2 = child(span, true);
     reset(span);
     template_effect(() => set_text(text2, code()));
@@ -12712,14 +12713,14 @@
     return pop$1($$exports);
   }
   create_custom_element(AsIs, { code: {} }, [], [], true);
-  var root$j = /* @__PURE__ */ from_html(`<span> </span>`);
-  const $$css$j = {
+  var root$k = /* @__PURE__ */ from_html(`<span> </span>`);
+  const $$css$k = {
     hash: "svelte-1hzke8x",
     code: "span.svelte-1hzke8x {position:relative;text-decoration-line:underline;text-decoration-style:wavy;text-decoration-thickness:1px;text-decoration-color:var(--color);text-underline-offset:0.2em;transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.is-empty.svelte-1hzke8x {color:transparent;}.wrong.svelte-1hzke8x {text-decoration-color:transparent;}.right.svelte-1hzke8x {opacity:0;font-size:0px;text-decoration-color:transparent;}.rtl-tooltip.svelte-1hzke8x::before {direction:rtl;text-align:right;}"
   };
   function WrongSpan($$anchor, $$props) {
     push$1($$props, true);
-    append_styles$1($$anchor, $$css$j);
+    append_styles$1($$anchor, $$css$k);
     const $ticks = () => store_get(ticks, "$ticks", $$stores);
     const [$$stores, $$cleanup] = setup_stores();
     let phaseNo = prop($$props, "phaseNo", 7), code = prop($$props, "code", 7), color = prop($$props, "color", 7, "red"), hint = prop($$props, "hint", 7);
@@ -12761,7 +12762,7 @@
         flushSync();
       }
     };
-    var span = root$j();
+    var span = root$k();
     let classes;
     let styles;
     var text2 = child(span, true);
@@ -12791,7 +12792,90 @@
     return $$pop;
   }
   create_custom_element(WrongSpan, { phaseNo: {}, code: {}, color: {}, hint: {} }, [], [], true);
-  var root$i = /* @__PURE__ */ from_html(`<span> </span>`);
+  const asciiMath = /* @__PURE__ */ (() => {
+    function mathJaxIsHere() {
+      return !!window.MathJax;
+    }
+    async function init2() {
+      if (!window.MathJax) return;
+      await window.MathJax.startup.promise;
+    }
+    function test(text2) {
+      if (!window.MathJax)
+        return false;
+      let first = text2.indexOf("`");
+      let last = text2.lastIndexOf("`");
+      return first >= 0 && last > first + 1;
+    }
+    function renderAsHtml(math) {
+      return window.MathJax.startup.document.convert(math);
+    }
+    function renderAsSvg(math) {
+      return window.MathJax.startup.document.convert(math, {
+        display: false,
+        end: {
+          output: "svg"
+        }
+      });
+    }
+    return {
+      mathJaxIsHere,
+      init: init2,
+      test,
+      renderAsHtml,
+      renderAsSvg
+    };
+  })();
+  var root$j = /* @__PURE__ */ from_html(`<span><!></span>`);
+  const $$css$j = { hash: "svelte-1y9a2jf", code: "svg {display:inline;}" };
+  function AsciiMath($$anchor, $$props) {
+    push$1($$props, true);
+    append_styles$1($$anchor, $$css$j);
+    let math = prop($$props, "math", 7), output = prop($$props, "output", 7, "svg");
+    let justText = !asciiMath.test(math());
+    let host;
+    onMount(async () => {
+      if (justText) return;
+      await asciiMath.init();
+      let justMath = math().substring(1, math().length - 1);
+      let html2 = output() === "chtml" ? asciiMath.renderAsHtml(justMath) : asciiMath.renderAsSvg(justMath);
+      host.replaceChildren(html2);
+    });
+    var $$exports = {
+      get math() {
+        return math();
+      },
+      set math($$value) {
+        math($$value);
+        flushSync();
+      },
+      get output() {
+        return output();
+      },
+      set output($$value = "svg") {
+        output($$value);
+        flushSync();
+      }
+    };
+    var span = root$j();
+    var node = child(span);
+    {
+      var consequent = ($$anchor2) => {
+        var text$1 = text();
+        template_effect(() => set_text(text$1, math()));
+        append($$anchor2, text$1);
+      };
+      if_block(node, ($$render) => {
+        if (justText) $$render(consequent);
+      });
+    }
+    reset(span);
+    bind_this(span, ($$value) => host = $$value, () => host);
+    append($$anchor, span);
+    return pop$1($$exports);
+  }
+  create_custom_element(AsciiMath, { math: {}, output: {} }, [], [], true);
+  var root$i = /* @__PURE__ */ from_html(`<span><!></span>`);
   const $$css$i = {
     hash: "svelte-12p80z8",
     code: "span.svelte-12p80z8 {position:relative;transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.wrong.svelte-12p80z8 {opacity:0;font-size:0px;}.hint.svelte-12p80z8 {opacity:0;font-size:0px;}.right.svelte-12p80z8 {background-color:var(--right-color);}"
@@ -12829,13 +12913,17 @@
     var span = root$i();
     let classes;
     let styles;
-    var text2 = child(span, true);
+    var node = child(span);
+    AsciiMath(node, {
+      get math() {
+        return code();
+      }
+    });
     reset(span);
     template_effect(
       ($0, $1) => {
         classes = set_class(span, 1, "svelte-12p80z8", null, classes, $0);
         styles = set_style(span, "", styles, $1);
-        set_text(text2, code());
       },
       [
         () => ({
@@ -15848,6 +15936,6 @@
     return pop$1($$exports);
   }
   customElements.define("img-areas", create_custom_element(Img_areas, { src: {}, width: {}, hide: {}, edit: {}, dx: {}, dy: {} }, [], [], false));
-  addToMyRoot(document.head, ["tailwind", "daisy-ui"]);
+  addToMyRoot(document.head, ["tailwind", "daisy-ui", "mathjax"]);
   console.log(`Hi, I am your Gebemot :) ${VERSION}`);
 })();

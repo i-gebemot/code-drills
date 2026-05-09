@@ -47,7 +47,7 @@ $👉$      for (int i = 0; $i < indx$; i++) {
         ^? ~g hb find-the-line              {4}!
         ^? ~g hb find-the-line              {5}!
 
-// מה היא סיבוכיות זמן ריצה?:    $O(n^2)$
+// מה היא סיבוכיות זמן ריצה?:    $`O(n^2)`$
         ^? ~g hb result
 </drill>
 
@@ -74,7 +74,7 @@ $👉$ while (l1 != null && l2 != null && l2.getNext() != null) {
 // lines: $4$
         ^? ~g hb find-the-line     {4}!
 
-// מה היא סיבוכיות זמן ריצה?:    $O(n)$
+// מה היא סיבוכיות זמן ריצה?:    $`O(n)`$
         ^? ~g hb result
 
 }
@@ -111,9 +111,9 @@ boolean isBalanced(BinNode&lt;Integer> node) {
            isBalanced(node.getRight());
 }
 
-// height() run time complexity is:    $O(n)$
+// height() run time complexity is:    $`O(n)`$
         ^? ~g hb result
-// isBalanced() runtime complexity is:    $O(n^2)$
+// isBalanced() runtime complexity is:    $`O(n^2)`$
         ^? ~g hb result
 </drill>
 
@@ -142,9 +142,9 @@ boolean isBalanced(BinNode&lt;Integer> node) {
     return balancedHeight(node) >= 0; 
 }
 
-// height() run time complexity is:    $O(n)$
+// height() run time complexity is:    $`O(n)`$
         ^? ~g hb result
-// isBalanced() runtime complexity is:    $O(n)$
+// isBalanced() runtime complexity is:    $`O(n)`$
         ^? ~g hb result
 </drill>
 

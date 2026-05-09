@@ -470,12 +470,12 @@ Node filter(Node lst, int value) {
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="merge-sorted-lists" todo>
-[1,4,5,7] \oplus [2,3,6,8] => [1,2,3,4,5,6,7,8]  
-[1,4,5,7] \oplus [2,3] => [1,2,3,4,5,7]  
-Node merge(Node a, Node b) {
-    Node lst = null;
-    Node tail = null;
+<drill lang="java" id="merge-sorted-lists!" todo>
+// [1,4,5,7] ⊕ [2,3,6,8] => [1,2,3,4,5,6,7,8]  
+// [1,4,5,7] ⊕ [2,3]     => [1,2,3,4,5,7]  
+public static Node&lt;Integer> merge(Node&lt;Integer> a, Node&lt;Integer> b) {
+    Node&lt;Integer> lst = null;
+    Node&lt;Integer> tail = null;
     while (a != null || b != null) {
         boolean nextIsA = true;
         if (a == null) {
@@ -539,8 +539,46 @@ Node<Point> remove(Node<Point> lst, Point pnt) {
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="slice" todo>
-Node<Node<Person>> slice() {
+<drill lang="java" id="slice">
+// מקבל רשימה ומחזיר רשימה של רשימות
+// x כאשר כל רשימה היא בעורך של
+// רשימה אחת יכולה להיות קצהרה יותר
+public static $Node&lt;Node&lt;Integer>> $$slice$(Node&lt;Integer> lst, int x) {
+        ^$
+        ~r ht return-type
+-    if (lst == null) {         {1}
+-        return null;           {1}
+-    }                          {1}
+    Node&lt;Node&lt;Integer>> lstOfLists = new Node&lt;Node&lt;Integer>>($lst$); {1}!
+        ~r ht list-can-be-empty
+    Node&lt;Integer> tail = null;
+    while (lst != null) {
+        for (int i = 0; i < x$ && lst != null$; i++) {
+                ^$ ~t               {3} 
+            tail = lst;
+            lst = $lst$.getNext();
+                ~r hr can-be-null   {3}
+        }
+-        if (lst != null) {             {4}
+-4          tail.setNext($null$);         {4}
+                ^... ~o hr complete       {+}
+-4          lstOfLists = new Node&lt;Node&lt;Integer>>($lst$, $lstOfLists$);  {4}
+                ~r ht can-be-null   {4}
+                ^... ~o hr complete       {+}
+-        }                              {4}
+    }
+    return lstOfLists;
+}
+
+var lst = listFromArray(new Integer[]{1,2,3,4,5,6,7,8});
+var lstOfLists = slice(lst, 3);
+$!html:w-h-r+ <img src="./img/linked-list-slice-lstOfLists.png">   {2}
+while (lstOfLists != null) {                // $[7, 8]$     {2}
+        ^? ~g ht result
+    print(lstOfLists.getValue());           // $[4, 5, 6]$  {2}
+        ^? ~g ht result
+    lstOfLists = lstOfLists.getNext();      // $[1, 2, 3]$  {2}
+        ^? ~g ht result
 }
 </drill>
 
