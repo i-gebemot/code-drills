@@ -4492,7 +4492,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.23.6";
+  const VERSION = "0.23.7";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -12759,7 +12759,7 @@
           let html2 = asciiMath.render(math(), output());
           host.replaceChildren(...html2);
         },
-        1e3
+        2e3
       );
     });
     var $$exports = {
