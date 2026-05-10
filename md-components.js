@@ -4492,7 +4492,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.23.0";
+  const VERSION = "0.23.4";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -12687,14 +12687,118 @@
     return $$pop;
   }
   create_custom_element(Line, { phaseNo: {}, wrongLine: {}, children: {} }, [], [], true);
-  var root$l = /* @__PURE__ */ from_html(`<span class="svelte-wikzf9"> </span>`);
-  const $$css$l = {
+  const asciiMath = /* @__PURE__ */ (() => {
+    function mathJaxIsHere() {
+      return !!window.MathJax;
+    }
+    async function init2() {
+      if (!window.MathJax) return;
+      await window.MathJax.startup.promise;
+    }
+    function test(text2) {
+      if (!window.MathJax)
+        return false;
+      return text2.split("`").length > 2;
+    }
+    function renderMath(math, output) {
+      return window.MathJax.startup.document.convert(math, {
+        display: false,
+        end: { output }
+      });
+    }
+    function span(text2) {
+      let span2 = document.createElement("span");
+      span2.textContent = text2;
+      return span2;
+    }
+    function render(text2, output) {
+      let parts = text2.split("`");
+      let elems = [];
+      let it = 0;
+      function addText() {
+        let text22 = parts[it++];
+        if (text22.length === 0) return;
+        elems.push(span(text22));
+      }
+      function addMath() {
+        let math = parts[it++];
+        if (math.length === 0) return;
+        elems.push(renderMath(math, output));
+      }
+      while (true) {
+        addText();
+        if (it >= parts.length - 1)
+          break;
+        addMath();
+      }
+      if (it < parts.length) {
+        addText();
+      }
+      return elems;
+    }
+    return {
+      mathJaxIsHere,
+      init: init2,
+      test,
+      render
+    };
+  })();
+  var root$l = /* @__PURE__ */ from_html(`<span><!></span>`);
+  const $$css$l = { hash: "svelte-1y9a2jf", code: "svg {display:inline;}" };
+  function AsciiMath($$anchor, $$props) {
+    push$1($$props, true);
+    append_styles$1($$anchor, $$css$l);
+    let math = prop($$props, "math", 7), output = prop($$props, "output", 7, "chtml");
+    let justText = !asciiMath.test(math());
+    let host;
+    onMount(async () => {
+      if (justText) return;
+      await asciiMath.init();
+      let html2 = asciiMath.render(math(), output());
+      host.replaceChildren(...html2);
+    });
+    var $$exports = {
+      get math() {
+        return math();
+      },
+      set math($$value) {
+        math($$value);
+        flushSync();
+      },
+      get output() {
+        return output();
+      },
+      set output($$value = "chtml") {
+        output($$value);
+        flushSync();
+      }
+    };
+    var span = root$l();
+    var node = child(span);
+    {
+      var consequent = ($$anchor2) => {
+        var text$1 = text();
+        template_effect(() => set_text(text$1, math()));
+        append($$anchor2, text$1);
+      };
+      if_block(node, ($$render) => {
+        if (justText) $$render(consequent);
+      });
+    }
+    reset(span);
+    bind_this(span, ($$value) => host = $$value, () => host);
+    append($$anchor, span);
+    return pop$1($$exports);
+  }
+  create_custom_element(AsciiMath, { math: {}, output: {} }, [], [], true);
+  var root$k = /* @__PURE__ */ from_html(`<span class="svelte-wikzf9"><!></span>`);
+  const $$css$k = {
     hash: "svelte-wikzf9",
     code: "span.svelte-wikzf9 {position:relative;transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}"
   };
   function AsIs($$anchor, $$props) {
     push$1($$props, true);
-    append_styles$1($$anchor, $$css$l);
+    append_styles$1($$anchor, $$css$k);
     let code = prop($$props, "code", 7);
     var $$exports = {
       get code() {
@@ -12705,22 +12809,26 @@
         flushSync();
       }
     };
-    var span = root$l();
-    var text2 = child(span, true);
+    var span = root$k();
+    var node = child(span);
+    AsciiMath(node, {
+      get math() {
+        return code();
+      }
+    });
     reset(span);
-    template_effect(() => set_text(text2, code()));
     append($$anchor, span);
     return pop$1($$exports);
   }
   create_custom_element(AsIs, { code: {} }, [], [], true);
-  var root$k = /* @__PURE__ */ from_html(`<span> </span>`);
-  const $$css$k = {
+  var root$j = /* @__PURE__ */ from_html(`<span><!></span>`);
+  const $$css$j = {
     hash: "svelte-1hzke8x",
     code: "span.svelte-1hzke8x {position:relative;text-decoration-line:underline;text-decoration-style:wavy;text-decoration-thickness:1px;text-decoration-color:var(--color);text-underline-offset:0.2em;transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.is-empty.svelte-1hzke8x {color:transparent;}.wrong.svelte-1hzke8x {text-decoration-color:transparent;}.right.svelte-1hzke8x {opacity:0;font-size:0px;text-decoration-color:transparent;}.rtl-tooltip.svelte-1hzke8x::before {direction:rtl;text-align:right;}"
   };
   function WrongSpan($$anchor, $$props) {
     push$1($$props, true);
-    append_styles$1($$anchor, $$css$k);
+    append_styles$1($$anchor, $$css$j);
     const $ticks = () => store_get(ticks, "$ticks", $$stores);
     const [$$stores, $$cleanup] = setup_stores();
     let phaseNo = prop($$props, "phaseNo", 7), code = prop($$props, "code", 7), color = prop($$props, "color", 7, "red"), hint = prop($$props, "hint", 7);
@@ -12762,17 +12870,21 @@
         flushSync();
       }
     };
-    var span = root$k();
+    var span = root$j();
     let classes;
     let styles;
-    var text2 = child(span, true);
+    var node = child(span);
+    AsciiMath(node, {
+      get math() {
+        return code();
+      }
+    });
     reset(span);
     template_effect(
       ($0, $1) => {
         classes = set_class(span, 1, `tooltip-${hint()?.where ?? ""} rtl-tooltip`, "svelte-1hzke8x", classes, $0);
         set_attribute(span, "data-tip", hint()?.text);
         styles = set_style(span, "", styles, $1);
-        set_text(text2, code());
       },
       [
         () => ({
@@ -12792,89 +12904,6 @@
     return $$pop;
   }
   create_custom_element(WrongSpan, { phaseNo: {}, code: {}, color: {}, hint: {} }, [], [], true);
-  const asciiMath = /* @__PURE__ */ (() => {
-    function mathJaxIsHere() {
-      return !!window.MathJax;
-    }
-    async function init2() {
-      if (!window.MathJax) return;
-      await window.MathJax.startup.promise;
-    }
-    function test(text2) {
-      if (!window.MathJax)
-        return false;
-      let first = text2.indexOf("`");
-      let last = text2.lastIndexOf("`");
-      return first >= 0 && last > first + 1;
-    }
-    function renderAsHtml(math) {
-      return window.MathJax.startup.document.convert(math);
-    }
-    function renderAsSvg(math) {
-      return window.MathJax.startup.document.convert(math, {
-        display: false,
-        end: {
-          output: "svg"
-        }
-      });
-    }
-    return {
-      mathJaxIsHere,
-      init: init2,
-      test,
-      renderAsHtml,
-      renderAsSvg
-    };
-  })();
-  var root$j = /* @__PURE__ */ from_html(`<span><!></span>`);
-  const $$css$j = { hash: "svelte-1y9a2jf", code: "svg {display:inline;}" };
-  function AsciiMath($$anchor, $$props) {
-    push$1($$props, true);
-    append_styles$1($$anchor, $$css$j);
-    let math = prop($$props, "math", 7), output = prop($$props, "output", 7, "svg");
-    let justText = !asciiMath.test(math());
-    let host;
-    onMount(async () => {
-      if (justText) return;
-      await asciiMath.init();
-      let justMath = math().substring(1, math().length - 1);
-      let html2 = output() === "chtml" ? asciiMath.renderAsHtml(justMath) : asciiMath.renderAsSvg(justMath);
-      host.replaceChildren(html2);
-    });
-    var $$exports = {
-      get math() {
-        return math();
-      },
-      set math($$value) {
-        math($$value);
-        flushSync();
-      },
-      get output() {
-        return output();
-      },
-      set output($$value = "svg") {
-        output($$value);
-        flushSync();
-      }
-    };
-    var span = root$j();
-    var node = child(span);
-    {
-      var consequent = ($$anchor2) => {
-        var text$1 = text();
-        template_effect(() => set_text(text$1, math()));
-        append($$anchor2, text$1);
-      };
-      if_block(node, ($$render) => {
-        if (justText) $$render(consequent);
-      });
-    }
-    reset(span);
-    bind_this(span, ($$value) => host = $$value, () => host);
-    append($$anchor, span);
-    return pop$1($$exports);
-  }
-  create_custom_element(AsciiMath, { math: {}, output: {} }, [], [], true);
   var root$i = /* @__PURE__ */ from_html(`<span><!></span>`);
   const $$css$i = {
     hash: "svelte-12p80z8",
@@ -12940,7 +12969,7 @@
     return $$pop;
   }
   create_custom_element(RightSpan, { phaseNo: {}, code: {}, bgColor: {} }, [], [], true);
-  var root$h = /* @__PURE__ */ from_html(`<span> </span>`);
+  var root$h = /* @__PURE__ */ from_html(`<span><!></span>`);
   const $$css$h = {
     hash: "svelte-mtqyq9",
     code: "span.svelte-mtqyq9 {position:relative;text-decoration-color:var(--color);text-decoration-line:underline;text-decoration-style:wavy;text-decoration-thickness:1px;text-underline-offset:0.2em;transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.wrong.svelte-mtqyq9 {text-decoration-color:transparent;}.right.svelte-mtqyq9 {text-decoration-color:transparent;}.rtl-tooltip.svelte-mtqyq9::before {direction:rtl;text-align:right;}"
@@ -12992,14 +13021,18 @@
     var span = root$h();
     let classes;
     let styles;
-    var text2 = child(span, true);
+    var node = child(span);
+    AsciiMath(node, {
+      get math() {
+        return code();
+      }
+    });
     reset(span);
     template_effect(
       ($0, $1) => {
         classes = set_class(span, 1, `tooltip-${hint()?.where ?? ""}`, "svelte-mtqyq9", classes, $0);
         set_attribute(span, "data-tip", hint()?.text);
         styles = set_style(span, "", styles, $1);
-        set_text(text2, code());
       },
       [
         () => ({
@@ -13030,7 +13063,7 @@
     append($$anchor, new_line);
   }
   create_custom_element(NewLine, {}, [], [], true);
-  var root$f = /* @__PURE__ */ from_html(`<div><span class="line-no svelte-15o8w5g"></span><span> </span></div>`);
+  var root$f = /* @__PURE__ */ from_html(`<div><span class="line-no svelte-15o8w5g"></span> <span><!></span></div>`);
   const $$css$f = {
     hash: "svelte-15o8w5g",
     code: "div.svelte-15o8w5g {transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.line-no.svelte-15o8w5g {font-size:var(--line-no-font-size);color:gray;}.wrong.svelte-15o8w5g {opacity:0;font-size:0px;}.hint.svelte-15o8w5g {opacity:0;font-size:0px;}.right.svelte-15o8w5g {background-color:var(--right-color);}"
@@ -13062,23 +13095,22 @@
     let classes;
     var span = child(div);
     span.textContent = "    ";
-    var span_1 = sibling(span);
-    var text2 = child(span_1, true);
+    var span_1 = sibling(span, 2);
+    var node = child(span_1);
+    AsciiMath(node, {
+      get math() {
+        return code();
+      }
+    });
     reset(span_1);
     reset(div);
-    template_effect(
-      ($0) => {
-        classes = set_class(div, 1, "svelte-15o8w5g", null, classes, $0);
-        set_text(text2, code());
-      },
-      [
-        () => ({
-          wrong: get$1(meAt).wrong,
-          hint: get$1(meAt).hint,
-          right: get$1(meAt).right
-        })
-      ]
-    );
+    template_effect(($0) => classes = set_class(div, 1, "svelte-15o8w5g", null, classes, $0), [
+      () => ({
+        wrong: get$1(meAt).wrong,
+        hint: get$1(meAt).hint,
+        right: get$1(meAt).right
+      })
+    ]);
     append($$anchor, div);
     var $$pop = pop$1($$exports);
     $$cleanup();
