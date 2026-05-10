@@ -4492,7 +4492,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.23.5";
+  const VERSION = "0.23.6";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -12754,8 +12754,13 @@
     onMount(async () => {
       if (justText) return;
       await asciiMath.init();
-      let html2 = asciiMath.render(math(), output());
-      host.replaceChildren(...html2);
+      setTimeout(
+        () => {
+          let html2 = asciiMath.render(math(), output());
+          host.replaceChildren(...html2);
+        },
+        1e3
+      );
     });
     var $$exports = {
       get math() {
