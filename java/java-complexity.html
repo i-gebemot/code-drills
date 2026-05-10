@@ -58,7 +58,7 @@ public static boolean hasLoop(Node&lt;Integer> head) {
     Node&lt;Integer> l1 = head;
     Node&lt;Integer> l2 = head;
 $👉$ while (l1 != null && l2 != null && l2.getNext() != null) {
-            ^   $ ~t                         {4}
+            ^   $ ~t ~m                      {4}
         l1 = l1.getNext();
         l2 = l2.getNext().getNext();
 
@@ -83,7 +83,7 @@ $👉$ while (l1 != null && l2 != null && l2.getNext() != null) {
 <!---------------------------------------------------------->
 
 <drill lang="java" id="isBalanced()">
-int height(BinNode&lt;Integer> node) {
+public static int height(BinNode&lt;Integer> node) {
     if (node == null) {
         return 0;
     }
@@ -94,7 +94,7 @@ int height(BinNode&lt;Integer> node) {
         height(node.getRight()));
 }
 
-boolean isBalanced(BinNode&lt;Integer> node) {
+public static boolean isBalanced(BinNode&lt;Integer> node) {
     if (node == null) {
         return true;
     }
@@ -120,7 +120,7 @@ boolean isBalanced(BinNode&lt;Integer> node) {
 <!---------------------------------------------------------->
 
 <drill lang="java" id="isBalanced2()" no-wrong-phase>
-int balancedHeight(BinNode&lt;Integer> node) {
+public static int balancedHeight(BinNode&lt;Integer> node) {
     if (node == null) {
         return 0;
     }
@@ -138,7 +138,7 @@ int balancedHeight(BinNode&lt;Integer> node) {
     return 1 + Math.max(lHeight, rHeight);
 }
 
-boolean isBalanced(BinNode&lt;Integer> node) {
+public static boolean isBalanced(BinNode&lt;Integer> node) {
     return balancedHeight(node) >= 0; 
 }
 
@@ -151,7 +151,7 @@ boolean isBalanced(BinNode&lt;Integer> node) {
 <!---------------------------------------------------------->
 
 <drill lang="java" id="endsWith()" todo>
-iboolean areSame(Node l1, Node l2) {
+public static boolean areSame(Node l1, Node l2) {
     while (l1 != null && l2 != null) {
         if (l1.getValue() != l2.getValue()) {
             return false;
@@ -162,7 +162,7 @@ iboolean areSame(Node l1, Node l2) {
     return l1 == null && l2 == null;
 }
 
-boolean suffix(Node l1, Node l2) {
+public static boolean suffix(Node l1, Node l2) {
     while (l1 != null) {
         if (areSame(l1, l2)) {
             return true;
