@@ -4492,7 +4492,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.23.4";
+  const VERSION = "0.23.5";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -13551,7 +13551,7 @@
           };
         }
         function parseHtmlContent() {
-          let content2 = htmlLine().replace(phaseSelectorRegex, "").replace("$!html", "");
+          let content2 = htmlLine().replace(phaseSelectorRegex, "").replace("$!html", "").replace(phaseNoRegex, "").replace(phaseSwitchRegex, "");
           if (!content2.includes("{")) {
             next2();
             return content2;
