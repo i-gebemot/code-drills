@@ -42,14 +42,14 @@ public static int count($Queue$$&lt;Integer>$ que) {    {1}
             ^$
             ~r ht wrong-logic
         int x = que.remove();
--        tmp.insert(x);                 {2}
+-       tmp.insert(x);                 {2}
         count++;
     $} $
         ~r hb why-temp-queue             {2}
 
--    while (!tmp.isEmpty()) {           {3}
--        que.insert(tmp.remove());      {3}
--    }                                  {3}
+-   while (!tmp.isEmpty()) {           {3}
+-       que.insert(tmp.remove());      {3}
+-   }                                  {3}
 -                                       {3}    
     return count;
 $} $
