@@ -4492,7 +4492,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.24.2";
+  const VERSION = "0.24.3";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -13360,7 +13360,7 @@
   }
   create_custom_element(RightIndent, { phaseNo: {}, spaceCount: {} }, [], [], true);
   var on_click$1 = (_, copy) => copy();
-  var root$d = /* @__PURE__ */ from_html(`<span class="outer tooltip tooltip-left svelte-1qzp864" data-tip="Copy code to clipboard"><button aria-label="Copy drill"><svg width="24" height="24" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"><rect x="42" y="0" width="66" height="78" rx="12" ry="12" fill="var(--fillColor)" stroke-width="4"></rect><rect x="22" y="20" width="66" height="78" rx="12" ry="12" fill="var(--fillColor)" stroke-width="4"></rect></svg></button></span>`);
+  var root$d = /* @__PURE__ */ from_html(`<span class="outer tooltip tooltip-left svelte-1qzp864"><button aria-label="Copy drill"><svg width="24" height="24" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"><rect x="42" y="0" width="66" height="78" rx="12" ry="12" fill="var(--fillColor)" stroke-width="4"></rect><rect x="22" y="20" width="66" height="78" rx="12" ry="12" fill="var(--fillColor)" stroke-width="4"></rect></svg></button></span>`);
   const $$css$d = {
     hash: "svelte-1qzp864",
     code: ".outer.svelte-1qzp864 {user-select:none;}button.svelte-1qzp864 {font-size:24px;border:none;cursor:pointer;transition:transform 0.15s, opacity 0.15s;}.copyable.svelte-1qzp864:hover {transform:scale(1.1);}.copyable.svelte-1qzp864:active {transform:scale(0.9);opacity:0.6;}"
@@ -13393,6 +13393,7 @@
     reset(span);
     template_effect(
       ($0, $1) => {
+        set_attribute(span, "data-tip", $copyable() ? "Copy code to clipboard" : "Reveal the solution before copying");
         classes = set_class(button, 1, "copy svelte-1qzp864", null, classes, $0);
         button.disabled = !$copyable();
         styles = set_style(button, "", styles, $1);
