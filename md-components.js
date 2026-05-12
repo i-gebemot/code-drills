@@ -4492,7 +4492,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.24.0";
+  const VERSION = "0.24.2";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -12706,6 +12706,100 @@
     return $$pop;
   }
   create_custom_element(Line, { phaseNo: {}, wrongLine: {}, children: {} }, [], [], true);
+  const resolveValue = Symbol("resolveValue");
+  const sleep = (ms, signal) => new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(signal.reason);
+      return;
+    }
+    const timeout = setTimeout(resolve, ms);
+    if (signal) {
+      signal.addEventListener("abort", () => {
+        clearTimeout(timeout);
+        reject(signal.reason);
+      }, { once: true });
+    }
+  });
+  const validateOptions = (interval, timeout) => {
+    if (typeof interval !== "number" || !Number.isFinite(interval) || interval < 0) {
+      throw new TypeError("Expected interval to be a finite non-negative number");
+    }
+    if (typeof timeout === "object" && timeout !== null) {
+      if (typeof timeout.milliseconds !== "number" || Number.isNaN(timeout.milliseconds) || timeout.milliseconds < 0) {
+        throw new TypeError("Expected timeout.milliseconds to be a finite non-negative number");
+      }
+    } else if (typeof timeout === "number" && (Number.isNaN(timeout) || timeout < 0)) {
+      throw new TypeError("Expected timeout to be a finite non-negative number");
+    }
+  };
+  const createTimeoutError = (timeout) => {
+    if (timeout.message instanceof Error) {
+      return timeout.message;
+    }
+    const message = timeout.message ?? `Promise timed out after ${timeout.milliseconds} milliseconds`;
+    return new TimeoutError(message);
+  };
+  const handleFallback = (timeout) => {
+    if (timeout.fallback) {
+      return timeout.fallback();
+    }
+    throw createTimeoutError(timeout);
+  };
+  const handleAbortError = (timeoutSignal, timeout, signal) => {
+    if (timeoutSignal?.aborted) {
+      if (typeof timeout === "object") {
+        return handleFallback(timeout);
+      }
+      throw new TimeoutError();
+    }
+    throw signal.reason;
+  };
+  async function pWaitFor(condition, options = {}) {
+    const {
+      interval = 20,
+      timeout = Number.POSITIVE_INFINITY,
+      before = true,
+      signal
+    } = options;
+    validateOptions(interval, timeout);
+    const timeoutMs = typeof timeout === "number" ? timeout : timeout?.milliseconds ?? Number.POSITIVE_INFINITY;
+    const timeoutSignal = timeoutMs === Number.POSITIVE_INFINITY ? void 0 : AbortSignal.timeout(timeoutMs);
+    const combinedSignal = timeoutSignal && signal ? AbortSignal.any([timeoutSignal, signal]) : timeoutSignal ?? signal;
+    if (!before) {
+      await sleep(interval, combinedSignal);
+    }
+    if (combinedSignal?.aborted) {
+      return handleAbortError(timeoutSignal, timeout, signal);
+    }
+    while (true) {
+      try {
+        const value = await condition();
+        if (typeof value === "object" && value !== null && resolveValue in value) {
+          return value[resolveValue];
+        }
+        if (value === true) {
+          return;
+        }
+        if (value === false) {
+          await sleep(interval, combinedSignal);
+          continue;
+        }
+        throw new TypeError("Expected condition to return a boolean");
+      } catch (error) {
+        if (error === combinedSignal?.reason) {
+          return handleAbortError(timeoutSignal, timeout, signal);
+        }
+        throw error;
+      }
+    }
+  }
+  pWaitFor.resolveWith = (value) => ({ [resolveValue]: value });
+  class TimeoutError extends Error {
+    constructor(message = "Promise timed out") {
+      super(message);
+      this.name = "TimeoutError";
+    }
+  }
   const asciiMath = /* @__PURE__ */ (() => {
     function mathJaxIsHere() {
       return !!window.MathJax;
@@ -12713,6 +12807,15 @@
     async function init2() {
       if (!window.MathJax) return;
       await window.MathJax.startup.promise;
+      await pWaitFor(() => !!window.MathJax?.startup?.document?.convert, {
+        interval: 200,
+        timeout: {
+          milliseconds: 1e4,
+          fallback: () => {
+            console.log("MATHJAX error: window.MathJax.startup.document.convert() is not there yet...");
+          }
+        }
+      });
     }
     function test(text2) {
       if (!window.MathJax)
@@ -12731,6 +12834,8 @@
       return span2;
     }
     function render(text2, output) {
+      let convert = window.MathJax?.startup?.document?.convert;
+      if (convert === null) return [];
       let parts = text2.split("`");
       let elems = [];
       let it = 0;
@@ -12773,13 +12878,22 @@
     onMount(async () => {
       if (justText) return;
       await asciiMath.init();
-      setTimeout(
-        () => {
-          let html2 = asciiMath.render(math(), output());
-          host.replaceChildren(...html2);
-        },
-        2e3
-      );
+      function render() {
+        if (!host) return false;
+        let html2 = asciiMath.render(math(), output());
+        if (html2.length === 0) return false;
+        host.replaceChildren(...html2);
+        return true;
+      }
+      await pWaitFor(() => render(), {
+        interval: 200,
+        timeout: {
+          milliseconds: 1e4,
+          fallback: () => {
+            console.log(`Failed to render math... ${math()}`);
+          }
+        }
+      });
     });
     var $$exports = {
       get math() {
@@ -13299,19 +13413,39 @@
     hash: "svelte-1bsz68t",
     code: ".header.svelte-1bsz68t {position:fixed;top:12;right:16;font-family:monospace;font-style:italic;font-size:14px;}.ver.svelte-1bsz68t {color:transparent;user-select:none;transition:color 0.3s ease}.ver.svelte-1bsz68t:hover {color:lightslategray;}"
   };
-  function PoweredBy($$anchor) {
+  function PoweredBy($$anchor, $$props) {
+    push$1($$props, true);
     append_styles$1($$anchor, $$css$c);
+    let noCopyBtn = prop($$props, "noCopyBtn", 7);
+    let hasCopyButton = noCopyBtn() == false;
+    var $$exports = {
+      get noCopyBtn() {
+        return noCopyBtn();
+      },
+      set noCopyBtn($$value) {
+        noCopyBtn($$value);
+        flushSync();
+      }
+    };
     var span = root$c();
     var span_1 = child(span);
     var text2 = child(span_1, true);
     reset(span_1);
     var node = sibling(span_1, 2);
-    CopyBtn(node, {});
+    {
+      var consequent = ($$anchor2) => {
+        CopyBtn($$anchor2, {});
+      };
+      if_block(node, ($$render) => {
+        if (hasCopyButton) $$render(consequent);
+      });
+    }
     reset(span);
     template_effect(() => set_text(text2, VERSION));
     append($$anchor, span);
+    return pop$1($$exports);
   }
-  create_custom_element(PoweredBy, {}, [], [], true);
+  create_custom_element(PoweredBy, { noCopyBtn: {} }, [], [], true);
   var root$b = /* @__PURE__ */ from_html(`<div><!></div>`);
   const $$css$b = {
     hash: "svelte-fhtu8n",
@@ -13869,7 +14003,7 @@
         }
         return drill.tokens;
       }
-      function buildDrill(id, tokens, atOnce, noWrongPhase) {
+      function buildDrill(id, tokens, atOnce, noWrongPhase, noCopyBtn) {
         let seenPhases = /* @__PURE__ */ new Set();
         function splitTokensToLines() {
           let line2 = null;
@@ -13896,7 +14030,7 @@
         seenPhases.delete(0);
         let phases = [...seenPhases].sort((a, b) => a - b);
         console.log(`${id} is built:`, phases);
-        return { id, atOnce, noWrongPhase, phases, tokens, lines };
+        return { id, atOnce, noWrongPhase, noCopyBtn, phases, tokens, lines };
       }
       let htmls = document.querySelectorAll("drill");
       log.info(`Found ${htmls.length} drills`);
@@ -13911,6 +14045,7 @@
         let _$ = el.getAttribute("$") || shellChars[lang] || "$";
         let atOnce = el.hasAttribute("at-once");
         let noWrongPhase = el.hasAttribute("no-wrong-phase");
+        let noCopyBtn = el.hasAttribute("no-copy-button");
         let logLevel = el.getAttribute("log-level") || "E";
         let todo = el.getAttribute("todo") !== null;
         if (todo) {
@@ -13926,7 +14061,7 @@
             log.info(`Drill '${id}' is empty; skipped`);
             return;
           }
-          let drill = buildDrill(id, tokens, atOnce, noWrongPhase);
+          let drill = buildDrill(id, tokens, atOnce, noWrongPhase, noCopyBtn);
           drills.push(drill);
           log.info(`Drill '${id}' is parsed: ${tokens.length} tokens`);
         } catch (err) {
@@ -14007,12 +14142,14 @@
       ["right-indent", RightIndent],
       ["html-content", HtmlContent]
     ]);
-    let heading = prop($$props, "heading", 7), logLevel = prop($$props, "log-level", 7), show = prop($$props, "show", 7), shuffle = prop($$props, "shuffle", 7), noWrongPhase = prop($$props, "no-wrong-phase", 7), atOnce = prop($$props, "at-once", 7);
+    let heading = prop($$props, "heading", 7), logLevel = prop($$props, "log-level", 7), show = prop($$props, "show", 7), shuffle = prop($$props, "shuffle", 7), noWrongPhase = prop($$props, "no-wrong-phase", 7), atOnce = prop($$props, "at-once", 7), noCopyBtnOnPage = prop($$props, "no-copy-button", 7);
     if (logLevel()) log.setLevel(logLevel());
     let order = show() ? lib.parse(show()) : [];
     shuffle(shuffle() !== void 0);
     noWrongPhase(noWrongPhase() !== void 0);
     atOnce(atOnce() !== void 0);
+    noCopyBtnOnPage(noCopyBtnOnPage() !== void 0);
+    let noCopyBtn = /* @__PURE__ */ state$1(proxy(noCopyBtnOnPage()));
     let urlArgs = new URLSearchParams(window.location.search);
     let noTodoDrills = urlArgs.has("no-todo-drills");
     let drills = /* @__PURE__ */ state$1(proxy([]));
@@ -14052,6 +14189,7 @@
       let phases = drill2.phases;
       if (atOnce() || drill2.atOnce) phases = [];
       phase.start(drill2.id, phases, noWrongPhase() || drill2.noWrongPhase);
+      set(noCopyBtn, noCopyBtnOnPage() || drill2.noCopyBtn, true);
     }
     function setNo(no) {
       if (no < 0 || no >= get$1(drills).length) return;
@@ -14113,6 +14251,13 @@
       },
       set "at-once"($$value) {
         atOnce($$value);
+        flushSync();
+      },
+      get "no-copy-button"() {
+        return noCopyBtnOnPage();
+      },
+      set "no-copy-button"($$value) {
+        noCopyBtnOnPage($$value);
         flushSync();
       }
     };
@@ -14218,7 +14363,13 @@
     reset(div_3);
     reset(div);
     var node_8 = sibling(div, 2);
-    PoweredBy(node_8);
+    key$1(node_8, () => get$1(noCopyBtn), ($$anchor2) => {
+      PoweredBy($$anchor2, {
+        get noCopyBtn() {
+          return get$1(noCopyBtn);
+        }
+      });
+    });
     template_effect(
       ($0, $1, $2) => {
         set_text(text$1, heading());
@@ -14248,7 +14399,8 @@
       show: {},
       shuffle: {},
       "no-wrong-phase": {},
-      "at-once": {}
+      "at-once": {},
+      "no-copy-button": {}
     },
     [],
     [],
