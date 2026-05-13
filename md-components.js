@@ -4492,7 +4492,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.24.4";
+  const VERSION = "0.24.5";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -12511,7 +12511,23 @@
     return { tick, untick, start, reveal, meAt };
   })();
   const vars = /* @__PURE__ */ (() => {
-    function color(name) {
+    let theme = "color";
+    function setTheme(value) {
+      theme = value;
+    }
+    function blackAndWhite(name) {
+      switch (name) {
+        case "green":
+          return "transparent";
+        case "mark":
+          return "transparent";
+        case "yellow":
+          return "transparent";
+        default:
+          return name;
+      }
+    }
+    function colorTheme(name) {
       switch (name) {
         case "green":
           return "rgb(200, 255, 200);";
@@ -12523,7 +12539,10 @@
           return name;
       }
     }
-    return { color };
+    function color(name) {
+      return theme == "color" ? colorTheme(name) : blackAndWhite(name);
+    }
+    return { setTheme, color };
   })();
   let log = (() => {
     let lines = writable([]);
@@ -14145,16 +14164,18 @@
       ["right-indent", RightIndent],
       ["html-content", HtmlContent]
     ]);
-    let heading = prop($$props, "heading", 7), logLevel = prop($$props, "log-level", 7), show = prop($$props, "show", 7), shuffle = prop($$props, "shuffle", 7), noWrongPhase = prop($$props, "no-wrong-phase", 7), atOnce = prop($$props, "at-once", 7), noCopyBtnOnPage = prop($$props, "no-copy-button", 7);
+    let heading = prop($$props, "heading", 7), logLevel = prop($$props, "log-level", 7), show = prop($$props, "show", 7), shuffle = prop($$props, "shuffle", 7), noWrongPhase = prop($$props, "no-wrong-phase", 7), atOnce = prop($$props, "at-once", 7), noCopyBtnOnPage = prop($$props, "no-copy-button", 7), blackAndWhite = prop($$props, "black-and-white", 7), noTodoDrills = prop($$props, "no-todo-drills", 7);
     if (logLevel()) log.setLevel(logLevel());
     let order = show() ? lib.parse(show()) : [];
     shuffle(shuffle() !== void 0);
     noWrongPhase(noWrongPhase() !== void 0);
     atOnce(atOnce() !== void 0);
     noCopyBtnOnPage(noCopyBtnOnPage() !== void 0);
-    let noCopyBtn = /* @__PURE__ */ state$1(proxy(noCopyBtnOnPage()));
     let urlArgs = new URLSearchParams(window.location.search);
-    let noTodoDrills = urlArgs.has("no-todo-drills");
+    blackAndWhite(urlArgs.has("black-and-white") || blackAndWhite() !== void 0);
+    if (blackAndWhite()) vars.setTheme("black-and-white");
+    let noCopyBtn = /* @__PURE__ */ state$1(proxy(noCopyBtnOnPage()));
+    noTodoDrills(urlArgs.has("no-todo-drills") || noTodoDrills() !== void 0);
     let drills = /* @__PURE__ */ state$1(proxy([]));
     let drill = /* @__PURE__ */ state$1(void 0);
     let indx = /* @__PURE__ */ state$1(0);
@@ -14209,7 +14230,7 @@
       phase.reveal();
     }
     document.addEventListener("DOMContentLoaded", () => {
-      let all = buildDrills({ noTodoDrills });
+      let all = buildDrills({ noTodoDrills: noTodoDrills() });
       set(drills, orderDrills(all, order, shuffle()), true);
       setNo(0);
     });
@@ -14261,6 +14282,20 @@
       },
       set "no-copy-button"($$value) {
         noCopyBtnOnPage($$value);
+        flushSync();
+      },
+      get "black-and-white"() {
+        return blackAndWhite();
+      },
+      set "black-and-white"($$value) {
+        blackAndWhite($$value);
+        flushSync();
+      },
+      get "no-todo-drills"() {
+        return noTodoDrills();
+      },
+      set "no-todo-drills"($$value) {
+        noTodoDrills($$value);
         flushSync();
       }
     };
@@ -14403,7 +14438,9 @@
       shuffle: {},
       "no-wrong-phase": {},
       "at-once": {},
-      "no-copy-button": {}
+      "no-copy-button": {},
+      "black-and-white": {},
+      "no-todo-drills": {}
     },
     [],
     [],
@@ -14428,8 +14465,9 @@
       });
       append($$anchor2, iframe_1);
     };
-    let width = prop($$props, "width", 7, 700), height = prop($$props, "height", 7, 700), base = prop($$props, "base", 7, "./java"), todoDrills = prop($$props, "todo-drills", 7), drillsList = prop($$props, "drills", 7);
+    let width = prop($$props, "width", 7, 700), height = prop($$props, "height", 7, 700), base = prop($$props, "base", 7, "./java"), todoDrills = prop($$props, "todo-drills", 7), blackAndWhite = prop($$props, "black-and-white", 7), drillsList = prop($$props, "drills", 7);
     todoDrills(todoDrills() !== void 0);
+    blackAndWhite(blackAndWhite() !== void 0);
     let errorMsg = /* @__PURE__ */ state$1("");
     function parseDrillsList(list) {
       try {
@@ -14441,8 +14479,17 @@
       }
     }
     function makeSrcUrl(name) {
-      let args = !todoDrills() ? "?no-todo-drills" : "";
-      return `${base()}/${name}.html${args}`;
+      let url = `${base()}/${name}.html`;
+      let firstArg = true;
+      function add(arg) {
+        if (arg.length === 0) return;
+        url += firstArg ? "?" : "&";
+        url += arg;
+        firstArg = false;
+      }
+      if (!todoDrills()) add("no-todo-drills");
+      if (blackAndWhite()) add("black-and-white");
+      return url;
     }
     let drills = parseDrillsList(drillsList());
     var $$exports = {
@@ -14472,6 +14519,13 @@
       },
       set "todo-drills"($$value) {
         todoDrills($$value);
+        flushSync();
+      },
+      get "black-and-white"() {
+        return blackAndWhite();
+      },
+      set "black-and-white"($$value) {
+        blackAndWhite($$value);
         flushSync();
       },
       get drills() {
@@ -14518,6 +14572,7 @@
       height: {},
       base: {},
       "todo-drills": {},
+      "black-and-white": {},
       drills: {}
     },
     [],
