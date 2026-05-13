@@ -4492,7 +4492,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.24.3";
+  const VERSION = "0.24.4";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -12516,6 +12516,8 @@
         case "green":
           return "rgb(200, 255, 200);";
         case "mark":
+          return "yellow";
+        case "yellow":
           return "yellow";
         default:
           return name;
