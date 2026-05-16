@@ -457,3 +457,25 @@ print($primeNumber$(43));         // $true$
     ^what ~g hr func-name   {1}
     ^? ~g hl result         {+}
 </drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="local-var">
+public static $int$ findIndex(int[] arr, int num) {
+        ^void ~r ht return-what
+-    int foundAtIndex = -1;                 {2}
+    for (int i = 0; i < arr.length; i++) {
+        $if$ $($arr[i] $==$ num$)$ {
+                ~r ht if-syntax             {1}
+                ^$
+                ^= ~r ht assign-vs-comp     {+}
+                ^$ ~t                       {1}
+            $$foundAtIndex = i;             {2}!
+                ^int $ ~r ht local-var
+        }
+    }
+    return $foundAtIndex$;
+        ~r hr local-var                     {2}
+}
+</drill>
+
