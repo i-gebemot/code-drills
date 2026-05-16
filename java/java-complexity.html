@@ -82,16 +82,16 @@ $👉$ while (l1 != null && l2 != null && l2.getNext() != null) {
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="isBalanced()">
-public static int height(BinNode&lt;Integer> node) {
+<drill lang="java" id="isBalanced()!">
+public static int depth(BinNode&lt;Integer> node) {
     if (node == null) {
-        return 0;
+        return -1;
     }
     $return$ $1 + $Math.max(
             ~r ht wrong-logic
             ^$
-        height(node.getLeft()), 
-        height(node.getRight()));
+        depth(node.getLeft()), 
+        depth(node.getRight()));
 }
 
 public static boolean isBalanced(BinNode&lt;Integer> node) {
@@ -99,10 +99,10 @@ public static boolean isBalanced(BinNode&lt;Integer> node) {
         return true;
     }
 
-    int lHeight = height(node.getLeft());
-    int rHeight = height(node.getRight());
+    int lDepth = depth(node.getLeft());
+    int rDepth = depth(node.getRight());
 
-    if ($Math.abs(lHeight - rHeight) > 1$) {
+    if ($Math.abs(lDepth - rDepth) > 1$) {
             ^... ~o ht implement
         return false;
     }
@@ -111,7 +111,7 @@ public static boolean isBalanced(BinNode&lt;Integer> node) {
            isBalanced(node.getRight());
 }
 
-// height() run time complexity is:    $`O(n)`$
+// depth() run time complexity is:    $`O(n)`$
         ^? ~g hb result
 // isBalanced() runtime complexity is:    $`O(n^2)`$
         ^? ~g hb result
