@@ -313,7 +313,43 @@ public static boolean noSingleChild(BinNode&lt;Integer> node) {
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="">
+<drill lang="java" id="isAVL()">
+public static int depth(BinNode&lt;Integer> root) {
+    if (root $==$ null) {
+            ^= ~r ht assign-vs-comp
+        return -1;
+    }
+    $return$ $1 + $Math.max(depth(root.getLeft()),      {1}
+        ~r ht wrong-logic
+        ^$
+-4                      depth(root.getRight()));      {1}
+}
+
+public static $boolean $$isAVL$(BinNode&lt;Integer> root) {
+        ^$
+        ~r ht return-type
+-    if (root == null) {                    {2}
+-        return true;                       {2}
+-    }                                      {2}
+    int lDepth = depth($root$.getLeft());
+        ~r ht can-be-null                   {2}
+    int rDepth = depth($root$.getRight());
+        ~r ht can-be-null                   {2}
+    if (Math.abs(lDepth - rDepth) > 1) {
+        return false;
+    }
++   $if (root == null) {$                    {2}
+            ~r ht stop-condition-at-top
++       $return true;$                       {2}
+            ~r ht stop-condition-at-top
++   $}$                                      {2}!
+            ~r ht stop-condition-at-top
+    return isAVL(root.$getLeft$$()$) && isAVL(root.$getRight$$()$);
+        ~r ht func-call
+        ^$
+        ~r ht func-call
+        ^$
+}
 </drill>
 
 <!---------------------------------------------------------->
