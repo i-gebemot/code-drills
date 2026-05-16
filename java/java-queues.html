@@ -92,7 +92,7 @@ $} $                            {1}
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="findByName()">
+<drill lang="java" id="findByName()!">
 public static Person findByName(Queue&lt;Person> que, String name) {
     Queue&lt;Person> $tmp$$ = new Queue&lt;Person>()$;
         ~r ht init-value
@@ -107,7 +107,7 @@ public static Person findByName(Queue&lt;Person> que, String name) {
         if (x.getName()$.equals($name$)$) {
                 ^ == $ ~r ht strings-are-refs
                 ^$
--            person = x;                    {1}
+-           person = x;                    {1}
 +           $return$ person;                {1}!
                 ~r hb  queue-is-destroyed
         }

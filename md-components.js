@@ -4492,7 +4492,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.24.5";
+  const VERSION = "0.24.6";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -13222,7 +13222,7 @@
     append($$anchor, new_line);
   }
   create_custom_element(NewLine, {}, [], [], true);
-  var root$g = /* @__PURE__ */ from_html(`<div><span class="line-no svelte-15o8w5g"></span> <span><!></span></div>`);
+  var root$g = /* @__PURE__ */ from_html(`<div><span class="line-no svelte-15o8w5g"></span><span><!></span></div>`);
   const $$css$g = {
     hash: "svelte-15o8w5g",
     code: "div.svelte-15o8w5g {transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.line-no.svelte-15o8w5g {font-size:var(--line-no-font-size);color:gray;}.wrong.svelte-15o8w5g {opacity:0;font-size:0px;}.hint.svelte-15o8w5g {opacity:0;font-size:0px;}.right.svelte-15o8w5g {background-color:var(--right-color);}"
@@ -13254,7 +13254,7 @@
     let classes;
     var span = child(div);
     span.textContent = "    ";
-    var span_1 = sibling(span, 2);
+    var span_1 = sibling(span);
     var node = child(span_1);
     AsciiMath(node, {
       get math() {

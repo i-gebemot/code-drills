@@ -211,3 +211,31 @@ $public $$static $$boolean same$(Person p1, Person p2) {
 }
 </drill>
 
+<!---------------------------------------------------------->
+
+<drill lang="java" id="new-is-reserved">
+Node&lt;Integer> copy(Node&lt;Integer> lst) {
+    if (lst == null) {
+        $return$$ null$;
+            ~r ht return-what
+            ^$
+    }
+    Node&lt;Integer> lst2 = new Node&lt;Integer>(lst.$getValue()$);
+        ^value ~r ht access-modifier
+    Node&lt;Integer> tail2 = lst2;
+    Node&lt;Integer> node = lst.getNext();
+        ^value ~r ht access-modifier
+    while (node != null) {
+        Node&lt;Integer> $node2$ = new Node&lt;Integer>(node.$getValue()$);
+            ^new ~r ht new-is-reserved      {1}
+            ^value ~r ht access-modifier   {+}
+        tail2.setNext($node2$);
+            ^new ~r ht new-is-reserved      {1}
+        tail2 = $node2$;
+            ^new ~r ht new-is-reserved      {1}
+        node = node.getNext();
+    }
+-    return lst2;                   {2}
+$} $
+    ~r hr return-is-missing         {2}
+</drill>
