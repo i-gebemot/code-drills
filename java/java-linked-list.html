@@ -448,23 +448,37 @@ Node removeAt(Node lst, int i) {
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="removeAll()" todo>
-Node filter(Node lst, int value) {
-    while (lst != null && lst.getValue() == value) {
+<drill lang="java" id="removeAll()!" no-wrong-phase>
+$!html:w-h-r+ <img width=420 src="./img/linked-list-removeAll().png">
+public static Node&lt;Integer> removeAll(Node&lt;Integer> lst, int value) {
+    // $מוחקים את הצמתים בראש הרשימה$
+            ^... ~o ht implement
+    while ($lst$ != null && $lst.getValue()$ == value) {
+            ^... ~o ht implement
+            ^... ~o ht implement    {+}
         lst = lst.getNext();
     }
-    if (lst == null) {
-        return null;
-    }
-    Node prev = lst;
+    // <bdo dir="rtl">?מה אם מחקנו הכול</bdo>
+-    if (lst == null) {             {1}
+-        return null;               {1}
+-    }                              {1}
++   $...$                           {1}
+        ~o ht implement
+    // $מוחקים מאמצע של רשימה$
+            ^... ~o ht implement
+    Node&lt;Integer> prev = lst;
     while (prev.hasNext()) {
-        if (prev.getNext().getValue() == value) {
-            prev.setNext(prev.getNext().getNext());
+        if ($prev.getNext().getValue()$ == value) {
+                ^... ~o ht implement
+            prev.setNext($prev.getNext().getNext()$);
+                ^... ~o ht implement
         } else {
-            prev = prev.getNext();
+            $prev = prev.getNext();$
+                ^... ~o ht implement
         }
     }
-    return lst;
+    return $lst$;
+        ^... ~o ht implement
 }
 </drill>
 
