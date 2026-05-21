@@ -1,0 +1,488 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="../md-components.js"></script>
+
+<import-hints from="./csharp-hints.html"></import-hints>
+
+<!---------------------------------------------------------->
+
+<code-drills log-level="W"
+    heading="Basic syntax"
+>
+</code-drills>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="variables-and-values" no-wrong-phase>
+int a = 10;         // 10
+int b = a + 10;     // $20$
+                        ^? ~g hr result
+int b = "a";        // $❌ Can't assing string to int$
+                        ^? ~g hr result
+double pi = 3.14;   // 3.14
+int x = pi;         // $❌ Can't assing double to int$
+                        ^? ~g hr result
+char ch = 'A';      // 'A'
+a = ch;             // $65$
+                        ^? ~g hr result
+bool ok = $$$true$$$;
+                ^" 
+                ~r hr bool-or-string
+                ^" 
+string name = $"$$CSharp$$"$;
+                ^$
+                ~r hr var-or-string
+                ^$ 
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="types-and-conversions" no-wrong-phase>
+int n = 123;        // 123
+double pi = 3.14;   // 3.14
+double x = "pi";    // $❌ Can't assing string to double$
+                            ^? ~g hr result
+double d = 123.0;   // 123.0
+d = n;              // $123.0$
+                            ^? ~g hr result
+n = d;              // $❌ Can't assign double to int$
+                            ^? ~g hr result
+n = (int) d;        // $123$
+                            ^? ~g hr result
+y = pi;             // $❌ y is not defined$
+                            ^? ~g hr result
+double d2 = n + d;  // $246.0$
+                            ^? ~g hr result
+int n2 = 123.0;     // $error: can't assign double to int$
+                            ^? ~g hr result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="module-and-int-div" no-wrong-phase>
+11 % 2          // $1$
+                    ^? ~g hr result
+10 % 2          // $0$
+                    ^? ~g hr result
+1  % 2          // $1$
+                    ^? ~g hr result
+0  % 2          // $0$
+                    ^? ~g hr result
+
+11 % 3          // $2$
+                    ^? ~g hr result
+12 % 3          // $0$
+                    ^? ~g hr result
+
+11   / 2        // $5$
+                    ^? ~g hr result
+11.0 / 2        // $5.5$
+                    ^? ~g hr result
+11   / 3        // $3$
+                    ^? ~g hr result
+10   / 2        // $5$
+                    ^? ~g hr result
+
+1234 % 10       // $4$
+                    ^? ~g hr result
+1234 / 10       // $123$
+                    ^? ~g hr result
+1234 / 10 % 10  // $3$
+                    ^? ~g hr result
+12345 / 100     // $123$
+                    ^? ~g hr result
+12345 % 100     // $45$
+                    ^? ~g hr result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="variables-and-operations" no-wrong-phase>
+int x = 5;
+double y = 3.14;
+bool ok = true;
+x += 1;             // $6$
+                        ^? ~g hr result
+y *= 2;             // $6.28$
+                        ^? ~g hr result
+ok = !ok;           // $false$
+                        ^? ~g hr result
+x++;                // $7$
+                        ^? ~g hr result
+x > 3 && y < 10     // $true$
+                        ^? ~g hr result
+x == 5 || !ok       // $true$     
+                        ^? ~g hr result
+x != 5 && ok        // $false$      
+                        ^? ~g hr result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="basic-logic" no-wrong-phase>
+Console.WriteLine(10 + 20);        // $30$
+                                        ^? ~g hr result
+Console.WriteLine("10" + "20");    // $1020$
+                                        ^? ~g hr result
+
+int n1 = 1;
+n1 += 2;
+n1 *= n1;
+bool b = n1 == 9;    // $true$
+                        ^? ~g hr result
+
+Console.WriteLine(n % 11 == 3) // $true is printed$    {1}
+                                        ~o
+n = ?                       // $14$                     {1}
+                                   ^?n מה יכול להיות הערך של ~g
+
+
+Console.WriteLine(n % 11 != 0) // $false is printed$   {2}
+                                        ~o
+n = ?                       // $22$                     {2}
+                                   ^?n מה יכול להיות הערך של ~g
+
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="more-logic" no-wrong-phase>
+int n1 = 10;
+int n2 = 20;
+
+print(n1 == n2);                   // $false$
+                                        ^? ~g ht result
+print(n1 != n2);                   // $true$
+                                        ^? ~g ht result
+                                        
+print(n1 > n2  ||  n1 < n2);       // $true$
+                                        ^? ~g ht result
+print(n1 < n2  &&  n2 < 10);       // $false$
+                                        ^? ~g ht result
+print(n1 < 10  ||  n2 > 20);       // $false$
+                                        ^? ~g ht result
+print(n1 <= 10  &&  n2 >= 20);     // $true$
+                                        ^? ~g ht result
+
+print(n1 + n2 == 30);              // $true$
+                                        ^? ~g ht result
+print(n1 * n2 > 100);              // $true$
+                                        ^? ~g ht result
+print(n2 / n1 == 2);               // $true$
+                                        ^? ~g ht result
+print(n2 % n1 == 0);               // $true$
+                                        ^? ~g ht result
+
+print(!(n1 == n2));                // $true$
+                                        ^? ~g ht result
+print(!(n1 < n2));                 // $false$
+                                        ^? ~g ht result
+print((n1 + 5) == (n2 - 5));       // $true$
+                                        ^? ~g ht result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="Min()">
+$public static$ $int $$Min$($int $$a$, $int $$b$)
+        ~r hr return-type
+        ^$
+        ^What ~g hb func-name       {1}
+        ^$ ~t                       {+}
+        ~r hb type-is-missing
+        ^$
+        ~r hb type-is-missing
+{
+    if $($$a < b$$)$
+            ^$ ~r ht syntax-error
+            ~r hr if-syntax
+            ^$ ~r ht syntax-error
+        return a;
+    return b$;$
+        ^ $ ~r ht end-of-op
+}
+
+$Min$(10, 20);     // $10$
+    ^What ~g hr func-name   {1}
+    ^?$ ~g hr result        {+}
+$Min$(20, 10);     // $10$
+    ^What ~g hr func-name   {1}
+    ^?$ ~g hr result        {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="ItsTriangle()">
+public static $bool $$ItsTriangle$(int a$,$ int b$,$ int c)
+^$
+~r hr return-type
+                            ^; ~r hb syntax-error   {+}
+                            ^; ~r hb syntax-error
+{
+    if (a + b < c)
+        return false$;$                     {1}
+                    ^ $ ~r ht end-of-op
+    if (a + c < b)
+        return false$;$                     {1}
+                    ^ $ ~r ht end-of-op
+    if (b + c < a)
+        return false$;$                     {1}
+                    ^ $ ~r ht end-of-op
+    return true$;$                          {1}
+                    ^ $ ~r ht end-of-op
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="redundant-if">
+public static $void $$Foo$(int num)     {1}
+              ^$
+              ~r hb return-type
+{
+    if (num >= 0)
+    {
+        Console.WriteLine("positive");
+        $return;$                       {1}
+        ~g
+    }
++   $if (num < 0) $                    {2}
+    ~o ht if-is-redundant
++4      Console.WriteLine("negative");
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="IsEven()">
+public static bool $IsEven$(int num)
+        ^What ~g hb func-name
+{
+    $return $num % 2 == 0$;$            {1}
+    ^if ( ~t
+    ^) ~t                             {1}                  
++       $return true;$                  {1}
+        ~o ht return-bool-expression
++    else                           {1}
++        $return false;$                {1}
+        ~o ht return-bool-expression
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="PythagorasTripple()">
+$public static$ $bool $$PythagorasTripple$(int $a$$,$ int $b$$,$ int c)
+        ~r hr return-type
+        ^$
+        ^What ~g hb func-name               {1}
+        ~r hb comma-is-missing              {+}
+        ^$
+        ~r hb comma-is-missing
+        ^$
+{
+    $return $a*a + b*b $==$ c*c$;$          {2}
+    ^if ( ~t
+                ^= ~r ht assign-vs-comp     {+}
+    ^) ~t                                 {2}                  
++       $return true;$                      {2}
+        ~o ht return-bool-expression
++    else                               {2}
++        $return false;$                    {2}!
+        ~o ht return-bool-expression
+}
+
+print($PythagorasTripple$(3,4,5));    // $true$
+        ^What ~g hr func-name   {1}
+        ^?$ ~g hr result        {+}
+print($PythagorasTripple$(3,4,7));    // $false$
+        ^What ~g hr func-name   {1}
+        ^?$ ~g hr result        {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="CountDigit()">
+public static int CountDigit(int num, $int $$digit$)
+        ^$
+        ~r hb type-is-missing
+{
+    int $count$$ = 0$;
+            ~r hr init-value
+            ^$
+    $while$ (num != 0)              {1}
+            ~r ht endless-loop
+    {
+        if (num % 10 $==$ digit)
+                ^= ~r hr assign-vs-comp
+            count += 1;
+-        num /= 10;                 {1}
+    }
+    return count$;$
+            ^ $ ~r hr end-of-op
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="DigitSum()">
+$public static$ $int $$DigitSum$(int num)
+        ~r hr return-type
+        ^$
+        ^What ~g hr func-name   {1}
+{
+    int $sum$$ = 0$;
+            ~r hr init-value
+            ^$
+    while $($$num != 0$$)$
+            ^$
+            ~r ht while-syntax
+            ^$
+    {
+        sum += num % 10;
+        num /= 10;
+    }
+    return sum;
+}
+
+$DigitSum$(123456789);        // $45$
+    ^What ~g hr func-name   {1}
+    ^? ~g hl result         {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="Reverse()"> 
+public static int $Reverse$($int $$num$)
+        ^What ~g hr func-name   {1}
+        ^$ ~t                   {+}
+        ~r hr type-is-missing
+{
+    $int $$rev$ = 0;
+        ^$
+        ~r hr type-is-missing
+    $while$ (num != 0)          {2}
+                    ~r ht endless-loop
+-   {                           {2}
+        rev = rev * 10 + num % 10;
+        num $/=$ 10;
+            ^/ ~r ht var-is-not-changed
+-    }                          {2}
+    return rev;
+}
+
+print($Reverse$(123456789));        // $987654321$
+    ^What ~g hr func-name   {1}
+    ^? ~g hl result         {+}
+
+public static bool $Palindrome$(int num)
+        ^What ~g hr func-name   {3}
+{
+    return num $==$ Reverse(num);
+        ^= ~r ht assign-vs-comp
+}
+
+print($Palindrome$(123321));        // $true$
+    ^What ~g hr func-name   {3}
+    ^? ~g hl result         {+}
+print($Palindrome$(123123));        // $false$
+    ^What ~g hr func-name   {3}
+    ^? ~g hl result         {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="boom-3">
+public static void Say(int num)
+{
+    bool endsWith3 = num % 10 == 3;
+    bool FactorOf3 = num % 3 == 0;
+
+    if (endsWith3 $&&$ FactorOf3)
+            ^and ~r ht java-not-python
+        Console.WriteLine("Boom boom");
+    else 
+    if (endsWith3 $||$ FactorOf3)
+            ^or ~r ht java-not-python
+        Console.WriteLine("Boom");
+    else
+        Console.WriteLine($$$num$$$);
+            ^"
+            ~r ht var-or-string
+            ^"
+}
+
+Say(13);        // $Boom$
+                    ^? ~g ht result
+Say(3);         // $Boom boom$
+                    ^? ~g ht result
+Say(12);        // $Boom$
+                    ^? ~g ht result
+Say(0);         // $Boom$
+                    ^? ~g ht result
+Say(10);        // $10$
+                    ^? ~g ht result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="PrimeNumber()">
+public static bool Factor(int a, int b)
+{
+    return a % b $==$ 0$;$
+        ^= ~r hr assign-vs-comp
+        ^ $ ~r hr end-of-op
+}
+
+print(Factor(12, 4));       // $true$
+    ^? ~g hl result
+print(Factor(12, 5));       // $false$
+    ^? ~g hl result         {+}
+
+public static bool $PrimeNumber$(int num)
+        ^What ~g hr func-name   {1}
+{
+    for (int $i = 2$; i < num; i++)
+        ~g ht למה זה מתחיל ב-2?
+    {
+        $if$ $($Factor($num$$,$ i)$)$
+                    ~r ht if-syntax             {2}
+                    ^$
+                    ~r ht comma-is-missing      {+}
+                    ^$
+                    ^$ ~t                       {2}
+            return false;
+    }
+    return true;
+}
+
+print($PrimeNumber$(100));        // $false$
+    ^What ~g hr func-name   {1}
+    ^? ~g hl result         {+}
+print($PrimeNumber$(43));         // $true$
+    ^What ~g hr func-name   {1}
+    ^? ~g hl result         {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="local-var">
+public static $int$ FindIndex(int[] arr, int num)
+        ^void ~r ht return-What
+{
+-    int foundAtIndex = -1;                 {2}
+    for (int i = 0; i < arr.Length; i++)
+    {
+        $if$ $($arr[i] $==$ num$)$
+                ~r ht if-syntax             {1}
+                ^$
+                ^= ~r ht assign-vs-comp     {+}
+                ^$ ~t                       {1}
+            $$foundAtIndex = i;             {2}!
+                ^int $ ~r ht local-var
+    }
+    return $foundAtIndex$;
+        ~r hr local-var                     {2}
+}
+</drill>
+

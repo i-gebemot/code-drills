@@ -1,0 +1,108 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="../md-components.js"></script>
+
+<!---------------------------------------------------------->
+<import-hints from="./csharp-hints.html"></import-hints>
+
+<code-drills
+    heading="Readme"
+    no-wrong-phase
+    at-once
+    log-level="W"
+>
+</code-drills>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="navigation">
+Next phase - $Left click$ or $Space$    Previous phase - $Right click$ or $Backspace$
+    ^Left click ~g hr שלב הבא
+    ^? ~g hr שלב הבא
+    ^? ~g hr שלב קודם
+    ^? ~g hr שלב קודם
+Show hint - $Mouse hover over underlined text$
+    ^? ~g hr כדי להציג רמז, רחף עם העכבר מעל הטקסט המסומן בקו תחתון
+
+Next drill - $Enter$ or $N$             Previous drill - $Backspace$ or $P$
+    ^? ~g hr דריל הבא
+    ^? ~g hr דריל הבא
+    ^? ~g hr דריל קודם
+    ^? ~g hr דריל קודם
+Reveal all answers - $Reveal button$ or $R$
+    ^? ~g hr להראות את כל התשובות
+    ^? ~g hr להראות את כל התשובות
+Restart current drill - $Again button$ or $A$
+    ^? ~g hr להתחיל את הדריל הנוכחי עוד פעם
+    ^? ~g hr להתחיל את הדריל הנוכחי עוד פעם
+Shuffle all drills - $Shuffle button$
+    ^? ~g hr לערבב את כל הדרילים
+$!html { 
+    <iframe width="600" height="360"
+        class="absolute left-32"
+        src="https://www.youtube.com/embed/wIF7GCOmLQM" 
+        title="Working with code-drills"
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+        referrerpolicy="strict-origin-when-cross-origin" 
+        allowfullscreen
+    ></iframe>
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<hint id="va-args" dir="rtl">
+    מקבלת הרבה פרמטרים של כל מיני סוגים
+</hint>
+
+<hint id="print-all" dir="rtl">
+    מדפיסה כל פרמטר לפי סוג שלו
+</hint>
+
+<drill la!ng="java" id="Print(...)">
+// פונקצית עזר בתרגילים הבאים
+// $מדפיסה כל פרמטר בתור מחרוזת$
+        ^מה הפונקציה עושה? ~g
+public static void $Print$($params object[] args$)
+        ~g ht helper
+        ^... ~g ht va-args
+{
+-    foreach (var arg in args)
+-    {
+-        Console.WriteLine(Str(arg));
+-        Console.WriteLine(' ');
+-    }
+-    Console.WriteLineln();
++    $...$
+        ~g hr Print-all
+}
+</drill>
+
+<drill lang="java" id="ListFromArray()">
+public static Node&lt;T> ListFromArray(T[] a)
+{
+    if (a == null || a.length == 0)
+        return null;
+    Node&lt;T> lst = new Node&lt;T>(values[0]);
+    Node&lt;T> node = lst;
+    for (int i = 1; i < values.length; i++)
+    {
+        node.setNext(new Node&lt;T>(values[i]));
+        node = node.getNext();
+    }
+    return lst;
+}
+</drill>
+
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="About">
+Author: $Gosha Smeh$
+    ^? ~g hr Gosha Smeh
+Contact me: $gosha.smeh@gmail.com$
+    ^? ~g hr gosha.smeh@gmail.com
+Powered by: $i-gebemot$
+    ^? ~g hr i-gebemot
+</drill>

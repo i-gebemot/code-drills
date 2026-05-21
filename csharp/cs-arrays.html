@@ -1,0 +1,341 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="../md-components.js"></script>
+
+<import-hints from="./csharp-hints.html"></import-hints>
+
+<!---------------------------------------------------------->
+
+<code-drills log-level="W"
+    heading="Arrays"
+>
+</code-drills>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="ArrayMax()">
+$public static $int $ArrayMax$(int$[]$ $arr$)
+    ^$
+    ~r hr external-func
+               ^$ ~t                      {+}
+               ~r hr is-it-array
+{
+-   int max = arr[0];                             {1}
+    for (int i = 0; i < arr.Length; i++)
+    {
+        if (arr[i] > $max$)                       {1}
+                   ~r ht missing-declaration
+            $max$ = arr[i];                       {1}
+            ~r ht missing-declaration
+    }
+    return $max$;                               {1}
+           ~r ht missing-declaration
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="ArrayMin()">
+$public$ $static $int $ArrayMin$(int[] a) {
+        ~r hr external-func
+        ^$
+        ^What ~g hr func-name   {1}
+    int $min$ = a[0]$;$
+            ^www ~g hr var-name             {2}
+            ^ $ ~r hr end-of-op             {+}
+    for (int i = 0; i < a.Length; i++)
+    {
+        if (a[i] < $min$)
+                    ^www ~g hr var-name     {2}
+            $min$ = a[i];
+                    ^www ~g hr var-name     {2}
+    }
+    return min;
+}
+
+$ArrayMin$(new int[] {10,3,-2,40});    // $-2$
+    ^What ~g hr func-name   {1}
+    ^? ~g hl result         {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="Contains()">
+$public $$static$ bool $Contains$(int[] a, $int $$num$) {
+        ^$
+        ~r hr external-func
+        ^What ~g hr func-name   {1}
+        ^$ ~t                   {+}
+        ~r hb type-is-missing
+    for (int i = 0$;$ i < a.Length$;$ i++)
+                ^ $ ~r hb for-syntax
+                ^ $ ~r hb for-syntax
+    {
+        if (a[i] $==$ num)
+                ^= ~r ht assign-vs-comp
+            return true;
+    }
+    return false;
+}
+
+$Contains$(new int[] {16,-3,10,40}, 10);      // $true$
+    ^What ~g hr func-name   {1}
+    ^? ~g hl result         {+}
+$Contains$(new int[] {16,-3,10,40}, 100);     // $false$
+    ^What ~g hr func-name   {1}
+    ^? ~g hl result         {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="CalculateSum()">
+$public static $$double$ $CalculateSum$(double[] arr) {
+        ^$
+        ~r hr external-func
+        ^What ~g hr func-name   {1}
+    $double$ $sum$ = 0;
+            ^int ~r hr type-mismatch
+            ^www ~g hr var-name             {2}
+    for (int i = 0; i < arr.Length; i++)
+    {
+        $sum$ += arr[i];
+            ^www ~g hr var-name             {2}
+    }
+-    return sum;                            {3}
+$} $                                        {3}
+    ~r hr חישבנו סכום ומה?
+
+
+$CalculateSum$(new double[] {1,2,3,4,5,6,7,8,9});   // $45.0$
+    ^What ~g hr func-name   {1}
+    ^? ~g hl result         {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="StartsWith()">
+$public static$ $bool $$StartsWith$(int[] a, int[] b) {
+        ~r hr return-type
+        ^$ ~t                   
+        ^What ~g hr func-name       {+}{1}
+-    if (b.Length > a.Length)       {2}
+-        return false;              {2}
+    for ($int $$i$ = 0; i $<$ b.Length; i++)
+            ^$
+            ~r hr type-is-missing
+            ^<= ~r ht index-vs-Length   {+}
+    {
+        if (a[i] != b[i])
+            return false;
+    }
+    return true;
+}
+
+print($StartsWith$(new int[] {1,4,7,10,8}, new int[] {1,4,7})); // $true$
+        ^What ~g hr func-name   {1}
+        ^? ~g hl result         {+}
+print($StartsWith$(new int[] {1,4,7,10,8}, new int[] {1,5,7})); // $false$
+        ^What ~g hr func-name   {1}
+        ^? ~g hl result         {+}
+print($StartsWith$(new int[] {1,4,7}, new int[] ${1,4,7,10,8}$));
+        ^What ~g hr func-name       {1}
+        ~r ht index-out-of-bounds   {2}!
+</drill>
+
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="AllEqualsTo()">
+public static bool AllEqualsTo(int$[]$ $a$, int num)
+        ^$
+        ~r hr is-it-array
+{
+    for (int i = 0; i < a.Length$$; i++)
+                ^() ~r hr Length-is-prop
+    {
+        if (a[i] != num)
+            return $false$;
+                    ^true ~r ht wrong-logic     {1}
+    }
+    return $true$;
+                    ^false ~r ht wrong-logic    {1}
+}
+
+print(AllEqualsTo($new $$int[] {20,10,20}$, 20));    // false {2}
+    ^$
+    ~r ht new-is-missing
+print(AllEqualsTo($new $$int[] {20,20,20}$, 20));    // true  {2}
+    ^$
+    ~r ht new-is-missing
+
+$public static $$bool$ $ConstArray$(int[] a) {
+        ^$
+        ~r hr external-func
+        ^What ~g hr func-name                           {3}
+    return AllEqualsTo(a, a[0]);
+}    
+
+print($ConstArray$(new int[] {1,2,1}));   // $false$
+        ^What ~g hr func-name                           {3}
+        ^? ~g hl result         {+}
+print($ConstArray$(new int[] {2,2,2}));   // $true$
+        ^What ~g hr func-name                           {3}
+        ^? ~g hl result         {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<hint id="not-ascending" dir="rtl">
+    פיתום זה לא עולה...
+</hint>
+
+<drill lang="java" id="Ascending()">
+public static bool $Ascending$(double$[]$ $a$)
+        ^What ~g hr func-name               {1}
+        ^$ ~t                               {+}
+        ~r hr is-it-array
+{
+    for (int i = 1; i $<=$ a.Length$-1$; i++)
+            ^< ~r ht index-vs-Length
+            ~g ht index-vs-Length
+    {
+        if (a[i-1] > a[i])
+            return false;
+    }
+    return true;
+}
+
+print($Ascending$(new double[] {2,10,13,15.0}));  // true
+        ^What ~g hr func-name                 {1}
+print($Ascending$(new double[] {2,$13.0,10$,15}));  // $false$
+        ^What ~g hr func-name                 {1}
+        ~o ht not-ascending                   {+}
+        ^? ~g ht result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="Ascending_2()">
+$public static$ $bool $$Ascending$(double[] a)
+        ~r hr return-type
+        ^$
+        ^What ~g hr func-name                 {1}
+{
+    for (int i $=$ a.Length-1; i > 0; i--)
+            ^== ~r ht assign-vs-comp
+    {
+        if (a[i] < a[i-1])
+            return false;
+    }
+    return true;
+}
+
+print($Ascending$($new double[] {$2,10,13,15.0$}$));    // true
+        ^What ~g hr func-name                 {1}
+        ^[ ~r ht new-array                    {2}
+        ^] ~r ht new-array
+print($Ascending$($new double[] {$2,$13.0,10$,15$}$));    // $false$
+        ^What ~g hr func-name                 {1}
+        ^[ ~r ht new-array                    {2}
+        ~o ht not-ascending                   {3}
+        ^] ~r ht new-array                    {2}
+        ^? ~g ht result                       {3}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="Palindrome()">
+$public $$static bool$ $Palindrome$($int[] $$a$)
+        ^$
+        ~r hr return-type
+        ^What ~g hr func-name                   {1}
+        ^$ ~t                                   {+}
+        ~r hr type-is-missing
+{
+    for (int i = 0; i $<=$ a.$Length$$-1$; i++)
+            ~g ht index-vs-Length
+            ~r ht index-vs-Length
+            ^$
+    {
+        if (a[i] != a[$a.Length-i$$-1$])
+                    ~r ht index-vs-Length
+                    ^$
+            return false;
+    }
+-    return true;                   {2}
+$} $                                {2}
+    ~r hr return-is-missing
+
+print($Palindrome$(new int[] {3,7,2,4,2,7,3}));       // $true$
+        ^What ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+print($Palindrome$(new int[] {3,7,2,4,4,2,7,3}));     // $true$
+        ^What ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+print($Palindrome$(new int[] {1,2,3,1,2,3}));         // $false$
+        ^What ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="ArithmeticProgression()" no-wrong-phase>
+public static bool $ArithmeticProgression$(int[] a, int a0, int d)
+        ^What ~g hr func-name                   {1}
+{
+    for (int i = 0; i < a.Length; i++)
+    {
+        if (a[i] != a0 + d * i)
+            return false;
+    }
+    return true;
+}
+
+print($ArithmeticProgression$(new int[] {1,3,5,7,9,11}, 1, 2));       // $true$
+        ^What ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+print($ArithmeticProgression$(new int[] {10,13,16,19,22}, 10, 3));    // $true$
+        ^What ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+print($ArithmeticProgression$(new int[] {5,5,5,5,5}, 5, 0));          // $true$
+        ^What ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+print($ArithmeticProgression$(new int[] {9,7,5,3,1,-1}, 9, -2));      // $true$
+        ^What ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+print($ArithmeticProgression$(new int[] {9,7,5,3,1,0}, 9, -1));       // $false$
+        ^What ~g hr func-name                   {1}
+        ^? ~g hl result                         {+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="EndsWith()">
+public static bool $EndsWith$(int$[]$ $a$, int$[]$ $b$)
+        ^What ~g hr func-name                   {1}
+        ^$ ~t                                   {+}
+        ~r hb is-it-array
+        ^$
+        ~r hb is-it-array
+{
+-    if (b.Length > a.Length)                   {2}
+-        return false;                          {2}
+    for (int i = 0; i < b.Length; $i += 1$)
+            ~g ht זה דווקה בסדר, זהה ל- ++i
+    {
+        if (a[a.Length-i-1] $!=$ b[$b$.Length-i-1])
+                ^== ~r ht wrong-logic
+                ^a ~r ht זה אחרון של מערך a או b?   {+}
+            return false;
+    }
+    return true;
+}
+
+$EndsWith$(new int[] {23,10,5,7,1}, new int[] {5,7,1});   // true
+        ^What ~g hr func-name                   {1}
+$EndsWith$(new int[] {23,10,5,7,1}, new int[] {5,8,1});   // true
+        ^What ~g hr func-name                   {1}
+$EndsWith$(new int[] {23,10,5,7,1}, new int[] ${1,23,10,5,7,1}$);
+        ^What ~g hr func-name                   {1}
+        ~r ht מה יקרא אחרי בדיקה של מספר 23?    {2}!
+</drill>

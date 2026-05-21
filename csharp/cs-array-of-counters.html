@@ -1,0 +1,56 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="../md-components.js"></script>
+
+<import-hints from="./csharp-hints.html"></import-hints>
+
+<!---------------------------------------------------------->
+
+<code-drills
+    heading="Array of counters"
+    log-level="W"
+>
+</code-drills>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="MostFrequentNum()">
+// להחזיר את המספר הנפוץ במערך
+// המספרים במערך הם מ-0 עד-100 (כולל)
+public static $int $$MostFrequentNum$(int[] nums)
+        ^$
+        ~r ht missing-ret-type
+{
+    int$[]$ $counters$ = new int[$101$];    $// מערך של הצוברים$
+        ^$
+        ~r ht is-it-array
+        ^100 ~r ht כמה מספרים יש מ-0 עד-100 כולל?     {+}
+        ^$ ~t                                           {1}
+    for (int i = 0; i < nums.Length; i++)
+    {
+        int num = nums[i];
+        $counters[num] += 1;$   $// מוסיפים אחד לצובר של המספר הנוכחי$
+            ~g ht זאת שורה חשובה... כדאי להסביר
+            ^$
+    }
+    int indexOfMax = 0;
+-    // עכשיו עוברים על מערך של הצוברים            {1}
+    for (int k = 0; k < $counters$.Length; k++)
+            ^nums ~r ht עכשיו עוברים על מערך של הצוברים    {1}!
+    {
+        if (counters[k] > counters[indexOfMax])
+            indexOfMax = k;
+    }
+    return $$$indexOfMax$$$;
+        ^counters[
+        ~r hb צריך להחזיר את המספר עצמו ולא כמה פעמים הוא מופיע
+        ^]
+}
+
+MostFrequentNum(new int[] {2,9,9,7,2,9,2,9});  // $9$
+    ^? ~g ht result
+MostFrequentNum(new int[] {2,2,2,3,3,3});      // $2$
+    ^? ~g ht result
+MostFrequentNum(new int[] {3,3,3,2,2,2});      // $2 (why not 3?)$
+    ^? ~g ht result
+</drill>

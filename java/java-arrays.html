@@ -111,8 +111,8 @@ $calculateSum$(new double[] {1,2,3,4,5,6,7,8,9});   // $45.0$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="prefix()">
-$public static$ $boolean $$prefix$(int[] a, int[] b) {
+<drill lang="java" id="startsWith()">
+$public static$ $boolean $$startsWith$(int[] a, int[] b) {
         ~r hr return-type
         ^$ ~t                   
         ^what ~g hr func-name       {+}{1}
@@ -130,13 +130,13 @@ $public static$ $boolean $$prefix$(int[] a, int[] b) {
     return true;
 }
 
-print($prefix$(new int[] {1,4,7,10,8}, new int[] {1,4,7})); // $true$
+print($startsWith$(new int[] {1,4,7,10,8}, new int[] {1,4,7})); // $true$
         ^what ~g hr func-name   {1}
         ^? ~g hl result         {+}
-print($prefix$(new int[] {1,4,7,10,8}, new int[] {1,5,7})); // $false$
+print($startsWith$(new int[] {1,4,7,10,8}, new int[] {1,5,7})); // $false$
         ^what ~g hr func-name   {1}
         ^? ~g hl result         {+}
-print($prefix$(new int[] {1,4,7}, new int[] ${1,4,7,10,8}$));
+print($startsWith$(new int[] {1,4,7}, new int[] ${1,4,7,10,8}$));
         ^what ~g hr func-name       {1}
         ~r ht index-out-of-bounds   {2}!
 </drill>
@@ -304,8 +304,8 @@ print($arithmeticProgression$(new int[] {9,7,5,3,1,0}, 9, -1));       // $false$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="suffix()">
-public static boolean $suffix$(int$[]$ $a$, int$[]$ $b$) {
+<drill lang="java" id="endsWith()">
+public static boolean $endsWith$(int$[]$ $a$, int$[]$ $b$) {
         ^what ~g hr func-name                   {1}
         ^$ ~t                                   {+}
         ~r hb is-it-array
@@ -325,11 +325,11 @@ public static boolean $suffix$(int$[]$ $a$, int$[]$ $b$) {
     return true;
 }
 
-$suffix$(new int[] {23,10,5,7,1}, new int[] {5,7,1});   // true
+$endsWith$(new int[] {23,10,5,7,1}, new int[] {5,7,1});   // true
         ^what ~g hr func-name                   {1}
-$suffix$(new int[] {23,10,5,7,1}, new int[] {5,8,1});   // true
+$endsWith$(new int[] {23,10,5,7,1}, new int[] {5,8,1});   // true
         ^what ~g hr func-name                   {1}
-$suffix$(new int[] {23,10,5,7,1}, new int[] ${1,23,10,5,7,1}$);
+$endsWith$(new int[] {23,10,5,7,1}, new int[] ${1,23,10,5,7,1}$);
         ^what ~g hr func-name                   {1}
         ~r ht מה יקרא אחרי בדיקה של מספר 23?    {2}!
 </drill>

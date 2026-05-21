@@ -1,0 +1,51 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="../md-components.js"></script>
+
+<import-hints from="./bagruts-hints.html"></import-hints>
+
+<!---------------------------------------------------------->
+
+<code-drills 
+    heading="2025 - 271"
+    log-level="W"
+>
+</code-drills>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="removeAll()" no-wrong-phase>
+$!html:w-h-r+ <img width=420 src="./img/linked-list-removeAll().png">
+public static Node&lt;Integer> removeAll(Node&lt;Integer> lst, int value) {
+    // $מוחקים את הצמתים בראש הרשימה$
+            ^... ~o ht implement
+    while ($lst$ != null && $lst.getValue()$ == value) {
+            ^... ~o ht implement
+            ^... ~o ht implement    {+}
+        lst = lst.getNext();
+    }
+    // <bdo dir="rtl">?מה אם מחקנו הכול</bdo>
+-    if (lst == null) {             {1}
+-        return null;               {1}
+-    }                              {1}
++   $...$                           {1}
+        ~o ht implement
+    // $מוחקים מאמצע של רשימה$
+            ^... ~o ht implement
+    Node&lt;Integer> prev = lst;
+    while (prev.hasNext()) {
+        if ($prev.getNext().getValue()$ == value) {
+                ^... ~o ht implement
+            prev.setNext($prev.getNext().getNext()$);
+                ^... ~o ht implement
+        } else {
+            $prev = prev.getNext();$
+                ^... ~o ht implement
+        }
+    }
+    return $lst$;
+        ^... ~o ht implement
+}
+</drill>
+
+<!---------------------------------------------------------->
