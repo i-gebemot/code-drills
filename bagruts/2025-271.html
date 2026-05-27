@@ -7,7 +7,7 @@
 <!---------------------------------------------------------->
 
 <code-drills 
-    heading="2025 - 271"
+    heading="2025-271"
     log-level="W"
 >
 </code-drills>
@@ -17,7 +17,7 @@
 <!---------------------------------------------------------->
 
 <drill lang="java" id="removeAll()" tags="['q-1','idea-1']" no-wrong-phase>
-$!html:w-h-r+ <img width=420 src="./img/linked-list-removeAll().png">
+$!html:w-h-r+ <img width=420 src=./img/2025-271-removeAll().png">
 public static Node&lt;Integer> removeAll(Node&lt;Integer> lst, int value) {
     // $מוחקים את הצמתים בראש הרשימה$
             ^... ~o ht implement
@@ -114,69 +114,6 @@ class Room {
 }
 </drill>
 
-<!---------------------------------------------------------->
-
-<drill lang="java" id="m-connected-array" tags="['q-2','idea-1']" no-wrong-phase>
-
-</drill>
-
-<!---------------------------------------------------------->
-
-<drill lang="java" id="" tags="['q-2','idea-2']" no-wrong-phase>
-</drill>
-
-<!---------------------------------------------------------->
-
-<drill lang="java" id="maxConnect()" tags="['q-2','idea-3']" no-wrong-phase todo>
-public static maxConnect(int[] a, int[] b) {
-    int m = 1;
-    while (m < a.length) {
-        if (!isMConnect(a, b, m)) {
-            return m - 1;
-        }
-        m++;
-    }
-    return m;
-}
-
-print(maxConnect(a, b));            // 2
-print(maxConnect(b, a));            // 0
-
-Runtime complexity of maxConnect is  `O(n^2)`
-</drill>
-
-<!---------------------------------------------------------->
-
-<drill lang="java" id="contains()!" tags="['q-3', 'idea-1']" as-html>
-<img-areas width=800
-    src="./img/bagrut-2025-b-271-q3-a.png"
-    hide="[
-        [30,6,21,12],[26,30,22,12],[12,50,23,14],[0,75,22,12],[10,90,31,10],[35,70,15,10],
-        [34,82,16,8],[42,90,28,9],[69,52,15,10],[84,81,16,10],[71,92,28,7],[79,28,19,16],
-        [57,30,7,5],[45,50,6,6],[26,67,5,5],[54,68,6,5],[59,46,6,5],[68,72,5,5],[70,22,8,6],[61,4,8,6]
-    ]">
-</img-areas>
-</drill>
-
-<!---------------------------------------------------------->
-
-<drill lang="java" id="" tags="['q-3','idea-2']" no-wrong-phase>
-</drill>
-
-<!---------------------------------------------------------->
-
-<drill lang="java" id="" tags="['q-3','idea-3']" no-wrong-phase>
-</drill>
-
-<!---------------------------------------------------------->
-
-<drill lang="java" id="" tags="['q-','idea-']" no-wrong-phase>
-</drill>
-
-<!---------------------------------------------------------->
-
-<drill lang="java" id="" tags="['q-','idea-']" no-wrong-phase>
-</drill>
 
 <!---------------------------------------------------------->
 

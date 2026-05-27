@@ -1,0 +1,239 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="../md-components.js"></script>
+
+<import-hints from="./bagrut-hints.html"></import-hints>
+
+<!---------------------------------------------------------->
+
+<code-drills 
+    heading="2025-271-b"
+    log-level="W"
+>
+</code-drills>
+
+<template>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="isMConnect()" tags="['q-2','idea-1']" no-wrong-phase>
+// first m numbers of a[] are last number of b[]
+public static boolean isMConnect(int[] a, int[] b, int m) {
+    int k = $a.length - m;$
+            ^... ~o hr implement
+    for (int i = 0; i < m; i++) {
+        if (a[i + k] != b[i]) {
+            return $false;$
+                ^... ~o hr implement
+        }
+    }
+    return $true;$
+        ^... ~o hr implement
+}
+
+int[] a = new int[] {2,5,4,4,7,2,6};
+int[] b = new int[] {2,6,7,1,4,2,1,8,1};
+print(isMConnect(a, b, 2));
+
+// Runtime complexity of isMConnect() is  $`O(n)`$
+    ^? ~g hr result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="atIndex()" tags="['q-2','idea-2']" no-wrong-phase>
+public static int atIndex(Queue&lt;Integer> que, int indx) {
+    Queue&lt;Integer> tmp = new Queue&lt;Integer>();
+    while (indx > 0) {
+-        que.insert(tmp.remove());      {1}
+-        indx--;                        {1}
++        $...$                          {1}
+            ~o hr implement
+    }
+    int x = $que.remove();$
+        ^... ~o hr implement            {2}
+-   tmp.insert(x);                      {2}
++   $...$                               {2}
+            ~o hr implement
+    while ($!que.isEmpty()$) {
+            ^... ~o hr implement        {3}
+-       tmp.insert(que.remove());       {3}
++       $...$                           {3}
+            ~o hr implement
+    }
+    while ($!tmp.isEmpty()$) {          {4}
+            ^... ~o hr implement        {4}
+-       que.insert(tmp.remove());       {4}
++       $...$                           {4}
+            ~o hr implement
+    }
+    return x;
+}
+
+// Runtime complexity of atIndex() is $`O(n)`$
+    ^? ~g hr result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="maxConnect()" tags="['q-2','idea-3']" no-wrong-phase>
+public static int maxConnect(int[] a, int[] b) {
+    int max = $0;$
+        ^... ~o hr implement
+    for ($int i = 0; i < a.length; i++$) {
+            ^... ~o hr implement
+        if ($isMConnect(a, b, i)$) {
+                ^... ~o hr implement
+            max = i;
+        }
+    }
+    return max;
+}
+
+int[] a = new int[] {2,5,4,4,7,2,6};
+int[] b = new int[] {2,6,7,1,4,2,1,8,1};
+
+print(maxConnect(a, b));            // $2$
+    ^? ~g hr result
+print(maxConnect(b, a));            // $0$
+    ^? ~g hr result
+
+// Runtime complexity of maxConnect is  $`O(n^2)`$
+    ^? ~g hr result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="queue-implementation" tags="['q-2','idea-4']" no-wrong-phase>
+public static int length(Queue&lt;Integer> que) {
+    // Runtime complexity is $`O(n)`$
+        ^? ~g hr result
+    ...
+}
+
+public static int atIndex(Queue&lt;Integer> que, int indx) {
+    // Runtime complexity is $`O(n)`$
+        ^? ~g hr result
+    ...
+}
+
+public static int isMConnect(Queue&lt;Integer> a, Queue<Integer> b, int m) {
+    // Runtime complexity is $`O(n^2)`$
+        ^? ~g hr result
+    ...
+}
+
+public static int maxConnect(Queue&lt;Integer> a, Queue<Integer> b) {
+    // Runtime complexity is $`O(n^3)`$
+        ^? ~g hr result
+    ...
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="maakav-1" tags="['q-3', 'idea-1']" as-html>
+<img-areas width=800
+    src=./img/2025-271-b-q3-a.png"
+    hide="[
+        [30,6,21,12],[26,30,22,12],[12,50,23,14],[0,75,22,12],[10,90,31,10],[35,70,15,10],
+        [34,82,16,8],[42,90,28,9],[69,52,15,10],[84,81,16,10],[71,92,28,7],[79,28,19,16],
+        [57,30,7,5],[45,50,6,6],[26,67,5,5],[54,68,6,5],[59,46,6,5],[68,72,5,5],[70,22,8,6],
+        [61,4,8,6]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="maakav-2" tags="['q-3', 'idea-2']" as-html>
+<img-areas width=800
+    src=./img/2025-271-b-q3-b.png"
+    hide="[
+        [1,24,70,7],[1,32,71,5],[1,38,71,5],[1,44,70,6],[1,50,70,6],[1,56,69,5],
+        [1,62,70,12],[1,74,70,6],[1,81,70,6],[80,18,20,70]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="sod() and secret()" tags="['q-'3,'idea-3']" no-wrong-phase>
+public static boolean $contains$(BinNode&lt;Integer> root, int num) {       {1}
+        ^sod ~g ht func-name
+    if (root == null)
+        return false;
+    if (root.getValue() == num)
+        return true;
+    return $contains$(root.getLeft(), num) || $contains$(root.getRight(), num);     {1}
+        ^sod ~g ht func-name
+        ^sod ~g ht func-name
+}
+
+-// עם יש לי איקס בתור בן תכליל אותי בסכום  {2}
+public static int $sumIfxIsChild$(BinNode&lt;Integer> root, int x) {            {2}
+        ^secret ~g ht func-name
+    if (!$contains$(root, x))       {1}
+            ^sod ~g ht func-name
+        return 0;
+    if ((root.getLeft() != null && root.getLeft().getValue() == x) || 
+        (root.getRight() != null && root.getRight().getValue() == x))
+    {
+        return root.getValue() + $sumIfxIsChild$(root.getLeft(), x) +
+                                    ^secret ~g ht func-name             {2}
+                                 $sumIfxIsChild$(root.getRight(), x);
+                                    ^secret ~g ht func-name             {2}
+    }
+    return $sumIfxIsChild$(root.getLeft(), x) + $sumIfxIsChild$(root.getRight(), x);    {2}
+        ^secret ~g ht func-name
+        ^secret ~g ht func-name
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="tests" tags="['q-3','idea-4']" no-wrong-phase>
+$!html <img width=500 src=./img/2025-271-b-q3.png" class="absolute right-0 top-0">
+sod(root, 25);      // $true$
+    ^? ~g hr result
+sod(root, $21$);      // false
+    ^... ~g hr implement
+secret(root, 10);   // $35$
+    ^? ~g hr result
+secret(root, 5);    // $15$
+    ^? ~g hr result
+secret(root, $20$);   // 50
+    ^... ~g hr implement
+secret(root, $25$);   // 50
+    ^... ~g hr implement
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q7-L1" no-wrong-phase as-html>
+<img src=./img/2025-271-b-q7.png">
+<img-areas width=800
+    src=./img/2025-271-b-q7-L1.png"
+    hide="[
+        [0,20,100,80],
+        [9,31,17,18],[40,31,15,18],[68,25,15,28],
+        [25,62,15,23],[54,66,15,28],[83,69,15,29],
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q7-L2" no-wrong-phase as-html>
+<img src=./img/2025-271-b-q7.png">
+<img-areas width=800
+    src=./img/2025-271-b-q7-L2.png"
+    hide="[
+        [15,25,40,67],[53,24,45,68]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+</template>

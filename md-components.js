@@ -4492,7 +4492,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.26.0";
+  const VERSION = "0.27.0";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -13610,7 +13610,6 @@
       function makeSrc(id, content, html2, _$) {
         let lines = content.split(/\r?\n/);
         let htmlLines = html2.split(/\r?\n/);
-        if (lines.length !== htmlLines.length) log.warn(`Drill '${id}' lines=${lines.length} htmlLines=${htmlLines.length}`);
         let lineNo = 0;
         let next2 = () => lineNo += lineNo < lines.length ? 1 : 0;
         let end = () => lineNo >= lines.length;
