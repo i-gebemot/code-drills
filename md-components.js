@@ -4492,7 +4492,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.25.0";
+  const VERSION = "0.26.0";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -11853,13 +11853,13 @@
     };
   })();
   var on_click$3 = (_, clicked2, indx) => clicked2(indx());
-  var root_2$6 = /* @__PURE__ */ from_html(`<span class="ans-letter"> </span>`);
+  var root_2$7 = /* @__PURE__ */ from_html(`<span class="ans-letter"> </span>`);
   var root_1$b = /* @__PURE__ */ from_html(`<button></button>`);
   var root_5$1 = /* @__PURE__ */ from_html(`<span> </span>`);
   var root_4$1 = /* @__PURE__ */ from_html(`<div class="row svelte-qx0naz"><span class="label svelte-qx0naz"> </span> <div class="cells svelte-qx0naz"></div></div>`);
   var root_3$2 = /* @__PURE__ */ from_html(`<div></div>`);
   var root_6 = /* @__PURE__ */ from_html(`<div class="case ml-4 mt-4 badge badge-accent svelte-qx0naz">A = a</div>`);
-  var root_7$3 = /* @__PURE__ */ from_html(`<div class="case ml-4 mt-4 badge badge-accent svelte-qx0naz">A ≠ a</div>`);
+  var root_7$2 = /* @__PURE__ */ from_html(`<div class="case ml-4 mt-4 badge badge-accent svelte-qx0naz">A ≠ a</div>`);
   var root$r = /* @__PURE__ */ from_html(`<!> <!> <!> <div class="answers grid2x2 svelte-qx0naz"><!> <!> <!> <!></div> <!>`, 1);
   const $$css$s = {
     hash: "svelte-qx0naz",
@@ -11874,7 +11874,7 @@
       var button = root_1$b();
       button.__click = [on_click$3, clicked2, indx];
       each(button, 21, () => get$1(word), index, ($$anchor3, n) => {
-        var span = root_2$6();
+        var span = root_2$7();
         var text2 = child(span, true);
         reset(span);
         template_effect(($0) => set_text(text2, $0), [() => viewAt(get$1(n))]);
@@ -12006,7 +12006,7 @@
     var node_1 = sibling(node, 2);
     {
       var consequent_1 = ($$anchor2) => {
-        var div_4 = root_7$3();
+        var div_4 = root_7$2();
         append($$anchor2, div_4);
       };
       if_block(node_1, ($$render) => {
@@ -12656,7 +12656,7 @@
   }
   create_custom_element(LineNo, { lineNo: {} }, [], [], true);
   var root_1$8 = /* @__PURE__ */ from_html(`<div><!></div>`);
-  var root_2$5 = /* @__PURE__ */ from_html(`<div class="svelte-gy0mow"><!></div>`);
+  var root_2$6 = /* @__PURE__ */ from_html(`<div class="svelte-gy0mow"><!></div>`);
   const $$css$n = {
     hash: "svelte-gy0mow",
     code: "div.svelte-gy0mow {transition:font-size var(--animation-time) ease,\r\n            opacity var(--animation-time) ease,\r\n            background-color var(--animation-time) ease,\r\n            text-decoration-color var(--animation-time) ease;}.right.svelte-gy0mow {font-size:0px;}"
@@ -12710,7 +12710,7 @@
         append($$anchor2, div);
       };
       var alternate = ($$anchor2) => {
-        var div_1 = root_2$5();
+        var div_1 = root_2$6();
         var node_2 = child(div_1);
         snippet(node_2, children);
         reset(div_1);
@@ -14025,7 +14025,7 @@
         }
         return drill.tokens;
       }
-      function buildDrill(id, tokens, atOnce, noWrongPhase, noCopyBtn) {
+      function buildDrill(id, innerHtml, tokens, atOnce, asHtml, noWrongPhase, noCopyBtn) {
         let seenPhases = /* @__PURE__ */ new Set();
         function splitTokensToLines() {
           let line2 = null;
@@ -14052,11 +14052,27 @@
         seenPhases.delete(0);
         let phases = [...seenPhases].sort((a, b) => a - b);
         console.log(`${id} is built:`, phases);
-        return { id, atOnce, noWrongPhase, noCopyBtn, phases, tokens, lines };
+        return {
+          id,
+          innerHtml,
+          atOnce,
+          asHtml,
+          noWrongPhase,
+          noCopyBtn,
+          phases,
+          tokens,
+          lines
+        };
       }
       let htmls = document.querySelectorAll("drill");
-      log.info(`Found ${htmls.length} drills`);
+      if (htmls.length === 0) {
+        let template = document.querySelector("template");
+        if (template) {
+          htmls = template.content.querySelectorAll("drill");
+        }
+      }
       if (htmls.length === 0) throw new Error("No <drill></drill> are found");
+      log.info(`Found ${htmls.length} drills`);
       let ids = /* @__PURE__ */ new Set();
       htmls.forEach((el, no) => {
         let id = el.getAttribute("id");
@@ -14066,6 +14082,7 @@
         let lang = el.getAttribute("lang") || "java";
         let _$ = el.getAttribute("$") || shellChars[lang] || "$";
         let atOnce = el.hasAttribute("at-once");
+        let asHtml = el.hasAttribute("as-html");
         let noWrongPhase = el.hasAttribute("no-wrong-phase");
         let noCopyBtn = el.hasAttribute("no-copy-button");
         let logLevel = el.getAttribute("log-level") || "E";
@@ -14079,11 +14096,11 @@
           let innerHtml = el.innerHTML;
           let content = el.textContent;
           let tokens = parseDrill(id, content, innerHtml, _$);
-          if (tokens.length === 0) {
+          if (tokens.length === 0 && !asHtml) {
             log.info(`Drill '${id}' is empty; skipped`);
             return;
           }
-          let drill = buildDrill(id, tokens, atOnce, noWrongPhase, noCopyBtn);
+          let drill = buildDrill(id, innerHtml, tokens, atOnce, asHtml, noWrongPhase, noCopyBtn);
           drills.push(drill);
           log.info(`Drill '${id}' is parsed: ${tokens.length} tokens`);
         } catch (err) {
@@ -14142,9 +14159,10 @@
     set(drills, lodashExports.shuffle(get$1(drills)), true);
     setNo(0);
   }
-  var root_7$2 = /* @__PURE__ */ from_html(`<br/>`);
-  var root_8 = /* @__PURE__ */ from_html(`<div class="tooltip"><button></button></div>`);
-  var root$a = /* @__PURE__ */ from_html(`<div class="drill svelte-1q1houn"><div class="bg-pink-100 text-2xl rounded-lg font-bold select-none pl-2"> </div> <!> <div class="code copy-src svelte-1q1houn"><!></div> <div class="control svelte-1q1houn"><button class="shuffle btn btn-xs btn-warning">Shuffle</button> <button>Prev</button> <button>Next</button> <button class="show btn btn-xs btn-outline btn-success">Reveal</button> <button class="again btn btn-xs btn-outline btn-error">Again</button> <!> <!></div></div> <!>`, 1);
+  var root_2$5 = /* @__PURE__ */ from_html(`<div class="code copy-src svelte-1q1houn"><!></div>`);
+  var root_9$1 = /* @__PURE__ */ from_html(`<br/>`);
+  var root_10 = /* @__PURE__ */ from_html(`<div class="tooltip"><button></button></div>`);
+  var root$a = /* @__PURE__ */ from_html(`<div class="drill svelte-1q1houn"><div class="bg-pink-100 text-2xl rounded-lg font-bold select-none pl-2"> </div> <!> <!> <div class="control svelte-1q1houn"><button class="shuffle btn btn-xs btn-warning">Shuffle</button> <button>Prev</button> <button>Next</button> <button class="show btn btn-xs btn-outline btn-success">Reveal</button> <button class="again btn btn-xs btn-outline btn-error">Again</button> <!> <!></div></div> <!>`, 1);
   const $$css$a = {
     hash: "svelte-1q1houn",
     code: ".drill.svelte-1q1houn {padding:4px;}.code.svelte-1q1houn {padding-top:8px;position:relative;user-select:none;font-family:monospace;white-space:pre;font-size:18px;font-family:monospace;cursor:pointer;padding-bottom:60px;}.control.svelte-1q1houn {position:fixed;width:100%;bottom:0;font-size:14px;user-select:none;}.exact.svelte-1q1houn {margin:2px;}"
@@ -14309,56 +14327,79 @@
     reset(div_1);
     var node = sibling(div_1, 2);
     Logger(node, {});
-    var div_2 = sibling(node, 2);
-    let styles;
-    var node_1 = child(div_2);
+    var node_1 = sibling(node, 2);
     {
       var consequent = ($$anchor2) => {
         var fragment_1 = comment();
         var node_2 = first_child(fragment_1);
-        key$1(node_2, () => get$1(refreshKey), ($$anchor3) => {
-          var fragment_2 = comment();
-          var node_3 = first_child(fragment_2);
-          each(node_3, 17, () => get$1(drill).lines, index, ($$anchor4, line2) => {
-            Line($$anchor4, {
-              get phaseNo() {
-                return get$1(line2).phaseNo;
-              },
-              get wrongLine() {
-                return get$1(line2).wrongLine;
-              },
-              children: ($$anchor5, $$slotProps) => {
-                var fragment_4 = comment();
-                var node_4 = first_child(fragment_4);
-                each(node_4, 17, () => get$1(line2).tokens, index, ($$anchor6, token2) => {
-                  const C = /* @__PURE__ */ user_derived(() => components.get(get$1(token2).type));
-                  var fragment_5 = comment();
-                  var node_5 = first_child(fragment_5);
-                  component(node_5, () => get$1(C), ($$anchor7, C_1) => {
-                    C_1($$anchor7, spread_props(() => get$1(token2).props));
-                  });
-                  append($$anchor6, fragment_5);
-                });
-                append($$anchor5, fragment_4);
-              },
-              $$slots: { default: true }
-            });
-          });
-          append($$anchor3, fragment_2);
-        });
+        html(node_2, () => get$1(drill).innerHtml);
         append($$anchor2, fragment_1);
       };
-      var alternate = ($$anchor2) => {
-        var text_1 = text("Parsing drills...");
-        append($$anchor2, text_1);
+      var alternate_1 = ($$anchor2) => {
+        var div_2 = root_2$5();
+        let styles;
+        var node_3 = child(div_2);
+        {
+          var consequent_1 = ($$anchor3) => {
+            var fragment_2 = comment();
+            var node_4 = first_child(fragment_2);
+            key$1(node_4, () => get$1(refreshKey), ($$anchor4) => {
+              var fragment_3 = comment();
+              var node_5 = first_child(fragment_3);
+              each(node_5, 17, () => get$1(drill).lines, index, ($$anchor5, line2) => {
+                Line($$anchor5, {
+                  get phaseNo() {
+                    return get$1(line2).phaseNo;
+                  },
+                  get wrongLine() {
+                    return get$1(line2).wrongLine;
+                  },
+                  children: ($$anchor6, $$slotProps) => {
+                    var fragment_5 = comment();
+                    var node_6 = first_child(fragment_5);
+                    each(node_6, 17, () => get$1(line2).tokens, index, ($$anchor7, token2) => {
+                      const C = /* @__PURE__ */ user_derived(() => components.get(get$1(token2).type));
+                      var fragment_6 = comment();
+                      var node_7 = first_child(fragment_6);
+                      component(node_7, () => get$1(C), ($$anchor8, C_1) => {
+                        C_1($$anchor8, spread_props(() => get$1(token2).props));
+                      });
+                      append($$anchor7, fragment_6);
+                    });
+                    append($$anchor6, fragment_5);
+                  },
+                  $$slots: { default: true }
+                });
+              });
+              append($$anchor4, fragment_3);
+            });
+            append($$anchor3, fragment_2);
+          };
+          var alternate = ($$anchor3) => {
+            var text_1 = text("Parsing drills...");
+            append($$anchor3, text_1);
+          };
+          if_block(node_3, ($$render) => {
+            if (get$1(drill)) $$render(consequent_1);
+            else $$render(alternate, false);
+          });
+        }
+        reset(div_2);
+        template_effect(($0) => styles = set_style(div_2, "", styles, $0), [
+          () => ({
+            "--animation-time": "1s",
+            "--line-no-font-size": "0.6em",
+            "--right-color": vars.color("green")
+          })
+        ]);
+        append($$anchor2, div_2);
       };
       if_block(node_1, ($$render) => {
-        if (get$1(drill)) $$render(consequent);
-        else $$render(alternate, false);
+        if (get$1(drill)?.asHtml) $$render(consequent);
+        else $$render(alternate_1, false);
       });
     }
-    reset(div_2);
-    var div_3 = sibling(div_2, 2);
+    var div_3 = sibling(node_1, 2);
     var button = child(div_3);
     button.__click = [shuffleDrills, shuffleCount, drills, setNo];
     var button_1 = sibling(button, 2);
@@ -14371,19 +14412,19 @@
     button_3.__click = reveal;
     var button_4 = sibling(button_3, 2);
     button_4.__click = again;
-    var node_6 = sibling(button_4, 2);
+    var node_8 = sibling(button_4, 2);
     {
-      var consequent_1 = ($$anchor2) => {
-        var br = root_7$2();
+      var consequent_2 = ($$anchor2) => {
+        var br = root_9$1();
         append($$anchor2, br);
       };
-      if_block(node_6, ($$render) => {
-        if (get$1(drills).length >= 15) $$render(consequent_1);
+      if_block(node_8, ($$render) => {
+        if (get$1(drills).length >= 15) $$render(consequent_2);
       });
     }
-    var node_7 = sibling(node_6, 2);
-    each(node_7, 17, () => get$1(drills), index, ($$anchor2, drill2, no, $$array) => {
-      var div_4 = root_8();
+    var node_9 = sibling(node_8, 2);
+    each(node_9, 17, () => get$1(drills), index, ($$anchor2, drill2, no, $$array) => {
+      var div_4 = root_10();
       var button_5 = child(div_4);
       let classes_2;
       button_5.__click = () => setNo(no);
@@ -14400,8 +14441,8 @@
     });
     reset(div_3);
     reset(div);
-    var node_8 = sibling(div, 2);
-    key$1(node_8, () => get$1(noCopyBtn), ($$anchor2) => {
+    var node_10 = sibling(div, 2);
+    key$1(node_10, () => get$1(noCopyBtn), ($$anchor2) => {
       PoweredBy($$anchor2, {
         get noCopyBtn() {
           return get$1(noCopyBtn);
@@ -14409,18 +14450,12 @@
       });
     });
     template_effect(
-      ($0, $1, $2) => {
+      ($0, $1) => {
         set_text(text$1, heading());
-        styles = set_style(div_2, "", styles, $0);
-        classes = set_class(button_1, 1, "prev btn btn-xs btn-accent", null, classes, $1);
-        classes_1 = set_class(button_2, 1, "next btn btn-xs btn-accent", null, classes_1, $2);
+        classes = set_class(button_1, 1, "prev btn btn-xs btn-accent", null, classes, $0);
+        classes_1 = set_class(button_2, 1, "next btn btn-xs btn-accent", null, classes_1, $1);
       },
       [
-        () => ({
-          "--animation-time": "1s",
-          "--line-no-font-size": "0.6em",
-          "--right-color": vars.color("green")
-        }),
         () => ({ "btn-disabled": get$1(indx) === 0 }),
         () => ({ "btn-disabled": get$1(indx) === get$1(drills).length - 1 })
       ]

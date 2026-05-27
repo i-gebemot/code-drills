@@ -1,0 +1,183 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="../md-components.js"></script>
+
+<import-hints from="./bagrut-hints.html"></import-hints>
+
+<!---------------------------------------------------------->
+
+<code-drills 
+    heading="2025 - 271"
+    log-level="W"
+>
+</code-drills>
+
+<template>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="removeAll()" tags="['q-1','idea-1']" no-wrong-phase>
+$!html:w-h-r+ <img width=420 src="./img/linked-list-removeAll().png">
+public static Node&lt;Integer> removeAll(Node&lt;Integer> lst, int value) {
+    // $מוחקים את הצמתים בראש הרשימה$
+            ^... ~o ht implement
+    while ($lst$ != null && $lst.getValue()$ == value) {
+            ^... ~o ht implement
+            ^... ~o ht implement    {+}
+        lst = lst.getNext();
+    }
+    // <bdo dir="rtl">?מה אם מחקנו הכול</bdo>
+-    if (lst == null) {             {1}
+-        return null;               {1}
+-    }                              {1}
++   $...$                           {1}
+        ~o ht implement
+    // $מוחקים מאמצע של רשימה$
+            ^... ~o ht implement
+    Node&lt;Integer> prev = lst;
+    while (prev.hasNext()) {
+        if ($prev.getNext().getValue()$ == value) {
+                ^... ~o ht implement
+            prev.setNext($prev.getNext().getNext()$);
+                ^... ~o ht implement
+        } else {
+            $prev = prev.getNext();$
+                ^... ~o ht implement
+        }
+    }
+    return $lst$;
+        ^... ~o ht implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="Stack()" tags="['q-1','idea-2']" no-wrong-phase>
+class Stack {
+    private Node<Integer> lst;
+
+    public Stack() {
++        $...$                  {1}
+            ~o hr implement
+-        this.lst = null;       {1}
+    }
+
+    public void push(int x) {
+        this.lst = $new Node<Integer>(x, this.lst)$;
+            ^... ~o ht implement
+    }
+
+    public int pop() {
+        int x = lst.getValue();
++        $...$                      {2}
+            ~o hr implement
+-       this.lst = lst.getNext();   {2}
+        return x;
+    }
+}
+
+Stack stack = new Stack();
+stack.push(123);
+print(stack.pop());                 // $123$
+    ^? ~g hr result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="sumFirstNums()" tags="['q-1','idea-3']" no-wrong-phase>
+class Room {
+    private Node&lt;Integer> lst;
+
+    // ...נגיד והפונקציה ממומשת
+    public int findMin() {
+        ...
+    }
+
+    // ...נגיד והפונקציה ממומשת
+    public int countValue(int value) {
+        ...
+    }
+
+    // Calculate sum of N first (smallest) numbers
+    public int sumOfSmallestNumbers(int count) {
+        int sum = 0;
+        while (count > 0) {
+            int min = findMin();    // find current smallest
+            int minCount = Math.min(count, countValue(min));
+            sum += $minCount * min$;
+                ^... ~o hr implement
+            count -= $minCount$;
+                ^... ~o hr implement
+        }
+        return sum;
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="m-connected-array" tags="['q-2','idea-1']" no-wrong-phase>
+
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="" tags="['q-2','idea-2']" no-wrong-phase>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="maxConnect()" tags="['q-2','idea-3']" no-wrong-phase todo>
+public static maxConnect(int[] a, int[] b) {
+    int m = 1;
+    while (m < a.length) {
+        if (!isMConnect(a, b, m)) {
+            return m - 1;
+        }
+        m++;
+    }
+    return m;
+}
+
+print(maxConnect(a, b));            // 2
+print(maxConnect(b, a));            // 0
+
+Runtime complexity of maxConnect is  `O(n^2)`
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="contains()!" tags="['q-3', 'idea-1']" as-html>
+<img-areas width=800
+    src="./img/bagrut-2025-b-271-q3-a.png"
+    hide="[
+        [30,6,21,12],[26,30,22,12],[12,50,23,14],[0,75,22,12],[10,90,31,10],[35,70,15,10],
+        [34,82,16,8],[42,90,28,9],[69,52,15,10],[84,81,16,10],[71,92,28,7],[79,28,19,16],
+        [57,30,7,5],[45,50,6,6],[26,67,5,5],[54,68,6,5],[59,46,6,5],[68,72,5,5],[70,22,8,6],[61,4,8,6]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="" tags="['q-3','idea-2']" no-wrong-phase>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="" tags="['q-3','idea-3']" no-wrong-phase>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="" tags="['q-','idea-']" no-wrong-phase>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="" tags="['q-','idea-']" no-wrong-phase>
+</drill>
+
+<!---------------------------------------------------------->
+
+</template>
