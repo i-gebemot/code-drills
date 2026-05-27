@@ -4492,7 +4492,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.27.0";
+  const VERSION = "0.27.1";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -14083,7 +14083,7 @@
         let atOnce = el.hasAttribute("at-once");
         let asHtml = el.hasAttribute("as-html");
         let noWrongPhase = el.hasAttribute("no-wrong-phase");
-        let noCopyBtn = el.hasAttribute("no-copy-button");
+        let noCopyBtn = el.hasAttribute("no-copy-button") || asHtml;
         let logLevel = el.getAttribute("log-level") || "E";
         let todo = el.getAttribute("todo") !== null;
         if (todo) {
