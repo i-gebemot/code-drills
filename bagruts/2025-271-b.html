@@ -16,6 +16,138 @@
 
 <!---------------------------------------------------------->
 
+<drill lang="java" id="contains()" tags="['q-1','idea-1']">
+-// פונקצית עזר                             {1}
+-// מקבלת רשימה וערך                        {1}
+-// מחזירה אמת עם הערך נימצא ברשימה                 {1}
+public static boolean $contains$($Node$$&lt;Integer>$ node, int x) {
+        ~r ht its-a-helper      {1}
+        ~r ht generic-type      {+}
+        ^$
+    while (node != null) {
+        if (node.$getValue$$()$ == x) {
+                ~r ht func-call
+                ^$
+            return true;
+        }
+-        node = node.getNext();             {2}
+    $} $                                    {2}
+        ~r hr endless-loop
+    return false;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="copyEvens()" tags="['q-1','idea-2']">
+public static Node&lt;Integer> copyEvens(Node&lt;Integer> node) {
++   if (node == null) {         {1}
++       return null;            {1}
++   }                           {1}
+    $Node$$&lt;Integer>$ lst = null;
+        ~r ht generic-type
+        ^$
+    while (node != null) {
+        if (node.getValue() % 2 $==$ 0) {
+                ^= ~r ht assign-vs-comp
+            lst = new $Node$$&lt;Integer>$(node.getValue(), lst);
+                ~r ht generic-type
+                ^$
+        }
+        node = node.getNext();
+    }
+    return lst;
+$} $                            {1}!
+    ~o hr needless-null-check-on-list
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="countBoth()" tags="['q-1','idea-3']" no-wrong-phase>
+public static int countBoth(Node&lt;Integer> a, Node&lt;Integer> b) {
+    int count = $0;$
+        ^... ~o hr implement
+    while ($a != null$) {
+            ^... ~o hr implement
+-        count++;                   {1}
+-        a = a.getNext();           {1}
++       $...$                       {1}
+            ~o hr implement
+    }
+    while ($b != null$) {
+            ^... ~o hr implement
+-        count++;                   {2}
+-        b = b.getNext();           {2}
++       $...$                       {2}
+            ~o hr implement
+    }
+    return $count;$
+        ^... ~o hr implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="craeteUnion()" tags="['q-1','a']" no-wrong-phase>
+$!html <img src="./img/2025-271-b-q1-a.png">
+public static Node&lt;Integer> createUnion(Node&lt;Integer> a, Node&lt;Integer> b) {
+    Node&lt;Integer> lst $= null;$
+        ^... ~o hr implement
+    while ($a != null$) {
+            ^... ~o hr implement
+        if ($!contains(lst, a.getValue())$) {
+                ^... ~o hr implement
+-            lst = new Node&lt;Integer>(a.getValue(), lst); {1}
++           $...$                                           {1}
+                ~o hr implement
+        }
+-        a = a.getNext();                               {2}
++       $...$                                           {2}
+            ~o hr implement
+    }
+    while ($b != null$) {
+            ^... ~o hr implement
+        if ($!contains(lst, b.getValue())$) {
+                ^... ~o hr implement
+-            lst = new Node&lt;Integer>(b.getValue(), lst); {3}
++           $...$                                           {3}
+                ~o hr implement
+        }
+-        b = b.getNext();                               {4}
++       $...$                                           {4}
+            ~o hr implement
+    }
+    return lst;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="intersection()" tags="['q-1','b']" no-wrong-phase>
+$!html <img src="./img/2025-271-b-q1-b.png">
+public static Node&lt;Integer> intersection(Node&lt;Integer> a, Node&lt;Integer> b) {
+    Node&lt;Integer> lst = null;
+    while ($a != null$) {
+            ^... ~o hr implement
+        int x = $a.getValue();$
+            ^... ~o hr implement
+        if ($contains(b, x)$ && !$contains(lst, x)$) {
+                ^... ~o hr implement
+                ^... ~o hr implement    {+}
+-            lst = new Node&lt;Integer>(x, lst);            {1}
++           $...$                                           {1}
+                ~o hr implement
+        }
+-        a = a.getNext();                                   {2}
++       $...$                                               {2}
+            ~o hr implement
+    }
+    return lst;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
 <drill lang="java" id="isMConnect()" tags="['q-2','idea-1']" no-wrong-phase>
 // first m numbers of a[] are last number of b[]
 public static boolean isMConnect(int[] a, int[] b, int m) {
@@ -133,6 +265,7 @@ public static int maxConnect(Queue&lt;Integer> a, Queue<Integer> b) {
 <!---------------------------------------------------------->
 
 <drill lang="java" id="maakav-1" tags="['q-3', 'idea-1']" as-html>
+<img src="./img/2025-271-b-q3-aa.png">
 <img-areas width=800
     src="./img/2025-271-b-q3-a.png"
     hide="[
@@ -147,6 +280,7 @@ public static int maxConnect(Queue&lt;Integer> a, Queue<Integer> b) {
 <!---------------------------------------------------------->
 
 <drill lang="java" id="maakav-2" tags="['q-3', 'idea-2']" as-html>
+<img width=460 src="./img/2025-271-b-q3-bb.png">
 <img-areas width=800
     src="./img/2025-271-b-q3-b.png"
     hide="[
@@ -230,6 +364,33 @@ secret(root, $25$);   // 50
     src="./img/2025-271-b-q7-L2.png"
     hide="[
         [15,25,40,67],[53,24,45,68]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q8-a" no-wrong-phase as-html>
+<img-areas width=800
+    src="./img/2025-271-b-q8-a.png"
+    hide="[
+        [29,37,15,10],[29,47,15,10],[1,59,48,21],
+        [58,76,23,9],[58,84,23,8],[58,91,26,9]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q8-b" no-wrong-phase as-html>
+<img-areas width=800
+    src="./img/2025-271-b-q8-b.png"
+    hide="[
+        [5,9,23,5],[1,18,26,5],
+        [31,25,61,11],[58,37,33,5],
+        [41,45,28,15],[41,61,59,13],
+        [29,75,46,6],[30,82,48,5],
+        [40,90,21,10]
     ]">
 </img-areas>
 </drill>

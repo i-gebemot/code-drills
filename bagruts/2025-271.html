@@ -16,6 +16,40 @@
 
 <!---------------------------------------------------------->
 
+<drill lang="java" id="complex-object" tags="['q-1','idea-0']" todo>
+public class Person {
+    private String name;
+    public String getName() { return this.name; }
+}
+
+public class Room {
+    private Node&lt;Person> people;
+    public Node&lt;Person> getPeople() { return this.people; }
+
+    public Room() {
+        this.people = null;
+    }
+}
+
+public static boolean contains(Node&lt;Room> room, int name) {
+    while (room != null) {
+        Node&lt;Person> lst = $room$$.getValue()$.getPeople();
+            ~r ht its-a-list
+            ^$
+        while (lst != null) {
+            if (lst.getValue().equals(name)) {
+                return true;
+            }
+            lst = lst.getNext();
+        }
+        room = room.getNext();
+    }
+    return false;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
 <drill lang="java" id="removeAll()" tags="['q-1','idea-1']" no-wrong-phase>
 $!html:w-h-r+ <img width=420 src="./img/2025-271-removeAll().png">
 public static Node&lt;Integer> removeAll(Node&lt;Integer> lst, int value) {
