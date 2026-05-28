@@ -17,9 +17,30 @@
 <!---------------------------------------------------------->
 
 <drill lang="java" id="2025-271-b" no-copy-button>
-$!html { <a href="../pdf/2025-271-b.pdf" target="_blank">
-            <img src="./img/2025-271-b.png">
-        </a> }
+$!html { 
+    <a href="../pdf/2025-271-b.pdf" target="_blank">
+        <img src="./img/2025-271-b.png">
+    </a>
+     <a href="../pdf/2025-271-b.pdf" target="_blank">בגרות 2025 מיעד חלופי</a>
+    <div style="display:flex; justify-content:space-evenly; margin-top: 80px">
+        <iframe width="240" height="200"
+            src="https://www.youtube.com/embed/wIF7GCOmLQM" 
+            title="Working with code-drills"
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            referrerpolicy="strict-origin-when-cross-origin" 
+            allowfullscreen
+        ></iframe>
+        <iframe width="240" height="200"
+            src="https://www.youtube.com/embed/wIF7GCOmLQM" 
+            title="Working with code-drills"
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            referrerpolicy="strict-origin-when-cross-origin" 
+            allowfullscreen
+        ></iframe>
+    </div>
+}
 </drill>
 
 <!---------------------------------------------------------->
@@ -186,7 +207,7 @@ print(isMConnect(a, b, 2));
 public static int atIndex(Queue&lt;Integer> que, int indx) {
     Queue&lt;Integer> tmp = new Queue&lt;Integer>();
     while (indx > 0) {
--        que.insert(tmp.remove());      {1}
+-        tmp.insert(que.remove());      {1}
 -        indx--;                        {1}
 +        $...$                          {1}
             ~o hr implement
@@ -245,7 +266,7 @@ print(maxConnect(b, a));            // $0$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="queue-implementation" tags="['q-2','idea-4']" no-wrong-phase>
+<drill lang="java" id="queue-blocks" tags="['q-2','idea-4']" no-wrong-phase>
 public static int length(Queue&lt;Integer> que) {
     // Runtime complexity is $`O(n)`$
         ^? ~g hr result
@@ -269,6 +290,41 @@ public static int maxConnect(Queue&lt;Integer> a, Queue<Integer> b) {
         ^? ~g hr result
     ...
 }
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="queue-solution" tags="['q-2','solution']" no-wrong-phase>
+public static boolean isMConnect(Queue&lt;Integer> a, Queue&lt;Integer> b, int m) {
+    int k = $length(a) - m;$
+        ^... ~o hr implement
+    for (int i = 0; i < m; i++) {
+        if ($atIndex(a, i + k)$ != $atIndex(b, i)$) {
+                ^... ~o hr implement
+                ^... ~o hr implement        {+}
+            return false;
+        }
+    }
+    return true;
+}
+
+public static int maxConnect(Queue&lt;Integer> a, Queue&lt;Integer> b) {
+    int max = 0;
+    for (int i = 0; i < $length(a)$; i++) {
+            ^... ~o hr implement
+        if (isMConnect(a, b, i)) {
+            max = i;
+        }
+    }
+    return max;
+}
+
+Queue&lt;Integer> a = queueFromArray(new Integer[] {2,5,4,4,7,2,6});
+Queue&lt;Integer> b = queueFromArray(new Integer[] {2,6,7,1,4,2,1,8,1});
+
+print(isMConnect(a, b, 2));     // true
+print(maxConnect(a, b));        // 2
+print(maxConnect(b, a));        // 0
 </drill>
 
 <!---------------------------------------------------------->
