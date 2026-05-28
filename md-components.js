@@ -4492,7 +4492,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.27.2";
+  const VERSION = "0.27.3";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -14086,6 +14086,8 @@
         let noCopyBtn = el.hasAttribute("no-copy-button") || asHtml;
         let logLevel = el.getAttribute("log-level") || "E";
         let todo = el.getAttribute("todo") !== null;
+        let skip = el.getAttribute("skip") !== null;
+        if (skip) return;
         if (todo) {
           if (args.noTodoDrills) return;
           log.warn(`Drill '${id}': Is not finished yet`);
