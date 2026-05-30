@@ -23,6 +23,9 @@
 <a href="./pdf/2025-271.pdf" target="_blank" class="link link-primary ml-6">
     בגרות 2025
 </a>
+<a href="https://www.youtube.com/playlist?list=PLNLf5_3sUeLzAinrmkwRubxKWvu_WfKA6" target="_blank" class="link link-primary ml-6">
+    פיתרונות של אריאל בר יתצחק
+</a>
 <video-list width=380 height=200 list="[
     ['https://youtu.be/', 'Q-1'],
 ]">
@@ -31,7 +34,7 @@
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="complex-object" tags="['q-1','idea-0']">
+<drill lang="java" id="q-1-i-0">
 public class Person {
     private String name;
     public String getName() { return this.name; }
@@ -42,7 +45,9 @@ public class Room {
     public Node&lt;Person> getPeople() { return this.people; }
 
     public Room() {
-        this.people = null;
+-       this.people = null;     {1}
++       $...$                   {1}
+            ~o ht implement
     }
 }
 
@@ -71,7 +76,7 @@ $public static $boolean $contains$(Node&lt;Room> hotel, int name) {
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="removeAll()" tags="['q-1','idea-1']" no-wrong-phase>
+<drill lang="java" id="q-1-i-1" no-wrong-phase>
 $!html:w-h-r+ <img width=420 src="./img/2025-271-removeAll().png">
 public static Node&lt;Integer> removeAll(Node&lt;Integer> lst, int value) {
     // $מוחקים את הצמתים בראש הרשימה$
@@ -107,7 +112,7 @@ public static Node&lt;Integer> removeAll(Node&lt;Integer> lst, int value) {
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="Stack()" tags="['q-1','idea-2']" no-wrong-phase>
+<drill lang="java" id="q-1-i-2" no-wrong-phase>
 class Stack {
     private Node<Integer> lst;
 
@@ -139,7 +144,7 @@ print(stack.pop());                 // $123$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="sumFirstNums()" tags="['q-1','idea-3']" no-wrong-phase>
+<drill lang="java" id="q-1-i-3" no-wrong-phase>
 class Room {
     private Node&lt;Integer> lst;
 
@@ -169,7 +174,134 @@ class Room {
 }
 </drill>
 
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q-2-i-1" no-wrong-phase>
+-// מחזירה אמת אם איקס נימצא בתור       {1}
+-// כול המספרים בתור חיוביים            {1}
+public static boolean $contains$(Queue<Integer> q, int x) {
+        ~g ht using-assumptions     {1}
+    boolean found = false;
+    q.insert(0);                // $מופתח שאין אפס בתור$
+        ^... ~g hr what-happens
+    while (q.head() > 0) {      // $בודקים מה הוא האביר הבא$
+            ^... ~g hr what-happens
+        if (q.head() == x) {    // $בלי להוציא אותו מהתור$
+                ^... ~g hr what-happens
+            found = true;
+        }
+        q.insert(q.remove());   // $!גלגל אותו$
+            ^... ~g hr what-happens
+    }
+    q.remove();                 // $להוציא אפס שהיכנסנו$
+        ^... ~g hr what-happens
+    return found;
+}
+</drill>
 
 <!---------------------------------------------------------->
+
+<drill lang="java" id="q-2-a" as-html>
+<img-areas width=800
+    src="./img/2025-271-q-2-a.png"
+    hide="[
+        [23,0,11,5],[3,19,24,6],[29,19,12,6],[43,20,8,5],
+        [43,25,9,5],[55,25,10,5],[72,25,10,5],
+        [4,30,24,5],[55,30,10,5],[72,30,12,5],[32,35,8,5],[43,35,8,5],
+        [3,39,25,5],[56,40,9,5],[72,40,12,5],[31,42,8,5],[43,42,7,5],
+        [4,47,24,5],[56,47,9,5],[72,47,12,5],[44,49,7,5],
+        [4,54,24,5],[55,55,11,5],[72,54,10,6],[43,57,8,5],
+        [4,62,24,5],[56,62,9,5],[72,61,11,5],[33,64,6,5],[44,64,6,5],
+        [4,69,24,5],[3,74,22,5],
+        [55,88,44,6],[48,92,13,8]
+    ]">
+</img-areas>
+<img width=350 src="./img/2025-271-q-2-mmm.png" class="absolute left-0 bottom-0 mb-4">
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q-2-b" as-html>
+<img-areas width=800
+    src="./img/2025-271-q-2-b.png"
+    hide="[
+        [20,2,5,11],
+        [52,45,9,11],[81,46,6,10],
+        [32,58,5,10],[52,58,9,9],[81,59,6,8],
+        [32,70,5,10],[52,71,9,9],[81,71,6,8],
+        [32,82,5,10],[52,83,9,9],[81,84,6,8],
+    ]">
+</img-areas>
+<img-areas width=800
+    src="./img/2025-271-q-2-b-2.png"
+    hide="[
+        [2,19,96,28],[1,59,29,32],[44,69,56,26]
+    ]">
+    <img width=380 src="./img/2025-271-q-2-what.png" class=" absolute right-24">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q-3-i-1" no-wrong-phase>
+$!html <img width=280 src="./img/2025-271-q-3-k2-left.png" class=" absolute right-0 top-0 mt-16">
+public static boolean isDeeper(BinNode&lt;Integer> node, int d) {
+    if (node == null) {
+        return $false$;
+            ^... ~o hr implement
+    }
+    if (node.hasLeft() && $d == 0$) {
+            ^... ~o hr implement
+        return true;
+    }
+    if ($node.hasRight()$ && $d == 0$) {
+            ^... ~o hr implement
+            ^... ~o hr implement        {+}
+        return true;
+    }
+    return isDeeper(node.getLeft(), $d-1$) $||$
+                ^... ~o hr implement
+                ^... ~o hr implement        {+}
+           isDeeper(node.getRight(), $d-1$);
+                ^... ~o hr implement
+}
+
+print(isDeeper(tree, $2$));       // $true$
+    ~t ~m
+    ~t ~m
+print(isDeeper(tree, $3$));       // $false$
+    ~t ~m
+    ~t ~m
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q-3-a!" no-wrong-phase>
+$!html <img src="./img/2025-271-q-3.png">
+$!html <span dir="rtl" class="float-right">א. סרטטו ”עץ 1־שמאלי" ובו 8 צמתים ומקסימום 4 רמות</span>
+$!html <span dir="rtl" class="float-right">ב. כתבו פעולה חיצונית המחזירה אמת אם העץ הוא "עץ K-שמאלי"</span>
+$!html:w-h-r+ <img width=280 src="./img/2025-271-q-3-k1-left.png" class=" absolute right-0 top-0 mt-48">
+public static boolean isLeftK(BinNode&lt;Integer> node, int k) {
+    if (node == null) {
+        return $true;$
+            ^... ~o hr implement
+    }
+    if ($node.hasLeft()$ && $k == 0$) {
+            ^... ~o hr implement
+            ^... ~o hr implement        {+}
+        return $false;$
+            ^... ~o hr implement
+    }
+    return isLeftK(node.getLeft(),  $k-1$) &&
+                ^... ~o hr implement
+           isLeftK(node.getRight(), $k$);
+                ^... ~o hr implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="">
+</drill>
 
 </template>
