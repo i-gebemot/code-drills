@@ -138,36 +138,103 @@ class Stack {
 
 Stack stack = new Stack();
 stack.push(123);
+stack.push(456);
+print(stack.pop());                 // $456$
+    ^? ~g hr result
 print(stack.pop());                 // $123$
     ^? ~g hr result
 </drill>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="q-1-i-3" no-wrong-phase>
-class A {
-    private Node&lt;Integer> lst;
+<drill lang="java" id="q-1-a" no-wrong-phase>
+class Store {
+    private Node&lt;Game> lst;
 
-    // ...נגיד והפונקציה ממומשת
-    public int findMin() {
-        ...
+    public int remove(int n, int pr) {
+-        int count = 0;                                 {2}
+        // מוחקים את הצמתים בראש הרשימה...
+        while ($this.$$lst$ != null &&$ count < n$ && 
+                    ^$ ~t                               {1}
+                    ~o ht better-with-this              {1}
+                    ^ ... ~o ht implement                {2}!
+               $this.$$lst$.$getValue()$$.getPrice()$ == pr)
+                    ^$ ~t                               {1}
+                    ~o ht better-with-this              {1}
+                    ~r ht is-it-num                     {+}
+                    ^$
+        {
+            $this.$$lst$ = $this.$$lst$.getNext();      {1}
+                ^$
+                ~o ht better-with-this
+                ^$                                  
+                ~o ht better-with-this
+-            count++;                                   {3}
+        }
+            ~r hr return-what                           {3}
+        // ?מה אם מחקנו הכול
+        if ($this.$$lst$ == null) {                     {1}          
+                ^$
+                ~o ht better-with-this
+            $return$$ count$;                           {3}!
+                ~r hr return-what
+                ^$
+        }                              
+        // מוחקים מאמצע של רשימה...
+        Node&lt;Game> prev = $this.$$lst$;                 {1}
+            ^$
+            ~o ht better-with-this
+        while (prev.hasNext() &&$ count < n$) {
+                ^ ... ~o ht implement
+            if (prev.getNext().$getValue()$$.getPrice()$ == pr) {
+                    ~r ht is-it-num
+                    ^$
+                prev.setNext(prev.getNext().getNext());
+-                count++;                               {3}
+            } else {
+                prev = prev.getNext();
+            }
+        }
+-        return count;                                  {3}
+    $} $
+        ~r hr return-what                               {3}
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q-1-b" no-wrong-phase>
+class Store {
+    private Node&lt;Game> lst;
+
+    $public $int $minPrice$() {             {1}
+            ^$
+            ~r hr internal-func
+        int min = $Integer.MAX_VALUE;$
+            ^... ~o hr implement
+        Node<Game> node = $this.$$lst$;     {1}
+            ^$
+            ~o ht better-with-this
+        while (node != null) {
+            min = Math.min($min$, $node.getValue().getPrice()$);
+                ^... ~o hr implement
+                ^... ~o hr implement
+            node = node.getNext();
+        }
+        return min;
     }
 
-    // ...נגיד והפונקציה ממומשת
-    public int countValue(int value) {
-        ...
-    }
-
-    // Calculate sum of N first (smallest) numbers
-    public int sumOfSmallestNumbers(int count) {
+    public int removeCheap(int num) {
         int sum = 0;
-        while (count > 0) {
-            int min = findMin();    // find current smallest
-            int minCount = Math.min(count, countValue(min));
-            sum += $minCount * min$;
-                ^... ~o hr implement
-            count -= $minCount$;
-                ^... ~o hr implement
+        while ($num > 0$) {
+                ^... ~o ht implement
+            int min = $minPrice();$
+                ^... ~o ht implement
+            int count = $remove(num, min);$
+                ^... ~o ht implement
+            sum += $min * count;$
+                ^... ~o ht implement
+            num -= count;
         }
         return sum;
     }
@@ -179,7 +246,7 @@ class A {
 <drill lang="java" id="q-2-i-1" no-wrong-phase>
 -// מחזירה אמת אם איקס נימצא בתור       {1}
 -// כול המספרים בתור חיוביים            {1}
-public static boolean $contains$(Queue<Integer> q, int x) {
+public static boolean $contains$(Queue&lt;Integer> q, int x) {
         ~g ht using-assumptions     {1}
     boolean found = false;
     q.insert(0);                // $מופתח שאין אפס בתור$
@@ -216,12 +283,21 @@ public static boolean $contains$(Queue<Integer> q, int x) {
         [55,88,44,6],[48,92,13,8]
     ]">
 </img-areas>
-<img width=350 src="./img/2025-271-q-2-mmm.png" class="absolute left-0 bottom-0 mb-4">
+<img width=340 src="./img/2025-271-q-2-mmm.png" class="absolute left-0 bottom-10 mb-4 zzz">
+<style>
+    .zzz { 
+        transition: transform 0.2s;
+        transform-origin: left bottom;
+    }
+    .zzz:hover {
+        transform: scale(1.5);
+    }
+</style>
 </drill>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="q-2-b" as-html>
+<drill lang="java" id="q-2-b!" as-html>
 <img-areas width=800
     src="./img/2025-271-q-2-b.png"
     hide="[
@@ -237,7 +313,7 @@ public static boolean $contains$(Queue<Integer> q, int x) {
     hide="[
         [2,19,96,28],[1,59,29,32],[44,69,56,26]
     ]">
-    <img width=380 src="./img/2025-271-q-2-what.png" class=" absolute right-24">
+    <img width=580 src="./img/2025-271-q-2-what.png" class="absolute left-0 bottom-10 mb-4">
 </img-areas>
 </drill>
 
