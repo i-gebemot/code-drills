@@ -149,6 +149,420 @@ $public static $boolean $nMagic$($Queue$$&lt;Integer>$ q, int n) {
 
 <!---------------------------------------------------------->
 
+<drill lang="java" id="insertOrdered()">
+// insert number into ordered (ascending) queue
+public static $void $$insertOrdered$(Queue&lt;<Integer> q, int num) {
+        ^$
+        ~r ht missing-ret-type
+    Queue&lt;Integer> tmp = $new $$Queue$&lt;Integer>();
+        ^$
+        ~r ht new-is-missing
+    while ($!$$q.isEmpty()$ && q.head() <= num) {
+            ^$
+            ~r ht wrong-logic
+        tmp.insert(q.remove());
+    }
+    $tmp.insert(num);$        $// כשנשחזר את התור האביר החדש יהיה שם$
+        ~g ht why-into-tmp
+        ^$
+    while ($!$$q.isEmpty()$) {
+            ^$
+            ~r ht wrong-logic
+        tmp.insert(q.remove());
+    }
+    while ($!$$tmp.isEmpty()$) {
+            ^$
+            ~r ht wrong-logic
+        $q$.insert($tmp$.remove());
+            ^tmp ~r ht wrong-logic
+            ^q ~r ht wrong-logic
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="insertWithPriority()">
+class Patient {
+    $private $int $id$;         {2}
+        ^$
+        ~r ht access-modifier
+    $private $int $priority$;   {2}
+        ^$
+        ~r ht access-modifier
+
+    $public $int $getPriority()$ { return this.priority; }
+        ^$
+        ~r ht access-modifier
+}
+
+-//<bdo dir="rtl">... הפונקציה מקבלת... ומכניסה לתור</bdo>
+public static void $insertWithPriority$(Queue&lt;Patient> q, Patient p) {
+        ~g ht its-a-helper      {3}
+    $Queue$$&lt;Patient>$ tmp = new $Queue$$&lt;Patient>$();
+        ~r ht generic-type
+        ^$
+        ~r ht generic-type
+        ^$
+    while (!q.isEmpty() $&&$
+        ^... ~o hr implement 
+            q.$head().$$getPriority()$ >= p.$getPriority()$)
+                ^$
+                ~r ht func-of-what
+                ^priority ~r ht cant-access-private     {+}
+    {
+        tmp.insert(q.$remove$$()$);         {1}
+            ~r ht func-call
+            ^$
+    }
+    tmp.insert(p);
+    while (!q.isEmpty()) {
+        tmp.insert(q.$remove$$()$);         {1}
+            ~r ht func-call
+            ^$
+    }
+    while (!tmp.isEmpty()) {
+        q.insert(tmp.$remove$$()$);         {1}
+            ~r ht func-call
+            ^$
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="remove()">
+// remove and return a person from a queue
+public $static $Patient $remove$(Queue&lt;Patient> q, int id) {
+        ^$
+        ~r ht external-func
+    Queue&lt;Patient> tmp = new Queue&lt;Patient>();
+    while (!q.isEmpty() $&&$ q$.head()$.$getId()$ != id) {
+            ^|| ~r ht wrong-logic
+            ^$ ~t                   {+}
+            ~r ht func-of-what
+        tmp.insert(q.remove());
+    }
+    $Patient$ p = q.remove();
+        ^int ~r ht number-or-object
+-    while (!q.isEmpty()) {             {2}
+-        tmp.insert(q.remove());        {2}
+-    }                                  {2}
+    while ($!tmp.isEmpty()$) {          {2}
+            ~r ht not-in-tmp-queue
+        q.insert(tmp.remove());
+    }
+-    return p;              {1}
+$} $                        {1}
+    ~r hr return-is-missing
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q-2">
+public class PriorQueue {
+    private $Queue$$&lt;Patient>$ q;
+        ~r ht generic-type
+        ^$
+
+    public PriorQueue() {
+        this.q = $new Queue&lt;Patient>()$;
+            ^null ~r ht empty-que-vs-empty-list
+    }
+
+    public void priorityInsert(Patient p) {
+        insertWithPriority($this.q$, $p$);
+            ^... ~o ht implement
+            ^... ~o ht implement            {+}
+    }
+
+    public void update(int id, int pri) {
+        Patient p = remove($this.q$, $id$);
+            ^... ~o ht implement
+            ^... ~o ht implement               {+}
+        p.setPriority$($pri$)$;
+            ^ = $ ~r ht func-call
+            ^$
+-        insertWithPriority(this.q, p);     {1}
++       $...$                              {1}
+            ~o ht implement
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q-3-a" as-html>
+<img-areas
+    src="./img/2024-271-q-3-a.png"
+    hide="[
+        [39,26,8,8],
+        [5,35,42,8],[5,43,42,9],[5,51,42,9],[5,60,42,8],[5,69,42,8],[5,77,42,8],[5,85,42,8],
+        [53,77,44,8],[54,68,43,9],[54,60,42,9],[54,52,42,7],[54,43,42,8],[54,35,42,9],[54,27,42,7],
+        [54,18,16,9]
+    ]">
+</img-areas>
+<img-areas
+    src="./img/2024-271-q-3-a-code.png"
+    hide="[
+        [58,17,41,21],[43,60,50,21]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="">
+<drill lang="java" id="q-3-b" as-html>
+<img-areas
+    src="./img/2024-271-q-3-b.png"
+    hide="[
+        [26,40,9,10],[41,39,20,9],[63,38,15,11],[81,38,17,11],
+        [5,50,30,10],[41,50,32,9],[81,50,15,10],[5,60,70,10],[81,60,15,10],
+        [5,71,70,9],[81,70,15,10],[5,81,29,11]
+    ]">
+</img-areas>
+<img-areas
+    src="./img/2024-271-q-3-b-code.png"
+    hide="[
+        [52,10,48,23],[56,57,37,30]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="BusStation">
+$!html <img src="./img/2024-271-q-4-a.png">
+class BusStation {
+    $private$ int num;
+        ^public ~r ht access-modifier       {2}
+    $private$ int[] arr;
+        ^public ~r ht access-modifier       {2}
+    $private$ int amount;
+        ^public ~r ht access-modifier       {2}
+
+    $public$ int[] getArr() { return this.arr; }
+        ^private ~r ht access-modifier       {3}
+    $public$ int getAmount() { return this.amount; }
+        ^private ~r ht access-modifier       {3}
+
+    $!html <img src="./img/2024-271-q-4-a-2.png">
+    public $$boolean isStopping($int $$n$) {
+            ^static $ ~r ht internal-func
+            ^$ ~t                                   {+}
+            ~r ht type-is-missing
+        for (int i = 0; i < this.$amount$; i++) {
+                ^arr.length ~r ht wrong-logic
+            if $($$arr[i] == n$$)$ {
+                    ^$
+                    ~r ht if-syntax
+                    ^$
+                return true$;$                  {1}
+                    ^  $ ~r ht comma-is-missing
+            }
+        }
+        return false$;$                         {1}
+            ^  $ ~r ht comma-is-missing
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="allStations-result">
+$!html <img src="./img/2024-271-q-4-b.png">
+var city = new BusStation[] {
+    new BusStation(1, new int[] {10, 20, 30}),
+    new BusStation(2, new int[] {10, 30, 40}),
+    new BusStation(3, new int[] {10, 20, 30}),
+    new BusStation(4, new int[] {10, 20, 30, 40}),
+};
+
+print(allStations(city));   // $[30, 10]$
+    ^? ~g ht result
+
+public static $boolean $$inCity$(BusStation[] arr, int n) {
+        ^$
+        ~r ht missing-ret-type
+    for ($BusStation $$bs$: arr) {
+            ^$
+            ~r ht type-is-missing
+        for ($int $$i $= 0; i < bs.$getAmount()$; i++) {
+                ^$
+                ~r ht type-is-missing
+                ^amount ~r ht member-access     {+}
+            if (bs.$getArr()$[i] == n) {
+                    ^arr ~r ht member-access     {+}
+                return $true$;                  {1}
+                    ^false ~r ht wrong-logic
+            }
+        }
+    }
+    return $false$;                             {1}
+        ^true ~r ht wrong-logic
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="contains()+" no-wrong-phase>
+var city = new BusStation[] {
+    new BusStation(1, new int[] {10, 20, 30}),
+    new BusStation(2, new int[] {10, 30, 40}),
+    new BusStation(3, new int[] {10, 20, 30}),
+    new BusStation(4, new int[] {10, 20, 30, 40}),
+};
+
+-// <bdo dir="rtl">בודקת האם קו עוצר בכל התחנות בעיר</bdo>     {1}
+public static boolean $stopsEverywhere$(BusStation[] arr, int n) {
+        ~g ht its-a-helper      {1}
+    for (BusStation bs: arr) {
+        if ($!bs.isStopping(n)$) {
+                ^... ~o ht implement
+            return false;
+        }
+    }
+    return true;
+}
+
+-// <bdo dir="rtl">בודקת האם איבר בתוך הרשימה</bdo>     {2}
+public static boolean $contains$(Node&lt;Integer> lst, int n) {
+        ~g ht its-a-helper      {2}
+    while (lst != null) {
+        if ($lst.getValue() == n$) {
+                ^... ~o ht implement
+            return true;
+        }
+-        lst = lst.getNext();               {3}
++       $...$                               {3}
+            ~o ht implement
+    }
+    return false;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="allStations()" no-wrong-phase>
+var city = new BusStation[] {
+    new BusStation(1, new int[] {10, 20, 30}),
+    new BusStation(2, new int[] {10, 30, 40}),
+    new BusStation(3, new int[] {10, 20, 30}),
+    new BusStation(4, new int[] {10, 20, 30, 40}),
+};
+
+public static boolean contains(Node<Integer> lst, int n) {
+    ...
+}
+
+public static boolean stopsEverywhere(BusStation[] arr, int n) {
+    ...
+}
+
+public static Node<Integer> allStations(BusStation[] arr) {
+    Node<Integer> lst = $null;$
+        ^... ~o ht implement
+    for ($BusStation bs: arr$) {
+            ^... ~o ht implement
+        for (int i = 0; i < $bs.getAmount()$; i++) {
+                ^... ~o ht implement
+            int n = $bs.getArr()[i];$
+                ^... ~o ht implement
+            if ($stopsEverywhere(arr, n)$ $&&$ $!contains(lst, n)$) {
+                    ^... ~o ht implement
+                    ^... ~o ht implement        {+}        
+                    ^... ~o ht implement        {+}
+                lst = $new Node&lt;Integer>(n, lst);$
+                    ^... ~o ht implement
+            }
+        }
+    }
+    return $lst;$
+        ^... ~o ht implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="longest()" no-wrong-phase>
+$!html <img src="./img/2024-271-q-5.png">
+$!html <img src="./img/2024-271-q-5-a.png"><br>
+public static int width(Node<Integer> lst, int num) {
+    return Math.max(
+        width(lst, -num, num),
+        width(lst, num, -num));
+}
+$!html <img src="./img/2024-271-q-5-b.png"><br>
+public static int longest(Node<Integer> lst) {
+    $Node$$&lt;Integer>$ $node$ = $lst;$
+        ~r ht generic-type
+        ^$
+        ~g ht why-not-lst           {+}
+        ^... ~o ht implement        {+}
+    int max = $-1;$
+        ^... ~o ht implement        {+}
+    while ($node != null$) {
+            ^... ~o ht implement        {+}
+        max = Math.max(max, $width(lst, node.getValue())$);
+            ^... ~o ht implement        {+}
+        node = $node.getNext();$
+            ^... ~o ht implement        {+}
+    }
+    return $max;$
+        ^... ~o ht implement        {+}
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="width()!" no-wrong-phase>
+$!html <img src="./img/2024-271-q-5-a.png"><br>
+public static int width(Node&lt;Integer> lst, int left, int right) {
+    int first = $-1;$
+        ^... ~o ht implement
+    int last = $-1;$
+        ^... ~o ht implement
+    int i = $0;$
+        ^... ~o ht implement
+    while (lst != null) {
+        if ($lst.getValue() == left$ && $first == -1$) {
+                ^... ~o ht implement
+                ^... ~o ht implement        {+}
+            first = $i;$
+                ^... ~o ht implement
+        }
+        if ($lst.getValue() == right$) {
+                ^... ~o ht implement
+            last = $i;$
+                ^... ~o ht implement
+        }
+        lst = lst.getNext();
+        i++;
+    }
+
+    if (first == -1 || $last == -1$ || $first > last$) {
+            ^... ~o ht implement
+            ^... ~o ht implement        {+}
+        return -1;
+    }
+    return $last - first + 1;$
+        ^... ~o ht implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="">
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="">
+</drill>
+
+<!---------------------------------------------------------->
+
 <drill lang="java" id="">
 </drill>
 
