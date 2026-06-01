@@ -516,7 +516,7 @@ public static int longest(Node<Integer> lst) {
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="width()!" no-wrong-phase>
+<drill lang="java" id="width()" no-wrong-phase>
 $!html <img src="./img/2024-271-q-5-a.png"><br>
 public static int width(Node&lt;Integer> lst, int left, int right) {
     int first = $-1;$
@@ -553,7 +553,31 @@ public static int width(Node&lt;Integer> lst, int left, int right) {
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="">
+<drill lang="java" id="q-9-a!" no-wrong-phase>
+אם `L_1` ו-`L_2` אינן רגולריות
+אז `L_1 nn L_2` בהכרח אינה רגולרית
+$לא נכון$
+    ^? ~g ~m hr is-it-right
+
+-`L_1 = \{a^n b^n\}`            {1}
+-`L_2 = bar L_1`                {1}
+-`L_1 nn L_2 = ∅`               {1}
+
+$!html <hr>
+
+`L_1^n \cdot L_2^n \Leftrightarrow (L_1 \cdot L_2)^n`
+
+-`L^n = \underbrace{L \cdot L \cdots L}_{n\text{ times}}`
+
+$לא נכון$
+    ^? ~g ~m hr is-it-right
+
+-`L_1 = \{a\} \Rightarrow L_1^2 = \{a^{}a\}`        {2}
+-`L_1 = \{b\} \Rightarrow L_1^2 = \{b^{}b\}`        {2}
+-`L_1 \cdot L_2 = \{a^{}b\}`                        {2}
+
+-`L_1^2 \cdot L_2^2 = {a^{}a^{}b^{}b}`               {3}
+-`(L_1 \cdot L_2)^2 = {a^{}b^{}a^{}b}`               {3}
 </drill>
 
 <!---------------------------------------------------------->
