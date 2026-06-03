@@ -176,11 +176,15 @@ public static Node&lt;NumCount> insertOrdered(
         Node&lt;NumCount> lst, 
         Node&lt;NumCount> node)
 {
+-    if (lst == null) {                         {1}
+-        return node;                           {1}
+-    }                                          {1}
     int num = node.$getValue().$$getNum()$;
         ^$
         ~r ht node-as-value
-    if (num < lst.$getValue().$$getNum()$) {
-                ^$
+    if (num < $lst$.$getValue().$$getNum()$)
+                ~r ht list-can-be-empty         {1}!
+                ^$ ~t                           {+}
                 ~r ht node-as-value
             node.setNext$($lst$)$;
                 ^ == $
@@ -188,14 +192,21 @@ public static Node&lt;NumCount> insertOrdered(
             return node;
     }
     Node<NumCount> cur = lst;
-    while (cur.hasNext() && cur.getNext().$getValue().$$getNum()$ < num) {
+    while (cur.hasNext() && 
+           cur.getNext().$getValue().$$getNum()$ < num)
             ^$
             ~r ht node-as-value
+    {
         cur = cur.getNext();
     }
-    cur.setNext$($cur.getNext().getNext()$)$;
-        ^ == $
+
+    node.$setNext($cur.getNext()$)$;
+        ^next = $ ~r ht member-access
         ^$
+    cur.$setNext($node$)$;
+        ^next = $ ~r ht member-access
+        ^$
+
     return $lst$;
         ^cur ~r ht wrong-logic
 }
@@ -239,7 +250,7 @@ class OrderedList {
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="ValueN()">
+<drill lang="java" id="valueN()">
 class OrderedList {
     private Node&lt;NumCount> lst;
 
@@ -247,16 +258,17 @@ class OrderedList {
             ^static $
             ~r ht internal-func
 -        Node<NumCount> node = this.lst;        {1}
+        int indx = 0;
         while ($node$ != null) {
                 ^lst ~r ht wrong-logic          {1}
             int count = $node$.getValue().getCount();
                 ^lst ~r ht wrong-logic          {1}
-            if (num < count) {
+            if (indx + count >= num) {
                 return $node$.getValue().$getNum()$;
                     ^lst ~r ht wrong-logic      {1}
                     ^getCount() ~r ht wrong-logic       {2}
             }
-            num -= $count;$
+            indx += $count;$
                 ^... ~o ht implement
             $node$ = $node$.getNext();          {1}
                 ^lst ~r ht wrong-logic
@@ -271,7 +283,7 @@ class OrderedList {
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="q-3-i-1" no-wrong-phase>
+<drill lang="java" id="factorOf()" no-wrong-phase>
 public static boolean isPrime(int num) {
     for (int $i = 2$; i < num; i++) {
             ~g ht למה דווקה 2?
@@ -284,7 +296,7 @@ public static boolean isPrime(int num) {
         ^... ~o ht implement
 }
 
-public static factorOf(int num) {
+public static int factorOf(int num) {
     for (int i = $2$; i < num; i++) {
             ^... $ ~o ht implement
         if (num % i $== 0$) {
