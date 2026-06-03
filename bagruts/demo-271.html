@@ -23,9 +23,9 @@
 <a href="./pdf/demo-271.pdf" target="_blank" class="link link-primary ml-6">
     <div dir="rtl" style="float:left;">בגרות demo</div>
 </a>
-<!--a href="https://www.youtube.com/playlist?list=PLNLf5_3sUeLzAinrmkwRubxKWvu_WfKA6" target="_blank" class="link link-primary ml-6">
-    פיתרונות של אריאל בר יתצחק
-</a-->
+<a href="./pdf/demo-271-slides.pdf" target="_blank" class="link link-primary ml-6">
+    שקופיות להדפסה
+</a>
 <video-list width=380 height=200 list="[
     ['https://youtu.be/', 'Q-1'],
 ]">
@@ -246,18 +246,17 @@ class OrderedList {
     public $$int $valueN$(int num) {
             ^static $
             ~r ht internal-func
-        int indx = 0;
 -        Node<NumCount> node = this.lst;        {1}
         while ($node$ != null) {
                 ^lst ~r ht wrong-logic          {1}
             int count = $node$.getValue().getCount();
                 ^lst ~r ht wrong-logic          {1}
-            if (indx < count) {
+            if (num < count) {
                 return $node$.getValue().$getNum()$;
                     ^lst ~r ht wrong-logic      {1}
                     ^getCount() ~r ht wrong-logic       {2}
             }
-            indx -= $count;$
+            num -= $count;$
                 ^... ~o ht implement
             $node$ = $node$.getNext();          {1}
                 ^lst ~r ht wrong-logic

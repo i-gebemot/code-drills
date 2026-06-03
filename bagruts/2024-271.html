@@ -23,6 +23,9 @@
 <a href="./pdf/2024-271.pdf" target="_blank" class="link link-primary ml-6">
     בגרות 2024
 </a>
+<a href="./pdf/2024-271-slides.pdf" target="_blank" class="link link-primary ml-6">
+    שקופיות להדפסה
+</a>
 <a href="https://www.youtube.com/playlist?list=" target="_blank" class="link link-primary ml-6">
     פיתרונות של אריאל בר יתצחק
 </a>
@@ -151,7 +154,7 @@ $public static $boolean $nMagic$($Queue$$&lt;Integer>$ q, int n) {
 
 <drill lang="java" id="insertOrdered()">
 // insert number into ordered (ascending) queue
-public static $void $$insertOrdered$(Queue&lt;<Integer> q, int num) {
+public static $void $$insertOrdered$(Queue&lt;Integer> q, int num) {
         ^$
         ~r ht missing-ret-type
     Queue&lt;Integer> tmp = $new $$Queue$&lt;Integer>();
@@ -197,8 +200,10 @@ class Patient {
 }
 
 -//<bdo dir="rtl">... הפונקציה מקבלת... ומכניסה לתור</bdo>
-public static void $insertWithPriority$(Queue&lt;Patient> q, Patient p) {
+public static void $insertWithPriority$(Queue&lt;Patient> q,
         ~g ht its-a-helper      {3}
+                                      Patient p)
+{
     $Queue$$&lt;Patient>$ tmp = new $Queue$$&lt;Patient>$();
         ~r ht generic-type
         ^$
@@ -415,8 +420,10 @@ var city = new BusStation[] {
 };
 
 -// <bdo dir="rtl">בודקת האם קו עוצר בכל התחנות בעיר</bdo>     {1}
-public static boolean $stopsEverywhere$(BusStation[] arr, int n) {
+public static boolean $stopsEverywhere$(BusStation[] arr,
         ~g ht its-a-helper      {1}
+                                      int n)
+{
     for (BusStation bs: arr) {
         if ($!bs.isStopping(n)$) {
                 ^... ~o ht implement
@@ -452,16 +459,18 @@ var city = new BusStation[] {
     new BusStation(4, new int[] {10, 20, 30, 40}),
 };
 
-public static boolean contains(Node<Integer> lst, int n) {
+public static boolean contains(Node&lt;Integer> lst, int n) {
     ...
 }
 
-public static boolean stopsEverywhere(BusStation[] arr, int n) {
+public static boolean stopsEverywhere(BusStation[] arr, 
+                                      int n)
+{
     ...
 }
 
-public static Node<Integer> allStations(BusStation[] arr) {
-    Node<Integer> lst = $null;$
+public static Node&lt;Integer> allStations(BusStation[] arr) {
+    Node&lt;Integer> lst = $null;$
         ^... ~o ht implement
     for ($BusStation bs: arr$) {
             ^... ~o ht implement
@@ -469,10 +478,12 @@ public static Node<Integer> allStations(BusStation[] arr) {
                 ^... ~o ht implement
             int n = $bs.getArr()[i];$
                 ^... ~o ht implement
-            if ($stopsEverywhere(arr, n)$ $&&$ $!contains(lst, n)$) {
+            if ($stopsEverywhere(arr, n)$ $&&$ 
                     ^... ~o ht implement
                     ^... ~o ht implement        {+}        
-                    ^... ~o ht implement        {+}
+                $!contains(lst, n)$)
+                    ^... ~o ht implement
+            {
                 lst = $new Node&lt;Integer>(n, lst);$
                     ^... ~o ht implement
             }
@@ -488,13 +499,13 @@ public static Node<Integer> allStations(BusStation[] arr) {
 <drill lang="java" id="longest()" no-wrong-phase>
 $!html <img src="./img/2024-271-q-5.png">
 $!html <img src="./img/2024-271-q-5-a.png"><br>
-public static int width(Node<Integer> lst, int num) {
+public static int width(Node&lt;Integer> lst, int num) {
     return Math.max(
         width(lst, -num, num),
         width(lst, num, -num));
 }
 $!html <img src="./img/2024-271-q-5-b.png"><br>
-public static int longest(Node<Integer> lst) {
+public static int longest(Node&lt;Integer> lst) {
     $Node$$&lt;Integer>$ $node$ = $lst;$
         ~r ht generic-type
         ^$
@@ -518,7 +529,9 @@ public static int longest(Node<Integer> lst) {
 
 <drill lang="java" id="width()" no-wrong-phase>
 $!html <img src="./img/2024-271-q-5-a.png"><br>
-public static int width(Node&lt;Integer> lst, int left, int right) {
+public static int width(Node&lt;Integer> lst, int left,
+                        int right)
+{
     int first = $-1;$
         ^... ~o ht implement
     int last = $-1;$

@@ -23,6 +23,9 @@
 <a href="./pdf/2025-271-b.pdf" target="_blank" class="link link-primary ml-6">
     בגרות 2025 מועד חילופי
 </a>
+<a href="./pdf/2025-271-b-slides.pdf" target="_blank" class="link link-primary ml-6">
+    שקופיות להדפסה
+</a>
 <video-list width=380 height=200 list="[
     ['https://youtu.be/Fd-_gqBxgyM', 'Q-1'],
     ['https://youtu.be/gfQ30JcLE4o', 'Q-2'],
@@ -108,7 +111,9 @@ public static int countBoth(Node&lt;Integer> a, Node&lt;Integer> b) {
 
 <drill lang="java" id="craeteUnion()" tags="['q-1','a']" no-wrong-phase>
 $!html <img src="./img/2025-271-b-q1-a.png"> 
-public static Node&lt;Integer> createUnion(Node&lt;Integer> a, Node&lt;Integer> b) {
+public static Node&lt;Integer> createUnion(Node&lt;Integer> a, 
+                                        Node&lt;Integer> b) 
+{
     Node&lt;Integer> lst $= null;$
         ^... ~o hr implement
     while ($a != null$) {
@@ -143,7 +148,9 @@ public static Node&lt;Integer> createUnion(Node&lt;Integer> a, Node&lt;Integer> 
 
 <drill lang="java" id="intersection()" tags="['q-1','b']" no-wrong-phase>
 $!html <img src="./img/2025-271-b-q1-b.png">
-public static Node&lt;Integer> intersection(Node&lt;Integer> a, Node&lt;Integer> b) {
+public static Node&lt;Integer> intersection(Node&lt;Integer> a, 
+                                         Node&lt;Integer> b)
+{
     Node&lt;Integer> lst = null;
     while ($a != null$) {
             ^... ~o hr implement
@@ -270,13 +277,18 @@ public static int atIndex(Queue&lt;Integer> que, int indx) {
     ...
 }
 
-public static int isMConnect(Queue&lt;Integer> a, Queue<Integer> b, int m) {
+public static int isMConnect(Queue&lt;Integer> a, 
+                             Queue&lt;Integer> b, 
+                             int m)
+{
     // Runtime complexity is $`O(n^2)`$
         ^? ~g hr result
     ...
 }
 
-public static int maxConnect(Queue&lt;Integer> a, Queue<Integer> b) {
+public static int maxConnect(Queue&lt;Integer> a, 
+                             Queue&lt;Integer> b)
+{
     // Runtime complexity is $`O(n^3)`$
         ^? ~g hr result
     ...
@@ -286,7 +298,10 @@ public static int maxConnect(Queue&lt;Integer> a, Queue<Integer> b) {
 <!---------------------------------------------------------->
 
 <drill lang="java" id="queue-solution" tags="['q-2','solution']" no-wrong-phase>
-public static boolean isMConnect(Queue&lt;Integer> a, Queue&lt;Integer> b, int m) {
+public static boolean isMConnect(Queue&lt;Integer> a, 
+                                 Queue&lt;Integer> b, 
+                                 int m)
+{
     int k = $length(a) - m;$
         ^... ~o hr implement
     for (int i = 0; i < m; i++) {
@@ -299,7 +314,9 @@ public static boolean isMConnect(Queue&lt;Integer> a, Queue&lt;Integer> b, int m
     return true;
 }
 
-public static int maxConnect(Queue&lt;Integer> a, Queue&lt;Integer> b) {
+public static int maxConnect(Queue&lt;Integer> a, 
+                             Queue&lt;Integer> b)
+{
     int max = 0;
     for (int i = 0; i < $length(a)$; i++) {
             ^... ~o hr implement
@@ -310,8 +327,8 @@ public static int maxConnect(Queue&lt;Integer> a, Queue&lt;Integer> b) {
     return max;
 }
 
-Queue&lt;Integer> a = queueFromArray(new Integer[] {2,5,4,4,7,2,6});
-Queue&lt;Integer> b = queueFromArray(new Integer[] {2,6,7,1,4,2,1,8,1});
+var a = queueFromArray(new Integer[] {2,5,4,4,7,2,6});
+var b = queueFromArray(new Integer[] {2,6,7,1,4,2,1,8,1});
 
 print(isMConnect(a, b, 2));     // true
 print(maxConnect(a, b));        // 2
