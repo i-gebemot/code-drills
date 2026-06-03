@@ -103,7 +103,7 @@ public static boolean twoSum(int[] a, int x) {
 // Runtime complexity: $`O(n^2)`$
     ^? ~g ht result
 
-public static boolean twoSum($Queue<Integer> q$, int x) {   {1}
+public static boolean twoSum($Queue&lt;Integer> q$, int x) {   {1}
         ^int[] a ~g
     for (int i = 0; i < $len(q)$; i++) {                    {1}
             ^a.lenght ~g
@@ -214,7 +214,7 @@ public static Node&lt;NumCount> insertOrdered(
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="insertNum()">
+<drill lang="java" id="insertNum()!">
 class OrderedList {
     private Node&lt;NumCount> lst;
 
@@ -229,7 +229,8 @@ class OrderedList {
             ~r ht missing-ret-type
         Node&lt;NumCount> node = find(this.lst, x);
         if (node != null) {
-            int count = node.getValue()$.getCount()$;
+            int count = node$.getValue()$.$getCount()$;
+                ^$
                 ~r ht number-or-object
             node.getValue().$setCount$$($count + 1$)$;
                 ^count ~r ht cant-access-private
@@ -314,7 +315,7 @@ public static int factorOf(int num) {
 
 <drill lang="java" id="q-3-a" no-wrong-phase>
 $!html <img src="./img/demo-271-q-3-a.png">
-public static boolean addNodes(BinNode<Integer> tr) {
+public static boolean addNodes(BinNode&lt;Integer> tr) {
     int num = tr.getValue();
     if (isPrime(num)) {
         return false;
@@ -322,9 +323,9 @@ public static boolean addNodes(BinNode<Integer> tr) {
     int f1 = factorOf(num);
     int f2 = $num / f1;$
         ^...$ ~o ht implement
-    tr.setLeft($new BinNode<Integer>(f1)$);
+    tr.setLeft($new BinNode&lt;Integer>(f1)$);
         ^...$ ~o ht implement
-    tr.setRight($new BinNode<Integer>(f2)$);
+    tr.setRight($new BinNode&lt;Integer>(f2)$);
         ^...$ ~o ht implement
     return true;
 }
