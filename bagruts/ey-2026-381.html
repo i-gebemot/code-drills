@@ -1,0 +1,496 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="../md-components.js"></script>
+
+<import-hints from="./bagrut-hints.html"></import-hints>
+
+<!---------------------------------------------------------->
+
+<code-drills 
+    heading="ey-2026-381"
+    log-level="W"
+>
+</code-drills>
+
+<template>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="makePartition()">
+$public static $void $makePartition$(int$[]$ $arr$, int x) {
+        ^$
+        ~r ht external-func
+        ^$ ~t                       {+}
+        ~r ht is-it-array
+    int k = 0;
+    $for$ (int i = 0$;$ i < arr.length$;$ i++) {
+            ~r ht for-syntax
+            ^, ~t
+            ^, ~t
+        if (arr[i] <= x) {
+            int tmp = arr[i];
+            arr[i] = arr[k];
+            arr[k] = tmp;
+            k++$;$
+                ^ $ ~r hr comma-is-missing
+        }
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="partitions" no-wrong-phase>
+int[] arr = new int[] {10, 5, 8, -1, -3, 4, 9, 5};
+makePartition(arr, 4);
+print(arr);     // $[-1, -3, 4, 10, 5, 8, 9, 5]$
+    ^... ~g ht result
+
+int[] arr = new int[] {10, 5, 8, -1, -3, 4, 9, 5};
+makePartition(arr, 5);
+print(arr);     // $[5, -1, -3, 4, 5, 10, 9, 8]$
+    ^... ~g ht result
+
+int[] arr = new int[] {10, 5, 8, -1, -3, 4, 9, 5};
+makePartition(arr, 100);
+print(arr);     // $[10, 5, 8, -1, -3, 4, 9, 5]$
+    ^... ~g ht result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="sort()">
+public static void $sort$(int[] a) {
+        ^what ~g ht func-name                   {1}
+    for (int i = 0; i < arr.length$$; i++) {    {2}
+            ^() ~r ht length-is-prop
+        int k = i;
+        for (int j = i + 1; j < arr.length$$; j++) {    {2}
+                ^() ~r ht length-is-prop
+            if (a[j] > a[k]) {
+                k = j;
+            }
+        }
+        if (k != i) {
+            a[i] += a[k];
+            a[k] = a[i] - a[k];
+            a[i] = a[i] - a[k];
+        }
+    }
+}
+
+int[] arr = new int[] {10, 5, 8, -3, 9};
+$sort$(arr);
+    ^what ~g ht func-name                   {1}!
+print(arr);        // $[10, 9, 8, 5, -3]$
+    ^... ~g ht result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="zigZagNumber()" todo skip>
+public static boolean zigZagNumber(int num) {
+    int l = 0;
+    int m = num % 10;
+    num /= 10;
+    int r = num % 10;
+    num /= 10;
+    while (num >= 100) {
+        l = m;
+        m = r;
+        r = num % 10;
+        num /= 10;
+        boolean min = m < l && m < r;
+        boolean max = m > l && m > r;
+        if (!min && !max) {
+            return false;
+        }
+    }
+    return true;
+}
+
+print(zigZagNumber(1213141516));    // true
+print(zigZagNumber(51535450));      // true
+print(zigZagNumber(254342474));     // false
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="oneTwoThree()" todo skip>
+// Last digits (a,b,c) of each trio: a * b = c 
+public static boolean oneTwoThree(int[] arr) {
+    if (arr.length < 3) {
+        return false;
+    }
+    for (int i = 2; i < arr.length; i++) {
+        int a = arr[i-2];
+        int b = arr[i-1];
+        int c = arr[i];
+        if (a % 10 * (b % 10) % 10 != c % 10) {
+            return false;
+        }
+        if (a * b % 10 != c % 10) {
+            return false;
+        }
+    }
+    return true;
+}
+
+print(oneTwoThree(new int[] {2,3,6,38,58,24,22}));  // true
+print(oneTwoThree(new int[] {2,3,6,39,58,24,22}));  // false
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="Stack">
+class Stack {
+    $private $int[] $arr$;          {1}
+        ^$
+        ~r ht access-modifier
+    $private $int $count$;          {1}
+        ^$
+        ~r ht access-modifier
+
+    $public $$Stack$(int capacity) {
+        ^$
+        ~r ht access-modifier
+        this.arr = $new int[capacity];$   $// המערך מאופס אוטומטית$
+            ^... ~o ht implement
+            ^$ ~t                   {+}
+-        this.count = 0;            {2}
+    $} $                            {2}
+        ~r hr init-is-missing
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="push-pop">
+class Stack {
+    private int[] arr;
+    private int count;
+
+    $public $void $push$(int x) {
+            ^$
+            ~r ht internal-func
+-        if (this.count == this.arr.length) {       {1}
+-            return;                                {1}
+-        }                                          {1}
+        this.arr[$this.$$count$] = x;
+            ^$
+            ~o ht better-with-this
+        this.count++;
+    $} $                                            {1}!
+        ~r ht ואם ה-Stack מלא?..
+
+    $public $int $pop$() {
+            ^$
+            ~r ht internal-func
+        int x = $this.$$arr$[$this.$$count$ - 1];
+            ^$
+            ~o ht better-with-this
+            ^$
+            ~o ht better-with-this
+-        this.count--;                          {2}
+        return x;
+    $} $                                        {2}
+        ~r hr wrong-logic
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="remove()" no-wrong-phase>
+class Stack {
+    private int[] arr;
+    private int count;
+
+    public boolean remove(int x) {
+        int k = $0;$
+            ^... ~o ht implement
+        while ($this.arr[k] != x$ && $k < this.count$) {
+                ^... ~o ht implement
+                ^... ~o ht implement        {+}
+            $k++;$
+                ^... ~o ht implement
+        }
+        if ($k == this.count$) {
+                ^... ~o ht implement
+            return $false;$
+                ^... ~o ht implement
+        }
+        while ($k < this.count-1$) {
+                ^... ~o ht implement
+-            arr[k] = arr[k+1];             {1}
+-            k++;                           {1}
++           $...$                           {1}
+                ^... ~o ht implement
+        }
+-        this.count--;                  {2}
++       $...$                           {2}
+            ^... ~o ht implement
+        arr[k] = 0;   $// לא חובה כאן, חובה במערך של אובייקטים$
+            ^$
+        return $true;$
+            ^... ~o ht implement
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="removeAll()" no-wrong-phase>
+class Stack {
+    private int[] arr;
+    private int count;
+
+    public int removeAll(int x) {
+        int $l = 0, r = 0;$
+            ^... ~o ht implement
+        for ($int i = 0; i < this.count; i++$) {
+                ^... ~o ht implement
+            if (this.arr[r] != x) {
+                this.arr[l] = this.arr[r];
+                l++;
+            }
+            r++;
+        }
+        int removed = $r - l;$
+            ^... ~o ht implement
+-        this.count -= removed;         {1}
++       $...$                           {1}
+            ^... ~o ht implement
+        return removed;
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="printAll()">
+class Stack {
+    private int[] arr;
+    private int count;
+
+    public void printAll() {
+        System.out.print('[');
+        for (int i = 0; i < count-1; i++) {
+            System.out.print(arr[i]);
+            System.out.print(", ");
+        }
+        if (count > 0) {
+            System.out.print(arr[count-1]);
+        }
+        System.out.println(']');
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="stack-use" no-wrong-phase>
+Stack stack = new Stack(new int[] {1,2,3,1,7,1,2,2,1});
+
+print(stack.pop());         // $1$
+    ^... ~g ht result
+stack.printAll();           // $[1, 2, 3, 1, 7, 1, 2, 2]$
+    ^... ~g ht result
+
+print(stack.remove(1));     // $true$
+    ^... ~g ht result
+stack.printAll();           // $[2, 3, 1, 7, 1, 2, 2]$
+    ^... ~g ht result
+
+print(stack.removeAll(1));  // $2$
+    ^... ~g ht result
+stack.printAll();           // $[2, 3, 7, 2, 2]$
+    ^... ~g ht result
+
+print(stack.removeAll(3));  // $1$
+    ^... ~g ht result
+stack.printAll();           // $[2, 7, 2, 2]$
+    ^... ~g ht result
+
+print(stack.removeAll(2));  // $3$
+    ^... ~g ht result
+stack.printAll();           // $[7]$
+    ^... ~g ht result
+
+print(stack.pop());         // $7$
+    ^... ~g ht result
+stack.printAll();           // $[]$
+    ^... ~g ht result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="exam" no-wrong-phase>
+Student[] exam = new Student[] {
+    new Student(new int[] {1,1, 2,1, 3,4, 4,3, 5,4, 6,1, 7,4, 8,3, 9,2, 10,2}),
+    new Student(new int[] {1,1, 2,2, 3,3, 4,1, 5,4, 6,1, 7,1, 8,2, 9,2, 10,4}),
+    new Student(new int[] {1,1, 2,1, 3,1, 4,1, 5,2, 6,1, 7,1, 8,3, 9,2, 10,2}),
+    new Student(new int[] {1,1, 2,1, 3,3, 4,3, 5,4, 6,1, 7,4, 8,3, 9,2, 10,2}),
+    new Student(new int[] {1,1, 2,2, 3,1, 4,3, 5,4, 6,1, 7,1, 8,2, 9,2, 10,2}),
+    new Student(new int[] {1,1, 2,2, 3,3, 4,1, 5,2, 6,1, 7,4, 8,3, 9,2, 10,2}),
+    new Student(new int[] {1,1, 2,2, 3,3, 4,3, 5,4, 6,1, 7,1, 8,2, 9,1, 10,4}),
+    new Student(new int[] {1,1, 2,1, 3,1, 4,3, 5,4, 6,1, 7,4, 8,3, 9,2, 10,4}),
+    new Student(new int[] {1,1, 2,2, 3,3, 4,3, 5,4, 6,1, 7,1, 8,2, 9,1, 10,2}),
+    new Student(new int[] {1,1, 2,2, 3,3, 4,3, 5,4, 6,1, 7,4, 8,3, 9,2, 10,4}),
+};
+
+int[] answers = new int[] {0, 1, 2, 3, 3, 4, 1, 1, 3, 2, 2};
+
+print(countQuestions(exam));            // $10$
+    ^... ~g ht result
+print(hardestQuestion(exam, answers));  // $7$
+    ^... ~g ht result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="Answer">
+class Answer {
+    private int question;
+    private int answer;
+
+    public int $getQuestion$$()$ { $return $$this.question$; }
+        ~r ht func-call                 {1}
+        ^$ ~t                           {1}
+        ^$ ~t                           {2}
+        ~r ht return-is-missing         {2}
+    public int $getAnswer$$()$ { $return $$this.answer$; }
+        ~r ht func-call                 {1}
+        ^$ ~t                           {1}
+        ^$ ~t                           {2}
+        ~r ht return-is-missing         {2}
+
+    public Answer(int question, int answer) {
+        $this.$question = $$question;               {3}
+            ^$
+            ^this. ~r ht something-wrong-here
+        $this.$answer = $$answer;                   {3}
+            ^$
+            ^this. ~r ht something-wrong-here
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="Student">
+class Student {
+    private Answer[] answers;
+
+    public $Answer$$[]$ getAnswers() {  return this.answers$;$ }
+        ~r ht is-it-array
+        ^$
+        ^ $ ~r ht comma-is-missing
+
+    // [1,1, 2,2, 3,3, 4,3, 5,4, 6,1, 7,4, 8,3, 9,2, 10,4]
+    public Student(int[] pairs) {
+        int count = pairs.length / 2;
+
+-                                    // מערך מאותחל ב-`\text{null}`-ים אוטומאית {1}
+        this.answers = $new Answer[count];$$$
+            ^... ~o ht implement
+            ^$ ~t                      {1}!
+
+        for ($int i = 0; i < count; i++$) {
+                ^... ~o ht implement
+            int question = pairs[$i*2$];
+                ^... ~o ht implement
+            int answer = pairs[$i*2 + 1$];
+                ^... ~o ht implement
+            this.answers[i] = $new Answer(question, answer);$
+                ^... ~o ht implement
+        }
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="countQuestions()" no-wrong-phase>
+class Answer {
+    private int question;
+    private int answer;
+}
+class Student {
+    private Answer[] answers;
+}
+
+// [1,1, 2,1, 3,4, 4,3, 5,4, 6,1, 7,4, 8,3, 9,2, 10,2]
+// [1,1, 2,2, 3,3, 4,1, 5,4, 6,1, 7,1, 8,2, 9,2, 10,4]
+public static int countQuestions(Student[] exam) {
+    int maxNumber = 0;
+    for ($int i = 0; i < exam.length; i++$) {
+            ^... ~o ht implement
+        Answer[] answers = $exam[i].getAnswers();$
+            ^... ~o ht implement
+        for ($int j = 0; j < answers.length; j++$) {
+                ^... ~o ht implement
+            int q = $answers[j].getQuestion();$
+                ^... ~o ht implement
+            if (q > maxNumber) {
+                maxNumber = q;
+            }
+        }
+    }
+    return maxNumber;
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="hardestQuestion" no-wrong-phase>
+public static int answersToHardestQuestion(Student[] exam, int[] rightAnswers) {
+    int numOfQuestions = countQuestions(exam);
+    int[] rightCounts = new int[$numOfQuestions + 1$];   $// המערך מאופס אוטומטית$
+        ^... ~o ht implement
+        ^$ ~t                   {+}
+
+    for ($int i = 0; i < exam.length; i++$) {
+            ^... ~o ht implement
+        Answer[] answers = $exam[i].getAnswers();$
+            ^... ~o ht implement
+        for ($int j = 0; j < answers.length; j++$) {
+                ^... ~o ht implement
+            int question = $answers[j].getQuestion();$
+                ^... ~o ht implement
+            int answer = $answers[j].getAnswer();$
+                ^... ~o ht implement
+            if (answer == $rightAnswers[question]$) {
+                    ^... ~o ht implement
+                $rightCounts[question]++;$
+                    ^... ~o ht implement
+            }
+        }
+    }
+
+    int hardest = 1;
+    for (int i = $2$; i < rightCounts.length; i++) {
+            ~g ht למה דווקה 2?
+        if (rightCounts[i] < rightCounts[hardest]) {
+            hardest = i;
+        }
+    }
+
+    System.out.println("hardest question is: " + hardest);
+    return $rightCounts[hardest];$
+        ^... ~o ht implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="easyExam()" no-wrong-phase>
+// מחזיר אמת אם לשאלה הקשה ענו יותר מ-45% של תלמידים
+public static boolean easyExam(Student[] exam, int[] rightAnswers) {
+    int answers = $answersToHardestQuestion(exam, rightAnswers);$
+        ^... ~o ht implement
+    return $answers * 100 / exam.length > 45;$
+        ^... ~o ht implement
+}
+</drill>
+
+</template>
