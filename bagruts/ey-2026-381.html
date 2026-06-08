@@ -154,9 +154,9 @@ class Stack {
     $public $$Stack$(int capacity) {
         ^$
         ~r ht access-modifier
-        this.arr = $new int[capacity];$   $// המערך מאופס אוטומטית$
+-        // המערך מאופס אוטומטית            {3}
+        this.arr = $new int[capacity];$     {3}
             ^... ~o ht implement
-            ^$ ~t                   {+}
 -        this.count = 0;            {2}
     $} $                            {2}
         ~r hr init-is-missing
@@ -326,19 +326,19 @@ stack.printAll();           // $[]$
 
 <drill lang="java" id="exam" no-wrong-phase>
 Student[] exam = new Student[] {
-    new Student(new int[] {1,1, 2,1, 3,4, 4,3, 5,4, 6,1, 7,4, 8,3, 9,2, 10,2}),
-    new Student(new int[] {1,1, 2,2, 3,3, 4,1, 5,4, 6,1, 7,1, 8,2, 9,2, 10,4}),
-    new Student(new int[] {1,1, 2,1, 3,1, 4,1, 5,2, 6,1, 7,1, 8,3, 9,2, 10,2}),
-    new Student(new int[] {1,1, 2,1, 3,3, 4,3, 5,4, 6,1, 7,4, 8,3, 9,2, 10,2}),
-    new Student(new int[] {1,1, 2,2, 3,1, 4,3, 5,4, 6,1, 7,1, 8,2, 9,2, 10,2}),
-    new Student(new int[] {1,1, 2,2, 3,3, 4,1, 5,2, 6,1, 7,4, 8,3, 9,2, 10,2}),
-    new Student(new int[] {1,1, 2,2, 3,3, 4,3, 5,4, 6,1, 7,1, 8,2, 9,1, 10,4}),
-    new Student(new int[] {1,1, 2,1, 3,1, 4,3, 5,4, 6,1, 7,4, 8,3, 9,2, 10,4}),
-    new Student(new int[] {1,1, 2,2, 3,3, 4,3, 5,4, 6,1, 7,1, 8,2, 9,1, 10,2}),
-    new Student(new int[] {1,1, 2,2, 3,3, 4,3, 5,4, 6,1, 7,4, 8,3, 9,2, 10,4}),
+    new Student(new int[] {2,1, 3,4, 4,3, 5,4, 6,1, 7,4, 8,3}),
+    new Student(new int[] {2,2, 3,3, 4,1, 5,4, 6,1, 7,1, 8,2}),
+    new Student(new int[] {2,1, 3,1, 4,1, 5,2, 6,1, 7,1, 8,3}),
+    new Student(new int[] {2,1, 3,3, 4,3, 5,4, 6,1, 7,4, 8,3}),
+    new Student(new int[] {2,2, 3,1, 4,3, 5,4, 6,1, 7,1, 8,2}),
+    new Student(new int[] {2,2, 3,3, 4,1, 5,2, 6,1, 7,4, 8,3}),
+    new Student(new int[] {2,2, 3,3, 4,3, 5,4, 6,1, 7,1, 8,2}),
+    new Student(new int[] {2,1, 3,1, 4,3, 5,4, 6,1, 7,4, 8,3}),
+    new Student(new int[] {2,2, 3,3, 4,3, 5,4, 6,1, 7,1, 8,2}),
+    new Student(new int[] {2,2, 3,3, 4,3, 5,4, 6,1, 7,4, 8,3}),
 };
 
-int[] answers = new int[] {0, 1, 2, 3, 3, 4, 1, 1, 3, 2, 2};
+int[] answers = new int[] {0, 1, 2, 3, 3, 4, 1, 1, 3};
 
 print(countQuestions(exam));            // $10$
     ^... ~g ht result
@@ -386,11 +386,11 @@ class Student {
         ^$
         ^ $ ~r ht comma-is-missing
 
-    // [1,1, 2,2, 3,3, 4,3, 5,4, 6,1, 7,4, 8,3, 9,2, 10,4]
+    // [2,2, 3,3, 4,3, 5,4, 6,1, 7,4, 8,3]
     public Student(int[] pairs) {
         int count = pairs.length / 2;
 
--                                    // מערך מאותחל ב-`\text{null}`-ים אוטומאית {1}
+-       // מערך מאותחל ב-`\text{null}`-ים אוטומאית {1}
         this.answers = $new Answer[count];$$$
             ^... ~o ht implement
             ^$ ~t                      {1}!
@@ -419,8 +419,8 @@ class Student {
     private Answer[] answers;
 }
 
-// [1,1, 2,1, 3,4, 4,3, 5,4, 6,1, 7,4, 8,3, 9,2, 10,2]
-// [1,1, 2,2, 3,3, 4,1, 5,4, 6,1, 7,1, 8,2, 9,2, 10,4]
+// [2,1, 3,4, 4,3, 5,4, 6,1, 7,4, 8,3]
+// [2,2, 3,3, 4,1, 5,4, 6,1, 7,1, 8,2]
 public static int countQuestions(Student[] exam) {
     int maxNumber = 0;
     for ($int i = 0; i < exam.length; i++$) {
@@ -443,11 +443,13 @@ public static int countQuestions(Student[] exam) {
 <!---------------------------------------------------------->
 
 <drill lang="java" id="hardestQuestion" no-wrong-phase>
-public static int answersToHardestQuestion(Student[] exam, int[] rightAnswers) {
+public static int answersToHardestQ(Student[] exam,
+                                    int[] rightAnswers)
+{
     int numOfQuestions = countQuestions(exam);
-    int[] rightCounts = new int[$numOfQuestions + 1$];   $// המערך מאופס אוטומטית$
+-    // המערך מאופס אוטומטית                            {1}
+    int[] rightCounts = new int[$numOfQuestions + 1$];      {1}
         ^... ~o ht implement
-        ^$ ~t                   {+}
 
     for ($int i = 0; i < exam.length; i++$) {
             ^... ~o ht implement
@@ -485,8 +487,10 @@ public static int answersToHardestQuestion(Student[] exam, int[] rightAnswers) {
 
 <drill lang="java" id="easyExam()" no-wrong-phase>
 // מחזיר אמת אם לשאלה הקשה ענו יותר מ-45% של תלמידים
-public static boolean easyExam(Student[] exam, int[] rightAnswers) {
-    int answers = $answersToHardestQuestion(exam, rightAnswers);$
+public static boolean easyExam(Student[] exam,
+                               int[] rightAnswers)
+{
+    int answers = $answersToHardestQ(exam, rightAnswers);$
         ^... ~o ht implement
     return $answers * 100 / exam.length > 45;$
         ^... ~o ht implement
