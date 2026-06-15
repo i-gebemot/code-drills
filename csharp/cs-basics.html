@@ -17,10 +17,10 @@
 int a = 10;         // 10
 int b = a + 10;     // $20$
                         ^? ~g hr result
-int b = "a";        // $❌ Can't assing string to int$
+int b = "a";        // $❌ Can't assign string to int$
                         ^? ~g hr result
 double pi = 3.14;   // 3.14
-int x = pi;         // $❌ Can't assing double to int$
+int x = pi;         // $❌ Can't assign double to int$
                         ^? ~g hr result
 char ch = 'A';      // 'A'
 a = ch;             // $65$
@@ -40,7 +40,7 @@ string name = $"$$CSharp$$"$;
 <drill lang="java" id="types-and-conversions" no-wrong-phase>
 int n = 123;        // 123
 double pi = 3.14;   // 3.14
-double x = "pi";    // $❌ Can't assing string to double$
+double x = "pi";    // $❌ Can't assign string to double$
                             ^? ~g hr result
 double d = 123.0;   // 123.0
 d = n;              // $123.0$
@@ -105,15 +105,15 @@ x += 1;             // $6$
                         ^? ~g hr result
 y *= 2;             // $6.28$
                         ^? ~g hr result
-ok = !ok;           // $false$
+ok = !ok;           // $False$
                         ^? ~g hr result
 x++;                // $7$
                         ^? ~g hr result
-x > 3 && y < 10     // $true$
+x > 3 && y < 10     // $True$
                         ^? ~g hr result
-x == 5 || !ok       // $true$     
+x == 5 || !ok       // $True$     
                         ^? ~g hr result
-x != 5 && ok        // $false$      
+x != 5 && ok        // $False$      
                         ^? ~g hr result
 </drill>
 
@@ -128,16 +128,16 @@ Console.WriteLine("10" + "20");    // $1020$
 int n1 = 1;
 n1 += 2;
 n1 *= n1;
-bool b = n1 == 9;    // $true$
+bool b = n1 == 9;    // $True$
                         ^? ~g hr result
 
-Console.WriteLine(n % 11 == 3) // $true is printed$    {1}
+Console.WriteLine(n % 11 == 3) // $True is printed$    {1}
                                         ~o
 n = ?                       // $14$                     {1}
                                    ^?n מה יכול להיות הערך של ~g
 
 
-Console.WriteLine(n % 11 != 0) // $false is printed$   {2}
+Console.WriteLine(n % 11 != 0) // $False is printed$   {2}
                                         ~o
 n = ?                       // $22$                     {2}
                                    ^?n מה יכול להיות הערך של ~g
@@ -150,34 +150,34 @@ n = ?                       // $22$                     {2}
 int n1 = 10;
 int n2 = 20;
 
-print(n1 == n2);                   // $false$
+Print(n1 == n2);                   // $False$
                                         ^? ~g ht result
-print(n1 != n2);                   // $true$
+Print(n1 != n2);                   // $True$
                                         ^? ~g ht result
                                         
-print(n1 > n2  ||  n1 < n2);       // $true$
+Print(n1 > n2  ||  n1 < n2);       // $True$
                                         ^? ~g ht result
-print(n1 < n2  &&  n2 < 10);       // $false$
+Print(n1 < n2  &&  n2 < 10);       // $False$
                                         ^? ~g ht result
-print(n1 < 10  ||  n2 > 20);       // $false$
+Print(n1 < 10  ||  n2 > 20);       // $False$
                                         ^? ~g ht result
-print(n1 <= 10  &&  n2 >= 20);     // $true$
-                                        ^? ~g ht result
-
-print(n1 + n2 == 30);              // $true$
-                                        ^? ~g ht result
-print(n1 * n2 > 100);              // $true$
-                                        ^? ~g ht result
-print(n2 / n1 == 2);               // $true$
-                                        ^? ~g ht result
-print(n2 % n1 == 0);               // $true$
+Print(n1 <= 10  &&  n2 >= 20);     // $True$
                                         ^? ~g ht result
 
-print(!(n1 == n2));                // $true$
+Print(n1 + n2 == 30);              // $True$
                                         ^? ~g ht result
-print(!(n1 < n2));                 // $false$
+Print(n1 * n2 > 100);              // $True$
                                         ^? ~g ht result
-print((n1 + 5) == (n2 - 5));       // $true$
+Print(n2 / n1 == 2);               // $True$
+                                        ^? ~g ht result
+Print(n2 % n1 == 0);               // $True$
+                                        ^? ~g ht result
+
+Print(!(n1 == n2));                // $True$
+                                        ^? ~g ht result
+Print(!(n1 < n2));                 // $False$
+                                        ^? ~g ht result
+Print((n1 + 5) == (n2 - 5));       // $True$
                                         ^? ~g ht result
 </drill>
 
@@ -292,10 +292,10 @@ $public static$ $bool $$PythagorasTripple$(int $a$$,$ int $b$$,$ int c)
         ~o ht return-bool-expression
 }
 
-print($PythagorasTripple$(3,4,5));    // $true$
+Print($PythagorasTripple$(3,4,5));    // $True$
         ^What ~g hr func-name   {1}
         ^?$ ~g hr result        {+}
-print($PythagorasTripple$(3,4,7));    // $false$
+Print($PythagorasTripple$(3,4,7));    // $False$
         ^What ~g hr func-name   {1}
         ^?$ ~g hr result        {+}
 </drill>
@@ -371,7 +371,7 @@ public static int $Reverse$($int $$num$)
     return rev;
 }
 
-print($Reverse$(123456789));        // $987654321$
+Print($Reverse$(123456789));        // $987654321$
     ^What ~g hr func-name   {1}
     ^? ~g hl result         {+}
 
@@ -382,10 +382,10 @@ public static bool $Palindrome$(int num)
         ^= ~r ht assign-vs-comp
 }
 
-print($Palindrome$(123321));        // $true$
+Print($Palindrome$(123321));        // $True$
     ^What ~g hr func-name   {3}
     ^? ~g hl result         {+}
-print($Palindrome$(123123));        // $false$
+Print($Palindrome$(123123));        // $False$
     ^What ~g hr func-name   {3}
     ^? ~g hl result         {+}
 </drill>
@@ -396,13 +396,13 @@ print($Palindrome$(123123));        // $false$
 public static void Say(int num)
 {
     bool endsWith3 = num % 10 == 3;
-    bool FactorOf3 = num % 3 == 0;
+    bool factorOf3 = num % 3 == 0;
 
-    if (endsWith3 $&&$ FactorOf3)
+    if (endsWith3 $&&$ factorOf3)
             ^and ~r ht java-not-python
         Console.WriteLine("Boom boom");
     else 
-    if (endsWith3 $||$ FactorOf3)
+    if (endsWith3 $||$ factorOf3)
             ^or ~r ht java-not-python
         Console.WriteLine("Boom");
     else
@@ -434,9 +434,9 @@ public static bool Factor(int a, int b)
         ^ $ ~r hr end-of-op
 }
 
-print(Factor(12, 4));       // $true$
+Print(Factor(12, 4));       // $True$
     ^? ~g hl result
-print(Factor(12, 5));       // $false$
+Print(Factor(12, 5));       // $False$
     ^? ~g hl result         {+}
 
 public static bool $PrimeNumber$(int num)
@@ -456,10 +456,10 @@ public static bool $PrimeNumber$(int num)
     return true;
 }
 
-print($PrimeNumber$(100));        // $false$
+Print($PrimeNumber$(100));        // $False$
     ^What ~g hr func-name   {1}
     ^? ~g hl result         {+}
-print($PrimeNumber$(43));         // $true$
+Print($PrimeNumber$(43));         // $True$
     ^What ~g hr func-name   {1}
     ^? ~g hl result         {+}
 </drill>
@@ -468,7 +468,7 @@ print($PrimeNumber$(43));         // $true$
 
 <drill lang="java" id="local-var">
 public static $int$ FindIndex(int[] arr, int num)
-        ^void ~r ht return-What
+        ^void ~r ht return-what
 {
 -    int foundAtIndex = -1;                 {2}
     for (int i = 0; i < arr.Length; i++)

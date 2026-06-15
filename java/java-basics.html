@@ -17,10 +17,10 @@
 int a = 10;         // 10
 int b = a + 10;     // $20$
                         ^? ~g hr result
-int b = "a";        // $❌ Can't assing string to int$
+int b = "a";        // $❌ Can't assign string to int$
                         ^? ~g hr result
 double pi = 3.14;   // 3.14
-int x = pi;         // $❌ Can't assing double to int$
+int x = pi;         // $❌ Can't assign double to int$
                         ^? ~g hr result
 char ch = 'A';      // 'A'
 a = ch;             // $65$
@@ -40,7 +40,7 @@ String name = $"$$Java$$"$;
 <drill lang="java" id="types-and-conversions" no-wrong-phase>
 int n = 123;        // 123
 double pi = 3.14;   // 3.14
-double x = "pi";    // $❌ Can't assing string to double$
+double x = "pi";    // $❌ Can't assign string to double$
                             ^? ~g hr result
 double d = 123.0;   // 123.0
 d = n;              // $123.0$
