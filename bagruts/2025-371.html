@@ -1,0 +1,283 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="../md-components.js"></script>
+
+<import-hints from="./bagrut-hints.html"></import-hints>
+
+<!---------------------------------------------------------->
+
+<code-drills 
+    heading="2025-371"
+    log-level="W"
+>
+</code-drills>
+
+<template>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="2025-371" as-html>
+<a href="./pdf/2025-371.pdf" target="_blank">
+    <img src="./img/2025-371.png" width=400>
+</a>
+<a href="./pdf/2025-371.pdf" target="_blank" class="link link-primary ml-6">
+    בגרות 2025
+</a>
+<!--a href="./pdf/2025-371-slides.pdf" target="_blank" class="link link-primary ml-6">
+    שקופיות להדפסה
+</a-->
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q1" no-wrong-phase as-html>
+<img-areas width=800
+    src="./img/2025-371-q1.png"
+    hide="[
+        [76,8,18,6],[50,14,20,5],[76,14,18,6],
+        [51,20,18,6],[75,20,19,6],[51,26,19,6],[75,26,19,11],
+        [50,37,22,6],[75,37,21,6],[50,43,47,6],[50,49,48,5]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q2" no-wrong-phase as-html>
+<img-areas width=800
+    src="./img/2025-371-q2.png"
+    hide="[
+        [7,91,26,9],[33,91,26,9]
+    ]">
+</img-areas>
+<br><br><br>
+<img-areas width=800
+    src="./img/2025-371-q2-copy().png"
+    hide="[
+        [46,19,45,12],[28,31,64,14],[25,46,40,11]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q2-solution" no-wrong-phase>
+public static $void$ arrange(int[] arr) {
+        ^... ~o hr implement
+    int[] tmp = $copy(arr);$
+        ^... ~o hr implement
+    int next = $0;$
+        ^... ~o hr implement
+    for ($int i = 0; i < tmp.length; i++$) {
+            ^... ~o hr implement
+        if ($tmp[i] >= 0$) {
+                ^... ~o hr implement
+            arr[$next$] = $tmp[i];$
+                ^... ~o hr implement
+                ^... ~o hr implement
+            $next++;$
+                ^... ~o hr implement
+        }
+    }
+    for ($int i = 0; i < tmp.length; i++$) {
+            ^... ~o hr implement
+        if ($tmp[i] < 0$) {
+                ^... ~o hr implement
+            arr[$next$] = $tmp[i];$
+                ^... ~o hr implement
+                ^... ~o hr implement
+            $next++;$
+                ^... ~o hr implement
+        }
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q3" as-html>
+<img-areas width=800
+    src="./img/2025-371-q3.png"
+    hide="[
+        [42,83,14,17],[57,86,14,14]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q3-helpers" no-wrong-phase>
+// מקבלת מספר ומחזירה כמות הסיפרות בו
+public static int length(int num) {
+    int len = 0;
+    while (num > 0) {
+        len++;
+        $num /= 10;$
+            ^... ~o hr implement
+    }
+    return len;
+}
+
+print(length(1234) == $Integer.toString(1234).length()$);
+    ^... ~o hr implement
+print(length(1234) == $String.valueOf(1234).length()$);
+    ^... ~o hr implement
+
+// מחזירה מזלה של מספר
+public static int pow($int num, int p$) {
+        ^... ~o hr implement
+    int mul = $1;$
+        ^... ~o hr implement
+    while (p > 0) {
+        $mul *= num;$
+            ^... ~o hr implement
+        p--;
+    }
+    return mul;
+}
+
+print(pow(2, 5) == $Math.pow(2, 5)$);
+    ^... ~o hr implement
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q3-isNarc()" no-wrong-phase>
+$!html <img src="img/2025-371-q3-a.png">
+public static boolean isNarc(int num) {
+    int sum = 0;
+    int len = $Integer.toString(num).length();$
+        ^... ~o hr implement
+    int n = $num;$
+        ^... ~o hr implement
+    while ($n > 0$) {
+            ^... ~o hr implement
+        sum += $Math.pow(n % 10, len);$
+            ^... ~o hr implement
+        $n /= 10;$
+            ^... ~o hr implement
+    }
+    return $num == sum;$
+        ^... ~o hr implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q3-theNarc()" no-wrong-phase>
+$!html <img src="img/2025-371-q3-b.png">
+public static $void$ theNarc(int n) {
+        ^... ~o hr implement
+    for ($int i = 1; i < n; i++$) {
+            ^... ~o hr implement
+        if ($isNarc(i)$) {
+                ^... ~o hr implement
+            $System.out.println(i);$
+                ^... ~o hr implement
+        }
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q4" as-html>
+<img src="img/2025-371-q4.png">
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q4-a" as-html>
+<img src="img/2025-371-q4-a.png">
+<img-areas width=800
+    src="./img/2025-371-q4-a-solution.png"
+    hide="[
+        [40,30,53,6],[37,36,12,5],[45,40,10,6],[35,46,9,5],[35,50,9,5],
+        [40,64,13,5],[38,68,14,6],[45,73,11,6],[35,79,10,5],[35,83,6,6]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q4-b-1" no-wrong-phase>
+$!html <img src="img/2025-371-q4-b-1.png"><br>
+Transport[] arr = new Transport[] {
+    new Transport("Aviv", true, 10, 4),
+    new Transport("Aviv", false, 9, 4),
+    new Transport("Aviv", true, 12, 4),
+    new Transport("Aviv", false, 12, 4),
+    new Transport("Aviv", true, 12, 6),
+};
+
+print(dayReport(arr, 4, true));     // $22$
+    ^? ~o hr result
+print(dayReport(arr, 4, false));    // $21$
+    ^? ~o hr result
+
+public static int dayReport(Transport[] arr, int day,
+                            boolean forward)
+{
+    int sum = $0;$
+        ^... ~o hr implement
+    for ($Transport tr: arr$) {
+            ^... ~o hr implement
+        if ($tr.getDay() == day$ && $tr.getToSchool() == forward$) {
+                ^... ~o hr implement
+                ^... ~o hr implement    {+}
+            sum += $tr.getNum();$
+                ^... ~o hr implement
+        }
+    }
+    $return sum;$
+        ^... ~o hr implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q4-b-2!" no-wrong-phase>
+$!html <img src="img/2025-371-q4-b-2.png"><br>
+Transport[] arr = new Transport[] {
+    new Transport("Aviv", true, 10, 4),
+    new Transport("Aviv", false, 9, 4),
+    new Transport("Aviv", true, 12, 4),
+    new Transport("Aviv", false, 12, 4),
+    new Transport("Aviv", true, 12, 6),
+};
+
+moreForward(arr);       // $4, 6$
+    ^? ~o hr result
+
+public static $void$ moreForward(Transport[] arr) {
+        ^... ~o hr implement
+    for ($int day = 0; day <= 6; day++$) {
+            ^... ~o hr implement
+        if ($dayReport(arr, day, true)$ > 
+                ^... ~o hr implement
+            $dayReport(arr, day, false)$) 
+                ^... ~o hr implement
+        {
+            $System.out.println(day);$
+                ^... ~o hr implement
+        }
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="">
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="">
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="">
+</drill>
+
+</template>
