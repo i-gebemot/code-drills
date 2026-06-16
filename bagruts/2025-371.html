@@ -236,7 +236,7 @@ public static int dayReport(Transport[] arr, int day,
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="q4-b-2!" no-wrong-phase>
+<drill lang="java" id="q4-b-2" no-wrong-phase>
 $!html <img src="img/2025-371-q4-b-2.png"><br>
 Transport[] arr = new Transport[] {
     new Transport("Aviv", true, 10, 4),
@@ -267,12 +267,148 @@ public static $void$ moreForward(Transport[] arr) {
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="">
+<drill lang="java" id="q5" no-wrong-phase>
+$!html <img src="img/2025-371-q5-a.png"><br>
+class User {
+    private String name;
+    private int id;
+    private int[] friends;
+}
+
+User[] users = new User[] {
+    new User("A", 111, new int[] {222, 333, 444}),
+    new User("B", 222, new int[] {333, 444}),
+    new User("C", 333, new int[] {111}),
+    new User("D", 444, new int[] {111}),
+};
+
+print(users[0].mutual(users[1]));       // $2$
+    ^? ~o hr result
+print(users[2].mutual(users[3]));       // $1$
+    ^? ~o hr result
 </drill>
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="">
+<drill lang="java" id="q5-a-solution" no-wrong-phase>
+class User {
+    private String name;
+    private int id;
+    private int[] friends;
+
+    private boolean isFriend(int id) {
+        for ($int i = 0; i < this.friends.length; i++$) {
+                ^... ~o hr implement
+            if ($this.friends[i] == id$) {
+                    ^... ~o hr implement
+                return $true;$
+                    ^... ~o hr implement
+            }
+        }
+        return $false;$
+            ^... ~o hr implement
+    }
+
+    public int mutual(User other) {
+        int count = $0;$
+            ^... ~o hr implement
+        for ($int id: other.getFriends()$) {
+                ^... ~o hr implement
+            if ($isFriend(id)$) {
+                    ^... ~o hr implement
+                $count++;$
+                    ^... ~o hr implement
+            }
+        }
+        $return count;$
+            ^... ~o hr implement
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q5-b" no-wrong-phase>
+$!html <img src="img/2025-371-q5-b.png"><br>
+class SocialNetwork {
+    private User[] users;
+}
+
+User[] users = new User[] {
+    new User("A", 111, new int[] {222, 333, 444}),
+    new User("B", 222, new int[] {333, 444}),
+    new User("C", 333, new int[] {111}),
+    new User("D", 444, new int[] {111}),
+};
+
+SocialNetwork sn = new SocialNetwork(users);
+User e = new User("E", 555, new int[] {111}); 
+User f = new User("F", 666, new int[] {333, 444}); 
+
+print(sn.exactOne(e));      // $true$
+    ^? ~o hr result
+print(sn.exactOne(f));      // $false$
+    ^? ~o hr result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q6" as-html>
+<img-areas width=800
+    src="./img/2025-371-q6.png"
+    hide="[
+        [46,54,8,10],[33,70,14,12],[35,85,8,11]
+    ]" edit>
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q6-a" no-wrong-phase>
+public static boolean isPerfect(int num) {
+    int sum = $0;$
+        ^... ~o hr implement
+    for ($int i = 1; i < num; i++$) {
+            ^... ~o hr implement
+        if ($num % i == 0$) {
+                ^... ~o hr implement
+            $sum += i;$
+                ^... ~o hr implement
+        }
+    }
+    return $sum == num;$
+        ^... ~o hr implement
+}
+
+public static $void$ thePerfects(int low, int high) {
+        ^... ~o hr implement
+    for ($int num = low; num <= high; num++$) {
+            ^... ~o hr implement
+        if ($isPerfect(num)$) {
+                ^... ~o hr implement
+            $System.out.println(num);$
+                ^... ~o hr implement
+        }
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q6-b" no-wrong-phase>
+$!html <img src="img/2025-371-q6-b.png"><br>
+public static boolean noOdd() {
+    for ($int num = 3; num <= 999999; num += 2$) {
+            ^... ~o hr implement
+        if ($isPerfect(num)$) {
+                ^... ~o hr implement
+            $return false;$
+                ^... ~o hr implement
+        }
+    }
+    $return true;$
+        ^... ~o hr implement
+}
 </drill>
 
 <!---------------------------------------------------------->
