@@ -54,6 +54,7 @@
     ]">
 </img-areas>
 <br><br><br>
+<pre>// פונקצית עזר: מקבלת מערך ומחזירה העתק שלו</pre>
 <img-areas width=800
     src="./img/2025-371-q2-copy().png"
     hide="[
@@ -65,6 +66,7 @@
 <!---------------------------------------------------------->
 
 <drill lang="java" id="q2-solution" no-wrong-phase>
+$!html <img src="img/2025-371-q2-short.png"> 
 public static $void$ arrange(int[] arr) {
         ^... ~o hr implement
     int[] tmp = $copy(arr);$
@@ -293,7 +295,8 @@ print(users[2].mutual(users[3]));       // $1$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="q5-a-solution" no-wrong-phase>
+<drill lang="java" id="q5-a-solution!" no-wrong-phase>
+$!html <img src="img/2025-371-q5-a-short.png">
 class User {
     private String name;
     private int id;
@@ -356,18 +359,41 @@ print(sn.exactOne(f));      // $false$
 
 <!---------------------------------------------------------->
 
+<drill lang="java" id="q5-b-exactOne()" no-wrong-phase>
+$!html <img src="img/2025-371-q5-b.png"><br>
+class SocialNetwork {
+    private User[] users;
+
+    public boolean exactOne(User other) {
+        for ($int i = 0; i < this.users.length; i++$) {
+                ^... ~o hr implement
+            if ($this.users[i].mutual(other) == 1$) {
+                    ^... ~o hr implement
+                return $true;$
+                    ^... ~o hr implement
+            }
+        }
+        return $false;$
+            ^... ~o hr implement
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
 <drill lang="java" id="q6" as-html>
 <img-areas width=800
     src="./img/2025-371-q6.png"
     hide="[
         [46,54,8,10],[33,70,14,12],[35,85,8,11]
-    ]" edit>
+    ]">
 </img-areas>
 </drill>
 
 <!---------------------------------------------------------->
 
 <drill lang="java" id="q6-a" no-wrong-phase>
+$!html <img src="img/2025-371-q6-a.png"> 
 public static boolean isPerfect(int num) {
     int sum = $0;$
         ^... ~o hr implement
