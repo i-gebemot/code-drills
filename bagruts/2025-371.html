@@ -23,9 +23,9 @@
 <a href="./pdf/2025-371.pdf" target="_blank" class="link link-primary ml-6">
     בגרות 2025
 </a>
-<!--a href="./pdf/2025-371-slides.pdf" target="_blank" class="link link-primary ml-6">
+<a href="./pdf/2025-371-slides.pdf" target="_blank" class="link link-primary ml-6">
     שקופיות להדפסה
-</a-->
+</a>
 <a href="https://www.youtube.com/playlist?list=PLNLf5_3sUeLw419oXaaD_VfOkGwDbCLMt" target="_blank" class="link link-primary ml-6">
     פיתרונות של אריאל בר יתצחק
 </a>
@@ -227,9 +227,11 @@ public static int dayReport(Transport[] arr, int day,
         ^... ~o hr implement
     for ($Transport tr: arr$) {
             ^... ~o hr implement
-        if ($tr.getDay() == day$ && $tr.getToSchool() == forward$) {
+        if ($tr.getDay() == day$ && 
                 ^... ~o hr implement
-                ^... ~o hr implement    {+}
+            $tr.getToSchool() == forward$)
+                ^... ~o hr implement
+        {
             sum += $tr.getNum();$
                 ^... ~o hr implement
         }
