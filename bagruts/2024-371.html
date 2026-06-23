@@ -23,9 +23,10 @@
 <a href="./pdf/2024-371.pdf" target="_blank" class="link link-primary ml-6">
     בגרות 371 2024
 </a>
-<!--a href="./pdf/2025-371-slides.pdf" target="_blank" class="link link-primary ml-6">
+<a href="./pdf/2024-371-slides.pdf" target="_blank" class="link link-primary ml-6">
     שקופיות להדפסה
-</a-->
+</a>
+<br>
 <a href="https://www.youtube.com/playlist?list=PLNLf5_3sUeLzL0WbHSWF5XYuI-KIM9HiM" target="_blank" class="link link-primary ml-6">
     פיתרונות של אריאל בר יצחק
 </a>
@@ -197,7 +198,11 @@ public class TourPackage {
     private int maxData;
     private int extra;
 
-    public TourPackage(int id, int price, int maxTime, int maxData) {
+    public TourPackage(int id, int price,
+                       int maxTime, int maxData) 
+    {
++        $...$                      {1}
+            ^... ~o ht implement
 -        this.id = id;              {1}
 -        this.price = price;        {1}
 -        this.maxTime = maxTime;    {1}
