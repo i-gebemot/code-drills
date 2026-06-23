@@ -4492,7 +4492,7 @@
     Class;
     return Class;
   }
-  const VERSION = "0.29.1";
+  const VERSION = "0.29.2";
   const PUBLIC_VERSION = "5";
   if (typeof window !== "undefined") {
     ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
@@ -13567,7 +13567,7 @@
     };
     var div = root$b();
     let classes;
-    set_style(div, "", {}, { "--width": "780" });
+    set_style(div, "", {}, { "--width": 780 });
     var node = child(div);
     html(node, content);
     reset(div);
