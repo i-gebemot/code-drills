@@ -1,0 +1,478 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="../md-components.js"></script>
+
+<import-hints from="./bagrut-hints.html"></import-hints>
+
+<!---------------------------------------------------------->
+
+<code-drills 
+    heading="2025-371"
+    log-level="W"
+>
+</code-drills>
+
+<template>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="2025-371" as-html>
+<a href="./pdf/2025-371.pdf" target="_blank">
+    <img src="./img/2025-371.png" width=400>
+</a>
+<a href="./pdf/2025-371.pdf" target="_blank" class="link link-primary ml-6">
+    בגרות 2025
+</a>
+<a href="./pdf/2025-371-slides.pdf" target="_blank" class="link link-primary ml-6">
+    שקופיות להדפסה
+</a>
+<br>
+<a href="https://www.youtube.com/playlist?list=PLNLf5_3sUeLw419oXaaD_VfOkGwDbCLMt" target="_blank" class="link link-primary ml-6">
+    פיתרונות של אריאל בר יצחק
+</a>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q1" no-wrong-phase as-html>
+<img-areas width=800
+    src="./img/2025-371-q1-sol.png"
+    hide="[
+        [74,17,23,10],[74,27,23,11],[49,26,22,11],[49,37,22,10],[49,47,22,11],
+        [74,37,23,10],[74,48,23,19],[49,67,22,10],[74,67,23,9],
+        [49,76,48,10],[49,86,48,10]
+    ]">
+</img-areas>
+<img src="img/2025-371-q1-code.png">
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q2" no-wrong-phase as-html>
+<img-areas width=800
+    src="./img/2025-371-q2.png"
+    hide="[
+        [7,91,26,9],[33,91,26,9]
+    ]">
+</img-areas>
+<br><br><br>
+<pre>// פונקצית עזר: מקבלת מערך ומחזירה העתק שלו</pre>
+<img-areas width=800
+    src="img/2025-371-q2-copy().png"
+    hide="[
+        [44,29,50,14],[23,43,73,14],[20,56,45,14]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q2-solution" no-wrong-phase>
+$!html <img src="img/2025-371-q2-short.png"> 
+public static $void$ Arrange(int[] arr) {
+        ^... ~o hr implement
+    int[] tmp = $Copy(arr);$
+        ^... ~o hr implement
+    int next = $0;$
+        ^... ~o hr implement
+    for ($int i = 0; i < tmp.Length; i++$)
+        ^... ~o hr implement
+    {
+        if ($tmp[i] >= 0$)
+            ^... ~o hr implement
+        {
+            arr[$next$] = $tmp[i];$
+                ^... ~o hr implement
+                ^... ~o hr implement
+            $next++;$
+                ^... ~o hr implement
+        }
+    }
+    for ($int i = 0; i < tmp.Length; i++$)
+        ^... ~o hr implement
+    {
+        if ($tmp[i] < 0$)
+            ^... ~o hr implement
+        {
+            arr[$next$] = $tmp[i];$
+                ^... ~o hr implement
+                ^... ~o hr implement
+            $next++;$
+                ^... ~o hr implement
+        }
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q3" as-html>
+<img-areas width=800
+    src="./img/2025-371-q3.png"
+    hide="[
+        [42,83,14,17],[57,86,14,14]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q3-helpers" no-wrong-phase>
+// מקבלת מספר ומחזירה כמות הסיפרות בו
+public static int Length(int num)
+{
+    int len = 0;
+    while (num > 0)
+    {
+        len++;
+        $num /= 10;$
+            ^... ~o hr implement
+    }
+    return len;
+}
+
+Print(Length(1234) == $1234.ToString().Length$);
+    ^... ~o hr implement
+Print(Length(1234) == $Convert.ToString(1234).Length$);
+    ^... ~o hr implement
+
+// מחזירה מזלה של מספר
+public static int Pow($int num, int p$)
+        ^... ~o hr implement
+{
+    int mul = $1;$
+        ^... ~o hr implement
+    while (p > 0)
+    {
+        $mul *= num;$
+            ^... ~o hr implement
+        p--;
+    }
+    return mul;
+}
+
+Print(Pow(2, 5) == $Math.Pow(2, 5)$);
+    ^... ~o hr implement
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q3-IsNarc()" no-wrong-phase>
+$!html <img src="img/2025-371-q3-a.png">
+public static bool IsNarc(int num) {
+    int sum = 0;
+    int len = $num.ToString().Length;$
+        ^... ~o hr implement
+    int n = $num;$
+        ^... ~o hr implement
+    while ($n > 0$)
+        ^... ~o hr implement
+    {
+        sum += $Math.Pow(n % 10, len);$
+            ^... ~o hr implement
+        $n /= 10;$
+            ^... ~o hr implement
+    }
+    return $num == sum;$
+        ^... ~o hr implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q3-TheNarc()" no-wrong-phase>
+$!html <img src="img/2025-371-q3-b.png">
+public static $void$ TheNarc(int n)
+    ^... ~o hr implement
+{
+    for ($int i = 1; i <= n; i++$)
+        ^... ~o hr implement
+    {
+        if ($IsNarc(i)$)
+                ^... ~o hr implement
+            $Console.WriteLine(i);$
+                ^... ~o hr implement
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q4" as-html>
+<img src="img/2025-371-q4.png">
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q4-a" as-html>
+<img src="img/2025-371-q4-a.png">
+<img-areas width=800
+    src="./img/2025-371-q4-a-sol.png"
+    hide="[
+        [41,28,56,5],[39,36,11,5],[46,40,12,5],[37,44,10,5],[37,48,9,5],
+        [41,59,14,5],[24,67,37,5],[23,71,17,5],[39,74,15,5],[46,79,14,5],[37,83,9,4],[36,87,7,4]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q4-b-1" no-wrong-phase>
+$!html <img src="img/2025-371-q4-b-1.png"><br>
+Transport[] arr = new Transport[]
+{
+    new Transport("Aviv", true, 10, 4),
+    new Transport("Aviv", false, 9, 4),
+    new Transport("Aviv", true, 12, 4),
+    new Transport("Aviv", false, 12, 4),
+    new Transport("Aviv", true, 12, 6),
+};
+
+Print(DayReport(arr, 4, true));     // $22$
+    ^? ~o hr result
+Print(DayReport(arr, 4, false));    // $21$
+    ^? ~o hr result
+
+public static int DayReport(Transport[] arr, int day,
+                            bool forward)
+{
+    int sum = $0;$
+        ^... ~o hr implement
+    foreach ($Transport tr in arr$) {
+            ^... ~o hr implement
+        if ($tr.GetDay() == day$ && 
+                ^... ~o hr implement
+            $tr.GetToSchool() == forward$)
+                ^... ~o hr implement
+        {
+            sum += $tr.GetNum();$
+                ^... ~o hr implement
+        }
+    }
+    $return sum;$
+        ^... ~o hr implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q4-b-2" no-wrong-phase>
+$!html <img src="img/2025-371-q4-b-2.png"><br>
+Transport[] arr = new Transport[]
+{
+    new Transport("Aviv", true, 10, 4),
+    new Transport("Aviv", false, 9, 4),
+    new Transport("Aviv", true, 12, 4),
+    new Transport("Aviv", false, 12, 4),
+    new Transport("Aviv", true, 12, 6),
+};
+
+MoreForward(arr);       // $4, 6$
+    ^? ~o hr result
+
+public static $void$ MoreForward(Transport[] arr)
+    ^... ~o hr implement
+{
+    for ($int day = 1; day <= 6; day++$) {
+            ^... ~o hr implement
+        if ($DayReport(arr, day, true)$ > 
+                ^... ~o hr implement
+            $DayReport(arr, day, false)$) 
+                ^... ~o hr implement
+        {
+            $Console.WriteLine(day);$
+                ^... ~o hr implement
+        }
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q5" no-wrong-phase>
+$!html <img src="img/2025-371-q5-a.png"><br>
+class User
+{
+    private string name;
+    private int id;
+    private int[] friends;
+}
+
+User[] users = new User[]
+{
+    new User("A", 111, new int[] {222, 333, 444}),
+    new User("B", 222, new int[] {333, 444}),
+    new User("C", 333, new int[] {111}),
+    new User("D", 444, new int[] {111}),
+};
+
+Print(users[0].Mutual(users[1]));       // $2$
+    ^? ~o hr result
+Print(users[2].Mutual(users[3]));       // $1$
+    ^? ~o hr result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q5-a-solution" no-wrong-phase>
+$!html <img src="img/2025-371-q5-a-short.png">
+class User
+{
+    private String name;
+    private int id;
+    private int[] friends;
+
+-    // פונקצית עזר: מקבל מס' של משתמש אחר          {1}
+-    // ומחזיר אמת אם הוא קיים בין החברים שלי               {1}
++   // $...$                                                        {1}
+                ^... ~o hr implement
+    private bool IsFriend(int id) {
+        for ($int i = 0; i < this.friends.Length; i++$) {
+                ^... ~o hr implement
+            if ($this.friends[i] == id$)
+                    ^... ~o hr implement
+                return $true;$
+                    ^... ~o hr implement
+        }
+        return $false;$
+            ^... ~o hr implement
+    }
+
+    public int Mutual(User other)
+    {
+        int count = $0;$
+            ^... ~o hr implement
+        foreach ($int id in other.GetFriends()$) {
+                ^... ~o hr implement
+            if ($IsFriend(id)$)
+                    ^... ~o hr implement
+                $count++;$
+                    ^... ~o hr implement
+        }
+        $return count;$
+            ^... ~o hr implement
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q5-b" no-wrong-phase>
+$!html <img src="img/2025-371-q5-b.png"><br>
+class SocialNetwork
+{
+    private User[] users;
+}
+
+User[] users = new User[]
+{
+    new User("A", 111, new int[] {222, 333, 444}),
+    new User("B", 222, new int[] {333, 444}),
+    new User("C", 333, new int[] {111}),
+    new User("D", 444, new int[] {111}),
+};
+
+SocialNetwork sn = new SocialNetwork(users);
+User e = new User("E", 555, new int[] {111}); 
+User f = new User("F", 666, new int[] {333, 444}); 
+
+Print(sn.ExactOne(e));      // $true$
+    ^? ~o hr result
+Print(sn.ExactOne(f));      // $false$
+    ^? ~o hr result
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q5-b-exactOne()" no-wrong-phase>
+$!html <img src="img/2025-371-q5-b.png"><br>
+class SocialNetwork
+{
+    private User[] users;
+
+    public bool ExactOne(User other)
+    {
+        for ($int i = 0; i < this.users.Length; i++$)
+            ^... ~o hr implement
+        {
+            if ($this.users[i].Mutual(other) == 1$)
+                    ^... ~o hr implement
+                return $true;$
+                    ^... ~o hr implement
+        }
+        return $false;$
+            ^... ~o hr implement
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q6" as-html>
+<img-areas width=800
+    src="./img/2025-371-q6.png"
+    hide="[
+        [46,54,8,10],[33,70,14,12],[35,85,8,11]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q6-a" no-wrong-phase>
+$!html <img src="img/2025-371-q6-a.png"> 
+public static bool IsPerfect(int num)
+{
+    int sum = $0;$
+        ^... ~o hr implement
+    for ($int i = 1; i < num; i++$)
+        ^... ~o hr implement
+    {
+        if ($num % i == 0$)
+                ^... ~o hr implement
+            $sum += i;$
+                ^... ~o hr implement
+    }
+    return $sum == num;$
+        ^... ~o hr implement
+}
+
+public static $void$ ThePerfects(int low, int high)
+    ^... ~o hr implement
+{
+    for ($int num = low; num <= high; num++$)
+        ^... ~o hr implement
+    {
+        if ($IsPerfect(num)$)
+                ^... ~o hr implement
+            $Console.WriteLine(num);$
+                ^... ~o hr implement
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q6-b" no-wrong-phase>
+$!html <img src="img/2025-371-q6-b.png"><br>
+public static bool NoOdd()
+{
+    for ($int num = 3; num <= 999999; num += 2$)
+        ^... ~o hr implement
+    {
+        if ($IsPerfect(num)$)
+                ^... ~o hr implement
+            $return false;$
+                ^... ~o hr implement
+    }
+    $return true;$
+        ^... ~o hr implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="">
+</drill>
+
+</template>
