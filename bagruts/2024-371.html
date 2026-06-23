@@ -303,11 +303,6 @@ public class Lesson {
     private int mm;
     private int duration;
 
-    public int getId() { return this.id; }
-    public int getHh() { return this.hh; }
-    public int getMm() { return this.mm; }
-    public int getDuration() { return this.duration; }
-
     public boolean isLater(Lesson other) {
         if ($this.hh > other.getHh()$) {
                 ^... ~o ht implement
@@ -366,15 +361,15 @@ public static void last(Lesson[] arr) {
 <drill lang="java" id="q5-b-1" no-wrong-phase>
 $!html <img src="img/2024-371-q5-b-1.png"><br>
 Lesson[] arr = new Lesson[] {
-    new Lesson(13, 13, 15, 30),
-    new Lesson(14, 14, 45, 45),
-    new Lesson(13, 13, 30, 45),
-    new Lesson(13, 13, 45, 30)
+    new Lesson(3333, 13, 15, 30),
+    new Lesson(4444, 14, 45, 45),
+    new Lesson(3333, 13, 30, 45),
+    new Lesson(3333, 13, 45, 30)
 };
 
-print(sumDuration(arr, 13));      // $105$
+print(sumDuration(arr, 3333));      // $105$
     ^... ~o hr result
-print(sumDuration(arr, 14));      // $45$
+print(sumDuration(arr, 4444));      // $45$
     ^... ~o hr result
 
 public static int sumDuration(Lesson[] arr, int id) {
@@ -389,6 +384,43 @@ public static int sumDuration(Lesson[] arr, int id) {
         }
     }
     return $sum;$
+        ^... ~o ht implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q5-b-2" no-wrong-phase>
+$!html <img src="img/2024-371-q5-b-2.png">
+Lesson[] arr = new Lesson[] {
+    new Lesson(3333, 13, 15, 30),
+    new Lesson(4444, 14, 45, 45),
+    new Lesson(3333, 13, 30, 45),
+    new Lesson(3333, 13, 45, 30),
+    new Lesson(4444, 14, 45, 120)
+};
+
+print(longest(arr));        // $4444$
+    ^... ~o hr result
+
+public static int longest(Lesson[] arr) {
+    int maxId = $arr[0].getId();$
+        ^... ~o ht implement
+    int max = $sumDuration(arr, maxId);$
+        ^... ~o ht implement
+    for ($int i = 1; i < arr.length; i++$) {
+            ^... ~o ht implement
+        int sum = $sumDuration(arr, arr[i].getId());$
+            ^... ~o ht implement
+        if ($sum > max$) {
+                ^... ~o ht implement
+            $max = sum;$
+                ^... ~o ht implement
+            $maxId = arr[i].getId();$
+                ^... ~o ht implement
+        }
+    }
+    return $maxId;$
         ^... ~o ht implement
 }
 </drill>
