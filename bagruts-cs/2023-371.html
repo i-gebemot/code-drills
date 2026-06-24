@@ -1,0 +1,538 @@
+<meta charset="utf-8" />
+<style> hint, drill {display: none;} </style>
+<script src="../md-components.js"></script>
+
+<import-hints from="./bagrut-hints.html"></import-hints>
+
+<!---------------------------------------------------------->
+
+<code-drills 
+    heading="2023-371"
+    log-level="W"
+>
+</code-drills>
+
+<template>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="2023-371" as-html>
+<a href="./pdf/2023-371.pdf" target="_blank">
+    <img src="./img/2023-371.png" width=400>
+</a>
+<a href="./pdf/2023-371.pdf" target="_blank" class="link link-primary ml-6">
+    בגרות 2023
+</a>
+<a href="./pdf/2023-371-slides.pdf" target="_blank" class="link link-primary ml-6">
+    שקופיות להדפסה
+</a-->
+<br>
+<a href="https://www.youtube.com/playlist?list=PLNLf5_3sUeLxdGrQ2YY75MkRBxwTnuBTF" target="_blank" class="link link-primary ml-6">
+    פיתרונות של אריאל בר יצחק
+</a>
+<br><br><br><br><br><br><br><br>
+<img src="img/2023-371-notes.png">
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q1-a" as-html>
+<img src="img/2023-371-q1-a.png">
+<img-areas
+    src="img/2023-371-q1-a-sol.png"
+    hide="[
+        [28,11,8,7],[3,18,22,9],[72,19,16,7],[46,18,10,8],[28,19,8,7],
+        [3,27,20,45],
+        [26,26,62,8],[26,34,62,8],[26,42,61,7],[26,49,61,7],[26,57,61,7],
+        [8,80,55,16]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q1-b" as-html>
+<img src="img/2023-371-q1-b.png">
+<img-areas
+    src="img/2023-371-q1-b-sol.png"
+    hide="[[33,5,67,38],[34,67,65,33]]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q2" as-html>
+<img-areas
+    src="img/2023-371-q2.png"
+    hide="[
+        [5,56,20,7],[56,83,13,8],[26,90,6,10],[1,90,12,10]
+    ]">
+</img-areas>
+<br><br><br><br>
+<img-areas width="450"
+    src="img/2023-371-q2-double.png"
+    hide="[[0,7,81,45],[0,47,81,53],[90,0,10,52],[90,44,10,53]]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q2-2" no-wrong-phase>
+$!html {
+    <img
+        width="160" src="./img/2023-371-q2.png"
+        style="z-index:9999; position:absolute; left:0; top:0; transition:transform 0.2s; transform-origin:left top;"
+        onmouseover="this.style.transform='scale(5)'"
+        onmouseout="this.style.transform='scale(1)'">
+}
+$!html <img src="img/2023-371-q2-2.png"><br>
+public static bool Success(int num)
+{
+    $double$ sum = $0.0;$
+        ^... ~o ht implement
+        ^... ~o ht implement
+    int count6 = $0;$
+        ^... ~o ht implement
+    bool tenPoints = $false;$
+        ^... ~o ht implement
+    for ($int i = 1; i <= num; i++$)
+        ^... ~o ht implement
+    {
+        Console.Write("type score #" + i + ": ");
+        int score = int.Parse(Console.ReadLine());
+        sum += $score;$
+            ^... ~o ht implement
+        if ($score >= 6$)
+                ^... ~o ht implement
+            $count6++;$
+                ^... ~o ht implement
+        if ($score == 10$)
+                ^... ~o ht implement
+            $tenPoints = true;$
+                ^... ~o ht implement
+    }
+    $double$ avgScore = $sum / num$;
+        ^... ~o ht implement
+        ^... ~o ht implement
+    if ($avgScore > 5$)
+            ^... ~o ht implement
+        $return true;$
+            ^... ~o ht implement
+    if ($count6 > num / 2$)
+            ^... ~o ht implement
+        $return true;$
+            ^... ~o ht implement
+    return $tenPoints;$
+        ^... ~o ht implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q3" as-html>
+<img-areas
+    src="img/2023-371-q3.png"
+    hide="[
+        [0,40,100,48],[0,90,100,10],
+        [45,92,7,7],[9,92,9,7],[1,93,5,5]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q3-2" no-wrong-phase>
+$!html {
+    <img
+        width="160" src="./img/2023-371-q3.png"
+        style="z-index:9999; position:absolute; left:0; top:0; transition:transform 0.2s; transform-origin:left top;"
+        onmouseover="this.style.transform='scale(5)'"
+        onmouseout="this.style.transform='scale(1)'">
+}
+$!html <img src="img/2023-371-q3-2.png"><br>
+Print(Discounts(75, 1, false));     // $122$
+    ^... ~g hr result
+Print(Discounts(25, 1, false));     // $222$
+    ^... ~g hr result
+Print(Discounts(45, 4, true));      // $211$
+    ^... ~g hr result
+
+public static int Discounts(int age, int num, bool city)
+{
+    int d1 = $2;$
+        ^... ~o ht implement
+    int d2 = $2;$
+        ^... ~o ht implement
+    int d3 = $2;$
+        ^... ~o ht implement
+    if ($age >= 70$)
+            ^... ~o ht implement
+        d1 = $1;$
+            ^... ~o ht implement
+    if ($num >= 3$)
+            ^... ~o ht implement
+        d2 = $1;$
+            ^... ~o ht implement
+    if ($city$)
+            ^... ~o ht implement
+        d3 = $1;$
+            ^... ~o ht implement
+    return $d1*100$ + $d2*10$ + $d3$;
+        ^... ~o ht implement
+        ^... ~o ht implement    {+}
+        ^... ~o ht implement    {+}
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q4" as-html>
+<img-areas
+    src="img/2023-371-q4.png"
+    hide="[
+        [0,29,100,16],[0,46,100,21],
+        [0,68,100,19],
+        [30,68,3,5],[79,73,4,5],
+        [0,89,99,10]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q4-a" no-wrong-phase>
+$!html {
+    <img
+        width="100" src="./img/2023-371-q4.png"
+        style="z-index:9999; position:absolute; left:0; top:0; transition:transform 0.2s; transform-origin:left top;"
+        onmouseover="this.style.transform='scale(8)'"
+        onmouseout="this.style.transform='scale(1)'">
+}
+$!html <img src="img/2023-371-q4-a.png"><br>
+class Results
+{
+    private int[] arr;
+    private string name;
+
+    public int Deltas(bool isLonger) {
+        int sum = $0;$
+            ^... ~o ht implement
+        for ($int i = 1; i < arr.Length; i++$)
+            ^... ~o ht implement
+        {
+            if ($isLonger$ && $arr[i] > arr[i-1]$)
+                    ^... ~o ht implement
+                    ^... ~o ht implement    {+}
+                sum += $arr[i]$ - $arr[i-1]$;
+                    ^... ~o ht implement
+                    ^... ~o ht implement
+            if ($!isLonger$ && $arr[i] < arr[i-1]$)
+                    ^... ~o ht implement
+                    ^... ~o ht implement    {+}
+                sum += $arr[i-1]$ - $arr[i]$;
+                    ^... ~o ht implement
+                    ^... ~o ht implement
+        }
+        return $sum;$
+            ^... ~o ht implement
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q4-b" no-wrong-phase>
+$!html {
+    <img
+        width="100" src="./img/2023-371-q4.png"
+        style="z-index:9999; position:absolute; left:0; top:0; transition:transform 0.2s; transform-origin:left top;"
+        onmouseover="this.style.transform='scale(8)'"
+        onmouseout="this.style.transform='scale(1)'">
+}
+$!html <img src="img/2023-371-q4-b.png"><br>
+class Results
+{
+    private int[] arr;
+    private string name;
+
+    public int Deltas(bool isLonger)
+    {
+        ...
+        return sum;
+    }
+
+    public bool Improving()
+    {
+        return $Deltas(false)$ > $Deltas(true)$;
+            ^... ~o ht implement
+            ^... ~o ht implement    {+}
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q5" as-html>
+<img-areas
+    src="img/2023-371-q5.png"
+    hide="[
+        [0,23,100,39],[0,63,100,26],[0,90,100,10]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q5-before()" no-wrong-phase>
+$!html {
+    <img
+        width="100" src="./img/2023-371-q5.png"
+        style="z-index:9999; position:absolute; left:0; top:0; transition:transform 0.2s; transform-origin:left top;"
+        onmouseover="this.style.transform='scale(8)'"
+        onmouseout="this.style.transform='scale(1)'">
+}
+$!html <img src="img/2023-371-q5-a.png"><br>
+
+Parking[] cars = new Parking[]
+{
+    new Parking("11-111-11", new MyTime(12,30), new MyTime(14,15)),
+    new Parking("22-222-22", new MyTime(11,30), new MyTime(13,45)),
+    new Parking("33-333-33", new MyTime(7,10), new MyTime(10,10)),
+    new Parking("44-444-44", new MyTime(9,15), new MyTime(11,30)),
+};
+
+First(cars);        // $33-333-33$
+    ^... ~g hr result
+
+class MyTime
+{
+    private int myHour;
+    private int myMinute;
+
+    // פונקצית עזר: מחזיר אמת עם אני לפני האחר
+    public bool Before(MyTime other)
+    {
+        if (myHour == other.myHour)
+            return $myMinute < other.myMinute;$
+                ^... ~o ht implement
+        return $myHour < other.myHour;$
+            ^... ~o ht implement
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q5-a" no-wrong-phase>
+$!html {
+    <img
+        width="100" src="./img/2023-371-q5.png"
+        style="z-index:9999; position:absolute; left:0; top:0; transition:transform 0.2s; transform-origin:left top;"
+        onmouseover="this.style.transform='scale(8)'"
+        onmouseout="this.style.transform='scale(1)'">
+}
+$!html <img src="img/2023-371-q5-a.png"><br>
+class MyTime
+{
+    private int myHour;
+    private int myMinute;
+
+    // פונקצית עזר: מחזיר אמת עם אני לפני האחר
+    public boolean Before(MyTime other)
+    {
+        ...
+    }
+}
+
+public static void First(Parking[] cars) {
+    int min = $0;$
+        ^... ~o ht implement
+    for ($int i = 1; i < cars.Length; i++$)
+        ^... ~o ht implement
+    {
+        if ($cars[i].GetIn()$.Before($cars[min].GetIn()$))
+                ^.. ~o ht implement
+                ^... ~o ht implement    {+}
+            min = $i;$
+                ^... ~o ht implement
+    }
+    Console.WriteLine($cars[min].GetId()$);
+        ^... ~o ht implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q5-b-1" no-wrong-phase>
+$!html {
+    <img
+        width="100" src="./img/2023-371-q5.png"
+        style="z-index:9999; position:absolute; left:0; top:0; transition:transform 0.2s; transform-origin:left top;"
+        onmouseover="this.style.transform='scale(8)'"
+        onmouseout="this.style.transform='scale(1)'">
+}
+$!html <img src="img/2023-371-q5-b-1.png">
+MyTime t1 = new MyTime(13,30);
+MyTime t2 = new MyTime(14,45);
+
+Print(t1.Diff(t2));
+Print(t2.Diff(t1));
+
+class MyTime
+{
+    private int myHour;
+    private int myMinute;
+
+    // פונקצית עזר: מחזיר זמן (דקות) שחלף ממני עד האחר 
+    public int Diff(MyTime other)
+    {
+        return Math.Abs(($60*myHour$ + $myMinute$) -
+                            ^... ~o ht implement
+                            ^... ~o ht implement    {+}
+                        ($60*other.myHour$ + $other.myMinute$));
+                            ^... ~o ht implement
+                            ^... ~o ht implement    {+}
+    }
+}
+
+class Parking
+{
+    private string id;
+    private MyTime in;
+    private MyTime out;
+
+    public int Total()
+    {
+        return $this.out.$Diff($this.in$);
+            ^.. ~o ht implement
+            ^... ~o ht implement    {+}
+    }
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q5-b-2" no-wrong-phase>
+$!html {
+    <img
+        width="100" src="./img/2023-371-q5.png"
+        style="z-index:9999; position:absolute; left:0; top:0; transition:transform 0.2s; transform-origin:left top;"
+        onmouseover="this.style.transform='scale(8)'"
+        onmouseout="this.style.transform='scale(1)'">
+}
+$!html <img src="img/2023-371-q5-b-2.png">
+Parking[] cars = new Parking[]
+{
+    new Parking("11-111-11", new MyTime(12,30), new MyTime(14,15)),
+    new Parking("22-222-22", new MyTime(11,30), new MyTime(13,45)),
+    new Parking("33-333-33", new MyTime(7,10), new MyTime(10,10)),
+    new Parking("44-444-44", new MyTime(9,15), new MyTime(11,30)),
+};
+
+Print(SumMoney(cars));      // $90$
+    ^... ~g hr result
+
+public static int SumMoney(Parking[] cars)
+{
+    int sum = $0;$
+        ^... ~o ht implement
+    foreach ($Parking car in cars$) {
+            ^... ~o ht implement
+        int mins = $car.Total();$
+            ^... ~o ht implement
+        if ($mins > 120$)
+                ^... ~o ht implement
+            sum += $mins - 120;$
+                ^... ~o ht implement
+    }
+    return $sum;$
+        ^... ~o ht implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q6" as-html>
+<img-areas
+    src="img/2023-371-q6.png"
+    hide="[[0,44,100,56]]">
+</img-areas>
+<img-areas width="360"
+    src="img/2023-371-q6-example.png"
+    hide="[[0,2,100,100]]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q6-a" as-html>
+<img width=200 src="img/2023-371-q6.png" class="absolute left-0 top-10 mb-4 zzz">
+<style>
+    .zzz { 
+        z-index: 999;
+        transition: transform 0.2s;
+        transform-origin: left top;
+    }
+    .zzz:hover {
+        transform: scale(4);
+    }
+</style>
+<br><br><br><br>
+<img src="img/2023-371-q6-a.png">
+<img-areas width=600
+    src="img/2023-371-q6-a-sol.png"
+    hide="[
+        [3,80,14,15],[23,80,14,15],[42,80,14,15],[62,80,14,15],[81,80,14,15]
+    ]">
+</img-areas>
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="q6-b" no-wrong-phase>
+$!html {
+    <img
+        width="200" src="./img/2023-371-q6.png"
+        style="z-index:9999; position:absolute; left:0; top:0; transition:transform 0.2s; transform-origin:left top;"
+        onmouseover="this.style.transform='scale(4)'"
+        onmouseout="this.style.transform='scale(1)'">
+}
+$!html <img src="img/2023-371-q6-b.png"><br>
+Print(ArrToString(new char[] {'W', 'o', 'r', 'l', 'd'}));   // $World$
+    ^... ~g hr result
+
+// פונקצית עזר: מקבלת מערך של תווים 
+// ומחזירה אותם כמחרוזת
+public static string ArrToString(char[] chars) {
+    string str = $"";$
+        ^... ~o ht implement
+    for ($int i = 0; i < chars.Length; i++$)
+        ^... ~o ht implement
+        str = $str + chars[i];$
+            ^... ~o ht implement
+    return $str;$
+        ^... ~o ht implement
+}
+
+public static string OriginalText(string str, int[] arr) {
+    char[] chars = $new char[arr.length];$
+        ^... ~o ht implement
+    for ($int i = 0; i < arr.Length; i++$)
+        ^... ~o ht implement
+    {
+        int indx = $arr[i];$
+            ^... ~o ht implement
+        chars[indx] = $str[i];$
+            ^... ~o ht implement
+    }
+    return $StrToString(chars);$
+        ^... ~o ht implement
+}
+</drill>
+
+<!---------------------------------------------------------->
+
+<drill lang="java" id="">
+</drill>
+
+</template>
