@@ -13,11 +13,14 @@
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="variables-and-values" no-wrong-phase>
+<drill
+    lang="java" id="variables-and-values" no-wrong-phase
+    youtube=""
+>
 int a = 10;         // 10
 int b = a + 10;     // $20$
                         ^? ~g hr result
-int b = "a";        // $❌ Can't assign string to int$
+b = "a";            // $❌ Can't assign string to int$
                         ^? ~g hr result
 double pi = 3.14;   // 3.14
 int x = pi;         // $❌ Can't assign double to int$
