@@ -280,7 +280,9 @@ public static $void $$foo$(int num) {   {1}
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="isEven()">
+<drill lang="java" id="isEven()"
+    youtube="https://youtu.be/CozZBsGvoiY"
+>
 public static boolean $isEven$(int num) {
         ^what ~g hb func-name
     $return $num % 2 == 0$;$            {1}
@@ -297,7 +299,9 @@ public static boolean $isEven$(int num) {
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="pythagorasTripple()">
+<drill lang="java" id="pythagorasTripple()"
+    youtube="https://youtu.be/rXPZqLoHOMI"
+>
 $public static$ $boolean $$pythagorasTripple$(int $a$$,$ int $b$$,$ int c) {
         ~r hr return-type
         ^$
@@ -328,7 +332,9 @@ print($pythagorasTripple$(3,4,7));    // $false$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="countDigit()">
+<drill lang="java" id="countDigit()"
+    youtube="https://youtu.be/APBshNwHomY"
+>
 public static int countDigit(int num, $int $$digit$) {
         ^$
         ~r hb type-is-missing
@@ -350,7 +356,9 @@ public static int countDigit(int num, $int $$digit$) {
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="digitSum()">
+<drill lang="java" id="digitSum()"
+    youtube="https://youtu.be/8C2ZZovqW5w"
+>
 $public static$ $int $$digitSum$(int num) {
         ~r hr return-type
         ^$
@@ -375,7 +383,9 @@ $digitSum$(123456789);        // $45$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="reverse()"> 
+<drill lang="java" id="reverse()"
+    youtube="https://youtu.be/ssSbbrZ0dBo"
+> 
 public static int $reverse$($int $$num$) {
         ^what ~g hr func-name   {1}
         ^$ ~t                   {+}
@@ -401,7 +411,7 @@ public static boolean $palindrome$(int num) {
         ^secret ~g hr func-name   {3}
     return num $==$ $reverse$(num);
         ^= ~r ht assign-vs-comp
-        ^what ~g ht func-name
+        ^what ~g ht func-name       {1}
 }
 
 print($palindrome$(123321));        // $true$
@@ -414,7 +424,9 @@ print($palindrome$(123123));        // $false$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="boom-3">
+<drill lang="java" id="boom-3"
+    youtube="https://youtu.be/r0X0E9RqRZs"
+>
 public static void say(int num) {
     boolean endsWith3 = num % 10 == 3;
     boolean factorOf3 = num % 3 == 0;
@@ -448,7 +460,9 @@ say(10);        // $10$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="primeNumber()">
+<drill lang="java" id="primeNumber()"
+    youtube="https://youtu.be/nknqA1Hc4Wc"
+>
 public static boolean $factor$(int a, int b) {
         ^secret ~g ht func-name       {3}
     return a % b $==$ 0$;$
@@ -490,7 +504,9 @@ print($primeNumber$(43));         // $true$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="local-var">
+<drill lang="java" id="local-var"
+    youtube="https://youtu.be/tBf_UVu8cl0"
+>
 public static $int$ findIndex(int[] arr, int num) {
         ^void ~r ht return-what
 -    int foundAtIndex = -1;                 {2}
