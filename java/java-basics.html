@@ -129,7 +129,9 @@ x != 5 && ok        // $false$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="basic-logic" no-wrong-phase>
+<drill lang="java" id="basic-logic" no-wrong-phase
+    youtube="https://youtu.be/4btZSAR8OCU"
+>
 System.out.println(10 + 20);        // $30$
                                         ^? ~g hr result
 System.out.println("10" + "20");    // $1020$
@@ -161,7 +163,9 @@ n = ?                       // $22$                     {2}
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="more-logic" no-wrong-phase>
+<drill lang="java" id="more-logic" no-wrong-phase
+    youtube="https://youtu.be/qIAjXJvL3KI"
+>
 int n1 = 10;
 int n2 = 20;
 
@@ -218,7 +222,7 @@ $public static$ $int $$min$($int $$a$, $int $$b$) {
 }
 
 $min$(10, 20);     // $10$
-    ^what ~g hr func-name   {1}
+    ^what ~g hr func-name   {1}!
     ^?$ ~g hr result        {+}
 $min$(20, 10);     // $10$
     ^what ~g hr func-name   {1}
