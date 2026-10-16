@@ -37,10 +37,6 @@ String name = $"$$Java$$"$;
                 ^$
                 ~r hr var-or-string
                 ^$ 
-
-System.out.println("The value of pi is: " + pi);
-                // $The value of pi is: 3.14$
-    ^? ~g hr result
 </drill>
 
 <!---------------------------------------------------------->
@@ -109,7 +105,9 @@ int n2 = 123.0;     // $❌ Can't assign double to int$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="variables-and-operations" no-wrong-phase>
+<drill lang="java" id="variables-and-operations" no-wrong-phase
+    youtube="https://youtu.be/047G3ojulrs"
+>
 int x = 5;
 double y = 3.14;
 boolean ok = true;
@@ -136,6 +134,10 @@ System.out.println(10 + 20);        // $30$
                                         ^? ~g hr result
 System.out.println("10" + "20");    // $1020$
                                         ^? ~g hr result
+
+System.out.println("The value of pi is: " + pi);
+                // $The value of pi is: 3.14$
+    ^? ~g hr result
 
 int n1 = 1;
 n1 += 2;
