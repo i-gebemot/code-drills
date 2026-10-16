@@ -202,7 +202,9 @@ print((n1 + 5) == (n2 - 5));       // $true$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="min()">
+<drill lang="java" id="min()"
+    youtube="https://youtu.be/c3tY-rLVAyg"
+>
 $public static$ $int $$min$($int $$a$, $int $$b$) {
         ~r hr return-type
         ^$
@@ -231,7 +233,9 @@ $min$(20, 10);     // $10$
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="itsTriangle()">
+<drill lang="java" id="itsTriangle()"
+    youtube="https://youtu.be/4vveTeMNF2o"
+>
 public static $boolean $$itsTriangle$(int a$,$ int b$,$ int c) {
 ^$
 ~r hr return-type
@@ -256,7 +260,9 @@ public static $boolean $$itsTriangle$(int a$,$ int b$,$ int c) {
 
 <!---------------------------------------------------------->
 
-<drill lang="java" id="redundant-if">
+<drill lang="java" id="redundant-if"
+    youtube="https://youtu.be/4Ia7-sQrR_k"
+>
 public static $void $$foo$(int num) {   {1}
               ^$
               ~r hb return-type
@@ -313,7 +319,7 @@ $public static$ $boolean $$pythagorasTripple$(int $a$$,$ int $b$$,$ int c) {
 }
 
 print($pythagorasTripple$(3,4,5));    // $true$
-        ^what ~g hr func-name   {1}
+        ^what ~g hr func-name   {1}!
         ^?$ ~g hr result        {+}
 print($pythagorasTripple$(3,4,7));    // $false$
         ^what ~g hr func-name   {1}
@@ -363,7 +369,7 @@ $public static$ $int $$digitSum$(int num) {
 }
 
 $digitSum$(123456789);        // $45$
-    ^what ~g hr func-name   {1}
+    ^what ~g hr func-name   {1}!
     ^? ~g hl result         {+}
 </drill>
 
@@ -388,20 +394,21 @@ public static int $reverse$($int $$num$) {
 }
 
 print($reverse$(123456789));        // $987654321$
-    ^what ~g hr func-name   {1}
+    ^what ~g hr func-name   {1}!
     ^? ~g hl result         {+}
 
 public static boolean $palindrome$(int num) {
-        ^what ~g hr func-name   {3}
-    return num $==$ reverse(num);
+        ^secret ~g hr func-name   {3}
+    return num $==$ $reverse$(num);
         ^= ~r ht assign-vs-comp
+        ^what ~g ht func-name
 }
 
 print($palindrome$(123321));        // $true$
-    ^what ~g hr func-name   {3}
+    ^secret ~g hr func-name   {3}!
     ^? ~g hl result         {+}
 print($palindrome$(123123));        // $false$
-    ^what ~g hr func-name   {3}
+    ^secret ~g hr func-name   {3}
     ^? ~g hl result         {+}
 </drill>
 
@@ -428,30 +435,34 @@ public static void say(int num) {
 }
 
 say(13);        // $Boom$
-                    ^? ~g ht result
+                    ~t ~m
 say(3);         // $Boom boom$
-                    ^? ~g ht result
+                    ~t ~m
 say(12);        // $Boom$
-                    ^? ~g ht result
+                    ~t ~m
 say(0);         // $Boom$
-                    ^? ~g ht result
+                    ~t ~m
 say(10);        // $10$
-                    ^? ~g ht result
+                    ~t ~m
 </drill>
 
 <!---------------------------------------------------------->
 
 <drill lang="java" id="primeNumber()">
-public static boolean factor(int a, int b) {
+public static boolean $factor$(int a, int b) {
+        ^secret ~g ht func-name       {3}
     return a % b $==$ 0$;$
         ^= ~r hr assign-vs-comp
-        ^ $ ~r hr end-of-op
+        ^ $ ~r hr end-of-op         {+}
 }
 
-print(factor(12, 4));       // $true$
-    ^? ~g hl result
-print(factor(12, 5));       // $false$
+print($factor$(12, 4));       // $true$
+    ^secret ~g ht func-name           {3}
+    ^? ~g hl result                 {+}
+print($factor$(12, 5));       // $false$$$
+    ^secret ~g ht func-name           {3}
     ^? ~g hl result         {+}
+    ^$ ~t {3}!
 
 public static boolean $primeNumber$(int num) {
         ^what ~g hr func-name   {1}
@@ -470,7 +481,7 @@ public static boolean $primeNumber$(int num) {
 }
 
 print($primeNumber$(100));        // $false$
-    ^what ~g hr func-name   {1}
+    ^what ~g hr func-name   {1}!
     ^? ~g hl result         {+}
 print($primeNumber$(43));         // $true$
     ^what ~g hr func-name   {1}
