@@ -28,6 +28,7 @@ int x = pi;         // $❌ Can't assign double to int$
 char ch = 'A';      // 'A'
 a = ch;             // $65$
                         ^? ~g hr result
+                        
 boolean ok = $$$true$$$;
                 ^" 
                 ~r hr bool-or-string
@@ -36,6 +37,10 @@ String name = $"$$Java$$"$;
                 ^$
                 ~r hr var-or-string
                 ^$ 
+
+System.out.println("The value of pi is: " + pi);
+                // $The value of pi is: 3.14$
+    ^? ~g hr result
 </drill>
 
 <!---------------------------------------------------------->
@@ -56,9 +61,9 @@ n = (int) d;        // $123$
                             ^? ~g hr result
 y = pi;             // $❌ y is not defined$
                             ^? ~g hr result
-double d2 = n + d;  // $246.0$
+double d2 = n + pi; // $126.14$
                             ^? ~g hr result
-int n2 = 123.0;     // $error: can't assign double to int$
+int n2 = 123.0;     // $❌ Can't assign double to int$
                             ^? ~g hr result
 </drill>
 
